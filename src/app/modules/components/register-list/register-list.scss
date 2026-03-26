@@ -1,0 +1,639 @@
+
+@use'../../../../styling/variables.scss' as var;
+
+// Modal overlay spinner for editing registration
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-spinner {
+    background: #fff;
+    min-width: 220px;
+    max-width: 90vw;
+    min-height: 0;
+    padding: 4px 16px 8px 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+
+.modal-spinner-text {
+    font-size: 18px;
+    color: #1976d2;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+
+::ng-deep .BlueHeadTable table 
+{
+    thead 
+    {
+        .mat-mdc-header-row th
+        {
+            padding: 8px 5px;
+
+            &:first-child {
+                width: 3% !important;
+            }
+        }
+    }
+}
+
+.greenText {
+  // color: green;
+  color: #28a745;
+  font-weight: 450;
+}
+
+.redText {
+  color: red;
+  font-weight: 450;
+}
+
+.blueText{
+color: blue;
+font-weight: 500;
+}
+
+table.mat-elevation-z8 * {
+  cursor: pointer;
+}
+
+// .filter-box {
+//   background: #f9f9f9;
+//   padding: 10px;
+//   border-radius: 6px;
+//   border: 1px solid #ddd;
+// }
+// .w-200 {
+//   width: 200px;
+// }
+.filter-container {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 8px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 16px;
+    background: var.$input-bgcolor;
+    border-radius: 6px;
+    border: 1px solid var.$color-border-light;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    min-width: 600px;
+
+    ::ng-deep .mat-mdc-form-field {
+        margin-bottom: 0;
+
+        .mat-mdc-text-field-wrapper {
+            background-color: var.$input-bgcolor;
+            height: 40px;
+        }
+
+        .mdc-text-field {
+            height: 40px;
+            padding: 0 12px;
+        }
+
+        .mat-mdc-form-field-infix {
+            min-height: 40px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+        }
+
+        &.mat-focused {
+            .mdc-notched-outline__leading,
+            .mdc-notched-outline__notch,
+            .mdc-notched-outline__trailing {
+                border-color: var.$color-primary !important;
+            }
+        }
+
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+            border-color: var.$color-border-light;
+        }
+
+        .mdc-notched-outline__leading {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .mdc-notched-outline__trailing {
+            border-radius: 0 4px 4px 0;
+        }
+
+        .mat-mdc-floating-label {
+            color: var.$color-text-muted;
+            font-size: var.$input-text-fontsize;
+            top: 20px;
+        }
+
+        input.mat-mdc-input-element {
+            font-size: var.$input-text-fontsize;
+            color: var.$color-text-default;
+            padding: 0;
+        }
+
+        .mat-mdc-select-trigger {
+            height: 40px;
+        }
+    }
+
+    .filter-select {
+        width: 180px;
+
+        ::ng-deep .mat-mdc-select {
+            font-size: 13px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        ::ng-deep .mat-mdc-select-value {
+            text-align: center;
+        }
+
+        ::ng-deep .mat-mdc-select-value-text {
+            text-align: center;
+            font-size: 13px;
+            color: var.$color-text-default;
+            font-weight: 500;
+        }
+
+        ::ng-deep .mat-mdc-floating-label {
+            font-size: 12px;
+            font-weight: 400;
+        }
+    }
+
+    .filter-input {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .search-icon-btn {
+        color: var.$color-primary;
+        width: 40px;
+        height: 40px;
+        margin-bottom: 4px;
+        background-color: var.$color-primary;
+        border-radius: 4px;
+        
+        ::ng-deep .mat-icon {
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+            color: #fff;
+        }
+        
+        &:hover:not(:disabled) {
+            background-color: #031f5e;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        &:disabled {
+            background-color: rgba(0, 0, 0, 0.12);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+}
+
+// Adjust parent positioning
+.RightSideItems {
+    position: relative;
+}
+
+.ControlIcons.filter-active {
+    background-color: var.$color-primary;
+    color: #fff;
+    border-radius: 4px;
+    padding: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.status-btn {
+    min-width: 86px;
+    height: 30px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    color: var.$color-text-white !important;
+    background-color: var.$color-primary !important;
+    border: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 2px 0px #00000026;
+      width: 70%;
+    white-space: nowrap;
+    margin: 0px auto;
+
+    &:hover:not(:disabled) {
+        background-color: #031f5e !important;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+    }
+}
+
+// Override Material Select Panel styles
+::ng-deep .mat-mdc-select-panel {
+    background: var.$select-dropdown-bgcolor !important;
+    
+    .mat-mdc-option {
+        font-size: var.$input-text-fontsize;
+        min-height: 40px;
+        background-color: var.$select-dropdown-bgcolor !important;
+        color: var.$color-text-default !important;
+        
+        .mdc-list-item__primary-text {
+            color: var.$color-text-default !important;
+            opacity: 1 !important;
+        }
+        
+        &.mdc-list-item--selected {
+            background-color: var.$color-primary-lighter !important;
+            
+            .mdc-list-item__primary-text {
+                color: var.$color-primary !important;
+                font-weight: 500;
+            }
+        }
+        
+        &.mat-mdc-option-active {
+            background-color: var.$color-primary-hover !important;
+        }
+        
+        &:hover {
+            background-color: var.$color-primary-lighter !important;
+        }
+    }
+}
+
+// No data found message styling
+.no-data-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    color: var.$color-text-muted;
+    background-color: var.$color-bg-light;
+    border-radius: 6px;
+    margin-top: 20px;
+
+    i {
+        font-size: 24px;
+        color: var.$color-primary;
+    }
+
+    p {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: var.$color-text-default;
+    }
+}
+
+// Progress bar styling for loading UCC data
+.progress-container {
+    background: var.$input-bgcolor;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid var.$color-border-light;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.loading-text {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var.$color-primary;
+    text-align: center;
+}
+
+::ng-deep .progress-container .p-progressbar {
+    border-radius: 6px;
+    background-color: var.$color-primary-lighter !important;
+    height: 6px !important;
+    max-width: 600px;
+    width: 100%;
+}
+
+::ng-deep .progress-container .p-progressbar-value {
+    background: linear-gradient(90deg, var.$color-primary 0%, #0652DD 100%) !important;
+    animation: progressAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes progressAnimation {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+// img .alert-icon {
+//   width:16px;
+//    height:16px;
+//     margin-right:6px;
+// }
+
+// .alert-list {
+//   text-align: left;
+// }
+
+// .alert-item {
+//   margin-bottom: 6px;
+//   display: flex;
+//   align-items: center;
+// }
+
+// .alert-icon {
+//   width: 16px;
+//   height: 16px;
+//   margin-right: 6px;
+// }
+
+// .alert-text {
+//   color: #C8102E;
+// }
+
+// .validation-message {
+//   text-align: left;
+
+//   &-header {
+//     color: black;
+//     font-weight: 600;
+//   }
+
+//   &-list {
+//     list-style: none;
+//     padding: 0;
+//     margin: 0;
+
+//   }
+
+//   &-item {
+//     margin-bottom: 6px;
+//     display: flex;
+//     align-items: center;
+  
+//   }
+
+//   &-icon {
+//     width: 16px;
+//     height: 16px;
+//     margin-right: 6px;
+//   }
+
+//   &-text {
+//     color: #C8102E;
+//     font-size: 13px;
+//   }
+
+
+// }
+
+
+///// ason 23-02-2026 
+/// // ...existing code...
+
+.edit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.edit-modal-container {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.edit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  border-radius: 8px 8px 0 0;
+
+  .edit-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .header-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .header-client-info {
+      font-size: 13px;
+      color: #999;
+      font-weight: 500;
+      padding: 6px 12px;
+      background-color: #e8e8e8;
+      border-radius: 4px;
+      min-width: 100px;
+      text-align: center;
+    }
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.edit-modal-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+
+  .edit-details-menu {
+    width: 100%;
+    padding: 15px 0;
+    overflow-y: auto;
+    background-color: #fff;
+
+    .edit-menu-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 12px 15px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
+      transition: all 0.3s ease;
+      text-align: left;
+
+      i {
+        margin-right: 12px;
+        font-size: 16px;
+        min-width: 20px;
+        color: #1976d2;
+      }
+
+      span {
+        flex: 1;
+      }
+
+      &:hover {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+
+      &.active {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border-left: 4px solid #1976d2;
+        padding-left: 11px;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.edit-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+// Scrollbar styling
+.edit-details-menu::-webkit-scrollbar,
+.edit-details-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.edit-details-menu::-webkit-scrollbar-track,
+.edit-details-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.edit-details-menu::-webkit-scrollbar-thumb,
+.edit-details-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+
+  &:hover {
+    background: #555;
+  }
+}
+
+// ✅ ACTION BUTTON STYLING
+.action-icon-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #1976d2;
+  font-size: 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  i {
+    display: inline-block;
+  }
+}

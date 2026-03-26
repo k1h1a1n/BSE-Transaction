@@ -1,0 +1,15 @@
+  {
+  "ConfigData": {
+    "baseUrl": "https://wmentdataserviceapiuat.wm-enterprise.com/api",
+    "sideMenuUrl": "http://mftransaction.imagicuat.in/api",
+    "baseUrlMF": "https://wmentdataserviceapiuat.wm-enterprise.com/PortfolioAPI",
+    "baseVMPROUrl": "https://vmproblserver.wealthmagic.in/api",
+    "ecasurl": "https://wmentdataserviceapiuat.wm-enterprise.com/WMFinauraAPI/api",
+    "onboarding": "https://entifaonbrd.wm-enterprise.com",
+    "ssoUrl": "http://sblogin.imagicuat.in/api",
+    "uccUrl": "http://wmentucccoreapi.imagicuat.in/api",
+    "elogUccUrl": "http://wmentsbonbapi.imagicuat.in/api",
+    "isMobileOTP": false,
+    "termsAndCondUrl": ""
+  }
+}

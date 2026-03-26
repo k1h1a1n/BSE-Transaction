@@ -1,0 +1,520 @@
+<!-- <app-ucc-tabs [selectedIndex]="0" (onTabChange)="navigate($event)"></app-ucc-tabs> -->
+
+<!-- /end here -->
+<!-- <app-sso></app-sso> -->
+
+
+<div>
+    <!-- <h5 class="PageHeading">BSE - Register Investors</h5> -->
+
+
+    <div class="MainPageCntnr" [formGroup]="registrationForm">
+        <div class="MaingPage_InnerNavHead">
+            <div class="LeftSideItems">
+                <span class="BackNavigation"><i class="pi pi-angle-left"></i>Register Investors</span>
+            </div>
+            <div class="RightSideItems">
+                <span class="ControlIcons">
+                    <i class="pi pi-sync"></i>
+                </span>
+            </div>
+        </div>
+
+          <div class="row mt-3 search-row" *ngIf="!isEdit">
+            <div class="col-4">
+                <div class="InputControl">
+                    <label>Search Group Code <span class="RedTxt">*</span></label>
+                    <div class="search-group-container" *ngIf="!editMode">
+                        <p-autoComplete
+                            formControlName="groupSearch"
+                            [suggestions]="filteredGroups"
+                            field="GroupDescription"
+                            dataKey="GroupID"
+                            [minLength]="3"
+                            [forceSelection]="true"
+                            [showClear]="true"
+                            [dropdown]="false"
+                            [disabled]="isGroupLookupLoading"
+                            inputStyleClass="Width100perc search-input"
+                            placeholder="Search or select Group Code..."
+                            (completeMethod)="onGroupComplete($event)"
+                            (onSelect)="onGroupSelect($event)"
+                            (onClear)="clearGroupSelection()">
+                            <ng-template let-group pTemplate="item">
+                                <div class="group-description">{{ group.GroupDescription }}</div>
+                            </ng-template>
+                            <ng-template pTemplate="empty">
+                                <div class="no-results" *ngIf="registrationForm.get('groupSearch')?.value?.length >= 3">
+                                    <i class="pi pi-info-circle"></i> No matching groups found
+                                </div>
+                            </ng-template>
+                        </p-autoComplete>
+
+                        <div *ngIf="isGroupLookupLoading" class="status-message">
+                            <i class="pi pi-spin pi-spinner"></i>
+                            <span>Fetching group codes...</span>
+                        </div>
+
+                        <div *ngIf="groupLookupError && !isGroupLookupLoading" class="error-message server-error">
+                            <i class="pi pi-times-circle"></i>
+                            <span>{{ groupLookupError }}</span>
+                            <button type="button" class="retry-link" (click)="getGroupByLogin()" [disabled]="isGroupLookupLoading">
+                                Retry
+                            </button>
+                        </div>
+
+                        <div *ngIf="registrationForm.controls['groupId'].touched && registrationForm.controls['groupId'].hasError('required')"
+                            class="error-message">
+                            Group ID is required
+                        </div>
+                        <div *ngIf="registrationForm.get('groupSearch')?.value && !registrationForm.get('groupId')?.value && registrationForm.get('groupSearch')?.touched"
+                            class="error-message">
+                            Please select a valid Group ID from the list
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="InputControl">
+                    <label>Select Member <span class="RedTxt">*</span></label>
+                    <div class="search-member-container">
+                        <mat-form-field class="Width100perc">
+                            <mat-select
+                                formControlName="memberName"
+                                placeholder="Select member..."
+                                [disabled]="!registrationForm.get('groupId')?.value"
+                                (selectionChange)="selectMember($event.value)">
+                                <mat-option value="" disabled>Select member...</mat-option>
+                                <mat-option *ngFor="let member of filteredMembers" [value]="member.LookUpID">
+                                    {{ member.LookUpDescription }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="!registrationForm.get('groupId')?.value && registrationForm.get('memberSearch')?.touched"
+                            class="error-message">
+                            <i class="pi pi-exclamation-triangle"></i> Please select a Group ID first
+                        </div>
+                        <div *ngIf="registrationForm.controls['memberName'].touched && registrationForm.controls['memberName'].hasError('required')"
+                            class="error-message">
+                            Member is required
+                        </div>
+                        <div *ngIf="registrationForm.get('memberSearch')?.value && !registrationForm.get('memberName')?.value && registrationForm.get('memberSearch')?.touched"
+                            class="error-message">
+                            Please select a valid member from the list
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div *ngIf="registrationForm.get('groupId')?.value && registrationForm.get('memberName')?.value"> -->
+        <div class="GreyBoxCntnr mt-3">
+            <div class="row ">
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label>Registration Type</label>
+
+                        <p-selectbutton [options]="registrationTypeOptions" formControlName="registrationType"
+                            optionLabel="label" optionValue="value" aria-labelledby="basic"
+                            class="Width100perc registration-type" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label>BSE Client ID <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="bseClientCode" required
+                            maxlength="10" (keypress)="restrictSpecialCharacters($event)" />
+
+                        <div *ngIf="registrationForm.controls['bseClientCode'].touched && registrationForm.controls['bseClientCode'].hasError('required')"
+                            class="error-message">
+                            BSE Client Code is required
+                        </div>
+                        <div *ngIf="registrationForm.controls['bseClientCode'].touched && registrationForm.controls['bseClientCode'].hasError('pattern')"
+                            class="error-message">
+                            Only letters and numbers are allowed
+                        </div>
+                        <div *ngIf="registrationForm.controls['bseClientCode'].touched && registrationForm.controls['bseClientCode'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 10 characters allowed
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label>Tax Type <span class="RedTxt">*</span></label>
+
+                        <mat-form-field>
+                            <mat-select formControlName="taxStatus">
+                                <mat-option value="" disabled>Select Tax Status </mat-option>
+                                <mat-option *ngFor="let status of taxStatusList" [value]="status.value">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="registrationForm.controls['taxStatus'].touched && registrationForm.controls['taxStatus'].hasError('required')"
+                            class="error-message">
+                            Tax Status is required
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label>Holding Pattern <span class="RedTxt">*</span></label>
+
+                        <mat-form-field>
+                            <mat-select formControlName="holdingPattern">
+                                <mat-option value="" disabled>Select Holding Pattern </mat-option>
+                                <mat-option *ngFor="let status of holdingPatternList" [value]="status.value">{{
+                                    status.label }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="registrationForm.controls['holdingPattern'].touched && registrationForm.controls['holdingPattern'].hasError('required')"
+                            class="error-message">
+                            Holding Pattern is required
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-3">
+                <div class="col-2">
+
+                    <div class="InputControl">
+                        <label>Nominee Opted <span class="RedTxt">*</span></label>
+                        <mat-radio-group class="Width100perc d-flex" aria-label="Select an option"
+                            formControlName="nominationOpted"
+                           >
+                            <mat-radio-button value="Y">Yes</mat-radio-button>
+                            <mat-radio-button value="N">No</mat-radio-button>
+                        </mat-radio-group>
+
+                        <div *ngIf="registrationForm.controls['nominationOpted'].touched && registrationForm.controls['nominationOpted'].hasError('required')"
+                            class="error-message">
+                            Nomination Opted is required
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label>Nomination Authentication <span class="RedTxt">*</span></label>
+                        <mat-radio-group class="Width100perc d-flex" aria-label="Select an option"
+                            formControlName="nominationAuthentication">
+                            <mat-radio-button value="O">Online</mat-radio-button>
+                            <mat-radio-button value="W">Wet Signature</mat-radio-button>
+                        </mat-radio-group>
+
+                        <div *ngIf="registrationForm.controls['nominationAuthentication'].touched && registrationForm.controls['nominationAuthentication'].hasError('required')"
+                            class="error-message">
+                            Nomination Authentication is required
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="TabInputCntnr mt-3">
+            <h5 class="TabCntnrHead mb-0">Personal Details <span class="RedTxt">*</span></h5>
+            <div class="TabInputSect">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>First Name <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="firstName" required
+                                maxlength="25" />
+
+
+                            <!-- <input 
+    type="text"
+    pInputText
+    class="Width100perc"
+    formControlName="firstName"
+    maxlength="25"
+ (focus)="openDropdown()"
+  (input)="syncSearchText()"
+
+ 
+/>
+
+<ul *ngIf="dropdownOpen && filteredMembers.length > 0" class="dropdown-list">
+    <li *ngFor="let member of filteredMembers" (click)="selectMember(member)">
+        {{ member.LookUpDescription }}
+    </li>
+</ul>  -->
+
+                            <div *ngIf="registrationForm.controls['firstName'].touched && registrationForm.controls['firstName'].hasError('required')"
+                                class="error-message">
+                                First Name is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['firstName'].touched && registrationForm.controls['firstName'].hasError('pattern')"
+                                class="error-message">
+                                Only letters and spaces are allowed
+                            </div>
+                            <div *ngIf="registrationForm.controls['firstName'].touched && registrationForm.controls['firstName'].hasError('minlength')"
+                                class="error-message">
+                                First Name must be at least 2 characters
+                            </div>
+                            <div *ngIf="registrationForm.controls['firstName'].touched && registrationForm.controls['firstName'].hasError('maxlength')"
+                                class="error-message">
+                                First Name cannot exceed 25 characters
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Middle Name </label>
+                            <input type="text" pInputText class="Width100perc" formControlName="middleName"
+                                maxlength="25" (input)="allowOnlyChars($event,'middleName')" />
+                            <div *ngIf="registrationForm.controls['middleName'].touched && registrationForm.controls['middleName'].hasError('pattern')"
+                                class="error-message">
+                                Only letters and spaces are allowed
+                            </div>
+                            <div *ngIf="registrationForm.controls['middleName'].touched && registrationForm.controls['middleName'].hasError('minlength')"
+                                class="error-message">
+                                Middle Name must be at least 1 character
+                            </div>
+                            <div *ngIf="registrationForm.controls['middleName'].touched && registrationForm.controls['middleName'].hasError('maxlength')"
+                                class="error-message">
+                                Middle Name cannot exceed 25 characters
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Last Name <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="lastName" maxlength="25"
+                                required (input)="allowOnlyChars($event,'lastName')" />
+
+                            <div *ngIf="registrationForm.controls['lastName'].touched && registrationForm.controls['lastName'].hasError('required')"
+                                class="error-message">
+                                Last Name is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['lastName'].touched && registrationForm.controls['lastName'].hasError('pattern')"
+                                class="error-message">
+                                Only letters and spaces are allowed
+                            </div>
+                            <div *ngIf="registrationForm.controls['lastName'].touched && registrationForm.controls['lastName'].hasError('minlength')"
+                                class="error-message">
+                                Last Name must be at least 2 characters
+                            </div>
+                            <div *ngIf="registrationForm.controls['lastName'].touched && registrationForm.controls['lastName'].hasError('maxlength')"
+                                class="error-message">
+                                Last Name cannot exceed 25 characters
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>PAN Number <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="pan"
+                                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" />
+                            <div *ngIf="registrationForm.controls['pan'].touched && registrationForm.controls['pan'].hasError('required')"
+                                class="error-message">
+                                PAN is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['pan'].touched && registrationForm.controls['pan'].hasError('pattern')"
+                                class="error-message">
+                                Enter a valid PAN (e.g., ABCDE1234F)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Gender<span class="RedTxt">*</span></label>
+                            <mat-radio-group class="Width100perc d-flex" aria-label="Select an option"
+                                formControlName="gender">
+                                <mat-radio-button value="F">Female</mat-radio-button>
+                                <mat-radio-button value="M">Male</mat-radio-button>
+                            </mat-radio-group>
+
+                            <div *ngIf="registrationForm.controls['gender'].touched && registrationForm.controls['gender'].hasError('required')"
+                                class="error-message">
+                                Gender is required
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>DOB <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="dob" type="date"
+                                [max]="today" />
+                            <div *ngIf="registrationForm.controls['dob'].touched && registrationForm.controls['dob'].hasError('required')"
+                                class="error-message">
+                                Date of Birth is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['dob'].touched && registrationForm.controls['dob'].hasError('underage')"
+                                class="error-message">
+                                You must be at least 18 years old.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Occupation <span class="RedTxt">*</span></label>
+                            <!-- <select id="occupation" formControlName="occupation" required>
+                                <option value="" disabled>Select Occupation</option>
+                                <option *ngFor="let occupation of occupationList" [value]="occupation.key">
+                                    {{ occupation.value }}
+                                </option>
+                            </select> -->
+
+                            <mat-form-field>
+                                <!-- <mat-label>Select</mat-label> -->
+                                <mat-select formControlName="occupation">
+                                    <mat-option value="" disabled>Select Occupation </mat-option>
+                                    <mat-option *ngFor="let occupation of occupationList" [value]="occupation.key">{{
+                                        occupation.value }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <div *ngIf="registrationForm.controls['occupation'].touched && registrationForm.controls['occupation'].hasError('required')"
+                                class="error-message">
+                                Occupation is required
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Email Declaration <span class="RedTxt">*</span></label>
+                            <!-- <select id="occupation" formControlName="emailDeclaration" required>
+                                <option value="" disabled>Select Email Declaration</option>
+                                <option *ngFor="let occupation of emailDeclarationOptions" [value]="occupation.key">
+                                    {{ occupation.value }}
+                                </option>
+                            </select> -->
+                            <mat-form-field>
+                                <!-- <mat-label>Select</mat-label> -->
+                                <mat-select formControlName="emailDeclaration">
+                                    <mat-option value="" disabled>Select Email Declaration</mat-option>
+                                    <mat-option *ngFor="let occupation of emailDeclarationOptions"
+                                        [value]="occupation.key">{{ occupation.value }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <div *ngIf="registrationForm.controls['emailDeclaration'].touched && registrationForm.controls['emailDeclaration'].hasError('required')"
+                                class="error-message">
+                                Email Declaration is required
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Mobile Declaration <span class="RedTxt">*</span></label>
+                            <!-- <select id="occupation" formControlName="mobileDeclaration" required>
+                                <option value="" disabled>Select Mobile Declaration</option>
+                                <option *ngFor="let occupation of mobileDeclarationOptions" [value]="occupation.key">
+                                    {{ occupation.value }}
+                                </option>
+                            </select> -->
+                            <mat-form-field>
+                                <!-- <mat-label>Select</mat-label> -->
+                                <mat-select formControlName="mobileDeclaration">
+                                    <mat-option value="" disabled>Select Mobile Declaration</mat-option>
+                                    <mat-option *ngFor="let occupation of mobileDeclarationOptions"
+                                        [value]="occupation.key">{{ occupation.value }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <div *ngIf="registrationForm.controls['mobileDeclaration'].touched && registrationForm.controls['mobileDeclaration'].hasError('required')"
+                                class="error-message">
+                                Mobile Declaration is required
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Mobile Number <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="mobile" />
+                            <div *ngIf="registrationForm.controls['mobile'].touched && registrationForm.controls['mobile'].hasError('required')"
+                                class="error-message">
+                                Mobile Number is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['mobile'].touched && registrationForm.controls['mobile'].hasError('pattern')"
+                                class="error-message">
+                                Enter a valid 10-digit mobile number starting with 6, 7, 8, or 9
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Email Number <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="email" />
+                            <div *ngIf="registrationForm.controls['email'].touched && registrationForm.controls['email'].hasError('required')"
+                                class="error-message">
+                                Email is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['email'].touched && registrationForm.controls['email'].hasError('pattern')"
+                                class="error-message">
+                                Enter a valid Email Address
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-4">
+                                    <section class="example-section">
+                                        <mat-checkbox class="example-margin Width100perc"
+                                            formControlName="aadharLinked">Aadhar card linked with PAN
+                                            card</mat-checkbox>
+                                        <mat-checkbox class="example-margin Width100perc"
+                                            formControlName="kyc">KYC</mat-checkbox>
+                                    </section>
+                                </div> -->
+
+
+                    <!-- <div class="col-4">
+                        <div class="InputControl">
+                            <label>KYC Type <span class="RedTxt">*</span></label>
+                       <mat-form-field>
+  <mat-select formControlName="kycType">
+    <mat-option value="" disabled>Select KYC Type</mat-option>
+    <mat-option  *ngFor="let occupation of kycTypeOptions" [value]="occupation.key">{{ occupation.value }}</mat-option>
+  </mat-select>
+</mat-form-field>
+                            <div *ngIf="registrationForm.controls['kycType'].touched && registrationForm.controls['kycType'].hasError('required')"
+                                class="error-message">
+                                KYC Holder type is required
+                            </div>
+                        </div>
+                    </div> -->
+
+
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container mt-3" *ngIf="isLoading" [@slideDown]>
+            <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+            <p class="progress-text">⏳ Saving registration details...</p>
+        </div>
+        
+        <div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end ">
+            <button pButton class="Grey_OutlineBtn ms-1" (click)="goBack()"  [disabled]="isLoading">
+                <i class="pi pi-angle-left" pButtonIcon></i>
+                <span pButtonLabel>Back</span>
+            </button>
+            <button pButton class="Blue_FilledBtn ms-1" *ngIf="!isEdit" (click)="goToNextTab()" [disabled]="isLoading">
+                <span pButtonLabel>Save & Continue</span>
+            </button>
+               <button pButton class="Blue_FilledBtn ms-1" *ngIf="isEdit" (click)="updateDataandContinue()" [disabled]="isLoading">
+                <span pButtonLabel>Update & Continue</span>
+            </button>
+        </div>
+
+        <!-- </div> -->
+    <!-- </div> -->
+</div>
+</div>

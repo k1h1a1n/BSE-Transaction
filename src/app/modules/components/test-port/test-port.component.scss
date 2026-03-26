@@ -1,0 +1,22 @@
+@use '../../../../styling/variables.scss' as var;
+
+.TabMainCntnr { padding: 0 12px; }
+.TabInputCntnr { background: #fff; border: 1px solid #eef2f6; padding: 18px; border-radius: 8px; }
+.TabCntnrHead { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 12px; }
+.InputControl { margin-bottom: 12px; }
+.Width100perc { width: 100%; }
+.RedTxt { color: #d9534f; }
+.error-message { color: #f44336; font-size: 12px; margin-top: 6px; }
+
+.TabBtnSect { gap: 8px; }
+
+/* reuse dropdown-list styles used in nominee-detail */
+.dropdown-list { position: absolute; background: white; width: 100%; border: 1px solid #ccc; border-radius: 6px; max-height: 200px; overflow-y: auto; margin-top: 4px; padding: 0; list-style: none; z-index: 2000; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.dropdown-list li { padding: 10px; cursor: pointer; font-size: 14px; }
+.dropdown-list li:hover { background: #f1f1f1; }
+
+/* table styles */
+.nominee-table { width: 100%; border-collapse: collapse; }
+.nominee-table th, .nominee-table td { padding: 10px 12px; border: 1px solid #e6e9ef; }
+.empty-state-cell { text-align: center; padding: 0 !important; border: none !important; background-color: #f8f9fa; }
+

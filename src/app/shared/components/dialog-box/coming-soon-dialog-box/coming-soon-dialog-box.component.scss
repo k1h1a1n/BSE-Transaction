@@ -1,0 +1,32 @@
+.dialog-container {
+  min-width: 300px;
+  padding: 16px;
+
+  h2 {
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  mat-dialog-content {
+    font-size: 14px;
+    color: #333;
+  }
+
+  mat-dialog-actions {
+    margin-top: 16px;
+  }
+
+  button{
+   color: fcb900; 
+  }
+}
+
+
+p {
+   
+    font-size: 20px;
+}
+
+.mat-mdc-button:not(:disabled) {
+    color: #f44336;
+}

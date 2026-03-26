@@ -1,0 +1,65 @@
+::ng-deep .mat-mdc-dialog-inner-container {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border-radius: 20px;
+}
+::ng-deep .mat-mdc-dialog-container .mat-mdc-dialog-title {
+    text-align: center;
+    color: #000000;
+    letter-spacing: 0px;
+    font-size: 20px;
+    line-height: 0px;
+    font-weight: normal;
+    padding: 10px 5px;
+}
+::ng-deep .mat-mdc-dialog-container .mat-mdc-dialog-content {
+    text-align: center;
+    letter-spacing: 0px;
+    color: #FF0000;
+    font-size: 15px;
+    font-weight: normal;
+    padding: 15px 8px;
+}
+::ng-deep .btnOk {
+    background: #095BB8;
+    border-radius: 4px;
+    text-align: center;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    padding: 5px 40px;
+    font-size: 18px;
+    line-height: 30px;
+    margin-left: 10px;
+    font-style: normal;
+    font-weight: normal;
+    border: none;
+    outline: none;
+}
+::ng-deep .btnCancel {
+    background: #fcb900;
+    border-radius: 4px;
+    text-align: center;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    padding: 5px 40px;
+    font-size: 18px;
+    line-height: 30px;
+    font-style: normal;
+    font-weight: normal;
+    border: none;
+    outline: none;
+}
+::ng-deep .mat-mdc-dialog-actions button:focus {
+    border: none;
+    outline: 0;
+    box-shadow: none;
+}
+.img-fluid {
+    padding-top: 5px;
+    height: 55px;
+    width: 65px;
+}
+
+.mat-mdc-dialog-actions.mat-mdc-dialog-actions-align-end, .mat-mdc-dialog-actions[align=end]{
+    justify-content: space-around !important;
+    padding-top: 5px !important;
+}

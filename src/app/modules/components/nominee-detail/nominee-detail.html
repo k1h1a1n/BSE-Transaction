@@ -1,0 +1,574 @@
+<!-- <p>depo-bank-detail works!</p> -->
+<!-- <app-ucc-tabs [selectedIndex]="4" (onTabChange)="navigate($event)"></app-ucc-tabs> -->
+
+
+<div class="TabMainCntnr Width100perc mt-3">
+    <!-- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [formGroup]="nomineeForm"> -->
+    <!-- <mat-tab label="Nominee Details"> -->
+    <div class="TabInputCntnr mt-3" [formGroup]="nomineeForm">
+        <h5 class="TabCntnrHead mb-0">Nominee Details</h5>
+        <div class="TabInputSect">
+            <div class="row">
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Full Name <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="nomineeName" />
+
+                        <div *ngIf="nomineeForm.controls['nomineeName'].touched && nomineeForm.controls['nomineeName'].hasError('required')"
+                            class="error-message">
+                            Nominee Name is required
+                        </div>
+                        <div *ngIf="nomineeForm.controls['nomineeName'].touched && nomineeForm.controls['nomineeName'].hasError('pattern')"
+                            class="error-message">
+                            Only alphabets and spaces are allowed (2–25 characters)
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Relation</label> <span class="RedTxt">*</span>
+                        <!-- <select formControlName="relation">
+          <option value="">-- Select Relation --</option>
+          <option *ngFor="let relation of nomineeRelations" [value]="relation.value">{{ relation.label }}</option>
+        </select> -->
+
+
+                        <mat-form-field>
+                            <mat-select formControlName="relation">
+                                <mat-option value="" disabled>Select Relation </mat-option>
+                                <mat-option *ngFor="let status of nomineeRelations" [value]="status.value">{{
+                                    status.label }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="nomineeForm.controls['relation'].touched && nomineeForm.controls['relation'].hasError('required')"
+                            class="error-message">
+                            Relation is required
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Applicable(%) </label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="applicablePercentage">
+
+                        <div *ngIf="nomineeForm.controls['applicablePercentage'].touched && nomineeForm.controls['applicablePercentage'].hasError('required')"
+                            class="error-message">
+                            Applicable Percentage is required
+                        </div>
+                        <div *ngIf="nomineeForm.controls['applicablePercentage'].touched && nomineeForm.controls['applicablePercentage'].hasError('pattern')"
+                            class="error-message">
+                            Enter a valid percentage between 1 and 100 (up to 2 decimal places)
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-3">
+                                    <div class="InputControl">
+                                        <label> DOB</label>
+                                       <input type="date" pInputText class="Width100perc" formControlName="dob">
+                                    </div>
+                                </div> -->
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Identity Type</label> <span class="RedTxt">*</span>
+                        <!-- <select formControlName="identityType">
+          <option value="">-- Select Identity Type --</option>
+          <option *ngFor="let id of identityTypes" [value]="id.key">{{ id.label }}</option>
+        </select> -->
+                        <mat-form-field>
+                            <mat-select formControlName="identityType">
+                                <mat-option value="" disabled>Select Identity Type </mat-option>
+                                <mat-option *ngFor="let status of identityTypes" [value]="status.key">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+
+                        <div *ngIf="nomineeForm.controls['identityType'].touched && nomineeForm.controls['identityType'].hasError('required')"
+                            class="error-message">
+                            Identity type is required.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>ID No</label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="IDNumber"
+                            [attr.placeholder]="identityPlaceholder">
+
+                        <div *ngIf="nomineeForm.controls['IDNumber'].touched && nomineeForm.controls['IDNumber'].hasError('required')"
+                            class="error-message">
+                            ID Number is required.
+                        </div>
+
+                        <div *ngIf="nomineeForm.controls['IDNumber'].touched && nomineeForm.controls['IDNumber'].invalid && !nomineeForm.controls['IDNumber'].hasError('required')"
+                            class="error-message">
+                            <ng-container [ngSwitch]="selectedIdentityType">
+                                <div *ngSwitchCase="'1'"> Enter a valid PAN (e.g., ABCDE1234F)</div>
+                                <div *ngSwitchCase="'2'" aria-placeholder="Enter last 4 digits of Aadhaar">Enter last 4
+                                    digits of Aadhaar</div>
+                                <div *ngSwitchCase="'3'">Driving license number can be max 20 characters (e.g.,
+                                    MH1220150012345)</div>
+                                <div *ngSwitchCase="'4'">Passport number can be max 9 characters (e.g., A1234567)</div>
+                            </ng-container>
+
+
+                        </div>
+                        <div *ngIf="nomineeForm.controls['IDNumber'].touched && nomineeForm.get('IDNumber')?.hasError('sameAsGuardianPAN')"
+                            class="error-message">
+                            ID Number (PAN) must not be the same as Guardian PAN.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Email</label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="email" />
+                        <div *ngIf="nomineeForm.controls['email'].touched && nomineeForm.controls['email'].hasError('required')"
+                            class="error-message">
+                            Email is required.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['email'].touched && nomineeForm.controls['email'].hasError('email')"
+                            class="error-message">
+                            Enter a valid email address.
+                        </div>
+
+                        <div *ngIf="nomineeForm.controls['email'].touched && nomineeForm.controls['email'].hasError('minlength')"
+                            class="error-message">
+                            Minimum 10 characters required.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['email'].touched && nomineeForm.controls['email'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 200 characters allowed.
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl"> <span class="RedTxt">*</span>
+                        <label>Whose Email Address</label>
+                        <mat-form-field>
+                            <mat-select formControlName="whose_email_address">
+                                <mat-option value="" disabled>Select Whose Contact Number</mat-option>
+                                <mat-option *ngFor="let option of emailOwnershipOptions" [value]="option.value">
+                                    {{ option.value }} - {{ option.label }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="nomineeForm.controls['whose_email_address'].touched && nomineeForm.controls['whose_email_address'].hasError('required')"
+                            class="error-message">
+                            Whose Email Address is required.
+                        </div>
+
+                        <div *ngIf="nomineeForm.controls['whose_email_address'].touched && nomineeForm.controls['whose_email_address'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 100 characters allowed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Contact No</label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="mobile" />
+
+                        <div *ngIf="nomineeForm.controls['mobile'].touched && nomineeForm.controls['mobile'].hasError('required')"
+                            class="error-message">
+                            Contact number is required.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['mobile'].touched && nomineeForm.controls['mobile'].hasError('pattern')"
+                            class="error-message">
+                            Enter a valid 10-digit Indian Contact number.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <div class="row mt-2">
+
+                <div class="col-3">
+                    <div class="InputControl"> <span class="RedTxt">*</span>
+                        <label>Whose Contact Number</label>
+                        <mat-form-field>
+                            <mat-select formControlName="whose_contact_number">
+                                <mat-option value="" disabled>Select Whose Contact Number</mat-option>
+                                <mat-option *ngFor="let option of contactOwnershipOptions" [value]="option.value">
+                                    {{ option.value }} - {{ option.label }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="nomineeForm.controls['whose_contact_number'].touched && nomineeForm.controls['whose_contact_number'].hasError('required')"
+                            class="error-message">
+                            Whose Contact Number is required.
+                        </div>
+
+                        <div *ngIf="nomineeForm.controls['whose_contact_number'].touched && nomineeForm.controls['whose_contact_number'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 100 characters allowed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Contact Type</label> <span class="RedTxt">*</span>
+                        <mat-form-field>
+                            <mat-select formControlName="contact_type">
+                                <mat-option value="" disabled>Select Contact Type</mat-option>
+                                <mat-option *ngFor="let option of contactTypeOptions" [value]="option.value">
+                                    {{ option.value }} - {{ option.label }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="nomineeForm.controls['contact_type'].touched && nomineeForm.controls['contact_type'].hasError('required')"
+                            class="error-message">
+                            Contact Type is required.
+                        </div>
+
+                        <div *ngIf="nomineeForm.controls['contact_type'].touched && nomineeForm.controls['contact_type'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 50 characters allowed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Extension</label>
+                        <input type="text" pInputText class="Width100perc" formControlName="extension" />
+                        <div *ngIf="requiresContactDetails && nomineeForm.controls['extension'].hasError('required')"
+                            class="error-message">
+                            Extension is required for Residential or Office contact types.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['extension'].touched && nomineeForm.controls['extension'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 10 characters allowed.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['extension'].touched && nomineeForm.controls['extension'].hasError('pattern')"
+                            class="error-message">
+                            Only digits are allowed in extension.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Fax No</label>
+                        <input type="text" pInputText class="Width100perc" formControlName="fax_no" />
+                        <div *ngIf="requiresContactDetails && nomineeForm.controls['fax_no'].hasError('required')"
+                            class="error-message">
+                            Fax number is required for Residential or Office contact types.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['fax_no'].touched && nomineeForm.controls['fax_no'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 20 characters allowed.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-2">
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Address 1</label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="address1" />
+
+                        <div *ngIf="nomineeForm.controls['address1'].touched && nomineeForm.controls['address1'].hasError('required')"
+                            class="error-message">
+                            Address Line 1 is required.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['address1'].touched && nomineeForm.controls['address1'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 50 characters allowed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Address 2</label>
+                        <input type="text" pInputText class="Width100perc" formControlName="address2" />
+
+                        <div *ngIf="nomineeForm.controls['address2'].touched && nomineeForm.controls['address2'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 50 characters allowed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Address 3</label>
+                        <input type="text" pInputText class="Width100perc" formControlName="address3" />
+
+                        <div *ngIf="nomineeForm.controls['address3'].touched && nomineeForm.controls['address3'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 50 characters allowed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> City</label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="city" />
+
+                        <div *ngIf="nomineeForm.controls['city'].touched && nomineeForm.controls['city'].hasError('required')"
+                            class="error-message">
+                            City is required.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['city'].touched && nomineeForm.controls['city'].hasError('pattern')"
+                            class="error-message">
+                            Only alphabetic characters allowed.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['city'].touched && nomineeForm.controls['city'].hasError('minLength')"
+                            class="error-message">
+                            City name must be at least 2 characters
+                        </div>
+                        <div *ngIf="nomineeForm.controls['city'].touched && nomineeForm.controls['city'].hasError('maxLength')"
+                            class="error-message">
+                            City name cannot exceed 20 characters
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Pin Code</label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="pin" />
+
+                        <div *ngIf="nomineeForm.controls['pin'].touched && nomineeForm.controls['pin'].hasError('required')"
+                            class="error-message">
+                            PIN code is required.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['pin'].touched && nomineeForm.controls['pin'].hasError('pattern')"
+                            class="error-message">
+                            Enter a valid 6-digit PIN code.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Country</label> <span class="RedTxt">*</span>
+
+                        <!-- <select formControlName="country">
+                                   <option value="">-- Select Country --</option>
+                                    <option *ngFor="let country of countryList" [value]="country.key">{{ country.value }}</option>
+                                        </select> -->
+
+                        <mat-form-field>
+                            <mat-select formControlName="country">
+                                <mat-option value="" disabled>Select Country </mat-option>
+                                <mat-option *ngFor="let status of countryList" [value]="status.key">{{ status.value
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="nomineeForm.controls['country'].touched && nomineeForm.controls['country'].hasError('required')"
+                            class="error-message">
+                            Country is required.
+                        </div>
+                        <!-- <input type="text" pInputText class="Width100perc" formControlName="country" /> -->
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Country Code</label>  <span class="RedTxt">*</span>
+
+                        
+                        <mat-form-field>
+                            <mat-select formControlName="country_code">
+                                <mat-option value="" disabled>Select Country Code </mat-option>
+                                <mat-option *ngFor="let status of country_code_list" [value]="status.value">{{ status.key
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <!-- <input type="text" pInputText class="Width100perc" formControlName="country_code" /> -->
+
+                        <div *ngIf="nomineeForm.controls['country_code'].touched && nomineeForm.controls['country_code'].hasError('required')"
+                            class="error-message">
+                            Country Code is required.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['country_code'].touched && nomineeForm.controls['country_code'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 5 characters allowed.
+                        </div>
+                        <div *ngIf="nomineeForm.controls['country_code'].touched && nomineeForm.controls['country_code'].hasError('pattern')"
+                            class="error-message">
+                            Use country calling format like +91.
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+            <!-- Is Nominee a Minor - Full Width Row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="InputControl">
+                        <label class="form-label-bold">Is Nominee a Minor? </label>
+                        <div class="radio-group-horizontal">
+                            <label class="custom-radio-label">
+                                <input type="radio" formControlName="isMinor" [value]="'Y'" class="radio-input" />
+                                <span class="radio-text">Yes</span>
+                            </label>
+                            <label class="custom-radio-label">
+                                <input type="radio" formControlName="isMinor" [value]="'N'" class="radio-input" />
+                                <span class="radio-text">No</span>
+                            </label>
+                        </div>
+                        <div *ngIf="nomineeForm.controls['isMinor'].touched && nomineeForm.controls['isMinor'].hasError('required')"
+                            class="error-message">
+                            Please specify if the nominee is a minor
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guardian Details Row - Only shown when nominee is minor -->
+            <div class="row mt-2" *ngIf="nomineeForm.get('isMinor')?.value === 'Y'">
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label>Guardian Name <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="guardianName" />
+                        <div *ngIf="nomineeForm.controls['guardianName'].touched && nomineeForm.controls['guardianName'].hasError('required')"
+                            class="error-message">
+                            Guardian name is required if nominee is a minor
+                        </div>
+                        <div *ngIf="nomineeForm.controls['guardianName'].touched && nomineeForm.controls['guardianName'].hasError('pattern')"
+                            class="error-message">
+                            Only alphabets and spaces allowed (2–50 characters)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label for="nomineeDob">Guardian Date of Birth <span class="RedTxt">*</span></label>
+                        <input id="nomineeDob" formControlName="nomineeDob" type="date" [max]="today"
+                            class="Width100perc" />
+                        <div *ngIf="nomineeForm.controls['nomineeDob'].touched && nomineeForm.controls['nomineeDob'].hasError('required')"
+                            class="error-message">
+                            Guardian DOB is required if nominee is a minor
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="InputControl">
+                        <label>Guardian PAN No <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="pan"
+                            pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" />
+                        <div *ngIf="nomineeForm.controls['pan'].touched && nomineeForm.controls['pan'].hasError('required')"
+                            class="error-message">
+                            PAN is required
+                        </div>
+                        <div *ngIf="nomineeForm.controls['pan'].touched && nomineeForm.controls['pan'].hasError('pattern')"
+                            class="error-message">
+                            Enter a valid PAN (e.g., ABCDE1234F)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Nominee Button at the top -->
+    <div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end" *ngIf="savedNominees.length < maxNominees">
+        <button pButton class="Blue_FilledBtn ms-1" (click)="addNominee()" type="button" [disabled]="isLoading">
+            <i class="pi pi-plus" pButtonIcon></i>
+            <span pButtonLabel>Add Nominee ({{savedNominees.length}}/{{maxNominees}})</span>
+        </button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container mt-3" *ngIf="isLoading">
+        <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+        <p class="progress-text">⏳ Saving nominee details...</p>
+    </div>
+
+    <!-- Saved Nominees List -->
+    <div class="TabInputCntnr mt-3">
+        <h5 class="TabCntnrHead mb-0">Added Nominees ({{savedNominees.length}}/{{maxNominees}})</h5>
+
+        <!-- Nominees Table -->
+        <div class="table-responsive mt-2">
+            <table class="table table-bordered nominee-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Name</th>
+                        <th>Relation</th>
+                        <th>Percentage</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Empty State Message -->
+                    <tr *ngIf="savedNominees.length === 0">
+                        <td colspan="7" class="empty-state-cell">
+                            <div class="empty-state-content">
+                                <i class="pi pi-users" style="font-size: 2rem; color: #6c757d;"></i>
+                                <p>No nominees added yet</p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Nominee Rows -->
+                    <tr *ngFor="let nominee of savedNominees; let i = index">
+                        <td>{{i + 1}}</td>
+                        <td>{{nominee.name || nominee.nomineeName}}</td>
+                        <td>{{getRelationLabel(nominee.relation)}}</td>
+                        <td>{{nominee.percentage || nominee.applicablePercentage}}%</td>
+                        <td>{{nominee.mobileNumber || nominee.mobile}}</td>
+                        <td>{{nominee.email}}</td>
+                        <td class="text-center action-cell">
+                            <i class="pi pi-trash delete-icon" (click)="deleteNominee(nominee, i)"
+                                title="Delete Nominee"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bottom Buttons -->
+    <div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end">
+        <!-- <button pButton class="Grey_OutlineBtn ms-1">
+                            <i class="pi pi-angle-left" pButtonIcon></i>
+                            <span pButtonLabel>Back</span>
+                        </button>
+                        
+                        <button pButton class="Blue_FilledBtn ms-1" (click)="addNomineeandExit()">
+                            <span pButtonLabel>Save and Exit</span>
+                        </button> -->
+
+
+        <button pButton class="Grey_OutlineBtn ms-1" (click)="goBack()" [disabled]="isLoading">
+            <i class="pi pi-angle-left" pButtonIcon></i>
+            <span pButtonLabel>Back</span>
+        </button>
+
+        <button pButton class="Blue_FilledBtn ms-1" (click)="addNomineeandExit()" [disabled]="isLoading">
+            <span pButtonLabel>Save & Exit</span>
+        </button>
+    </div>
+    <!-- </mat-tab> -->
+    <!-- </mat-tab-group> -->
+</div>

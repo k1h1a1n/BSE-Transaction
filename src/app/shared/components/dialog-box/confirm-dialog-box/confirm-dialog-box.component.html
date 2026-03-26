@@ -1,0 +1,17 @@
+<div class="text-center mt-4">
+   <img src="../../../../../assets/images/alert-icon.png" class="img-fluid" alt="">
+</div>
+<h2 mat-dialog-title class="headT">{{data.title}}</h2>
+<mat-dialog-content>
+   {{data.message}}
+</mat-dialog-content>
+
+<!-- <mat-dialog-actions align="center">
+   <button class="btnOk mb-3" mat-dialog-close>Yes</button>
+<button class="btnOk mb-3" mat-dialog-close>No</button>
+</mat-dialog-actions> -->
+
+<mat-dialog-actions class="actions-row">
+  <button class="btnOk" [mat-dialog-close]="true">Yes</button>
+  <button class="btnOk" [mat-dialog-close]="false">No</button>
+</mat-dialog-actions>

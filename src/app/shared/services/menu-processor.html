@@ -1,0 +1,51 @@
+<div class="menu-processor-container">
+  <!-- Angular Menus Section -->
+  <div *ngIf="angularMenus.length > 0" class="menus-section">
+    <h3>Angular Menus</h3>
+    <ul>
+      <li *ngFor="let menu of angularMenus">
+        <a [routerLink]="menu.navigationPath" (click)="onMenuClick(menu)">
+          {{ menu.menuName }}
+        </a>
+        <ul *ngIf="menu.children && menu.children.length > 0">
+          <li *ngFor="let child of menu.children">
+            <a [routerLink]="child.navigationPath" (click)="onMenuClick(child)">
+              {{ child.menuName }}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Non-Angular Menus Section -->
+  <div *ngIf="nonAngularMenus.length > 0" class="menus-section">
+    <h3>Non-Angular Menus</h3>
+    <ul>
+      <li *ngFor="let menu of nonAngularMenus">
+        <a [href]="menu.navigationPath" target="_blank" (click)="onMenuClick(menu)">
+          {{ menu.menuName }}
+        </a>
+        <ul *ngIf="menu.children && menu.children.length > 0">
+          <li *ngFor="let child of menu.children">
+            <a [href]="child.navigationPath" target="_blank" (click)="onMenuClick(child)">
+              {{ child.menuName }}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Flattened Menus for Reference -->
+  <div *ngIf="allMenusFlattened.length > 0" class="menus-section">
+    <h3>All Menus (Flattened)</h3>
+    <ul>
+      <li *ngFor="let menu of allMenusFlattened">
+        <span [class.angular]="menu.isAngularMenu" [class.non-angular]="!menu.isAngularMenu">
+          {{ menu.menuName }} ({{ menu.isAngularMenu ? 'Angular' : 'Non-Angular' }})
+        </span>
+      </li>
+    </ul>
+  </div>
+</div>

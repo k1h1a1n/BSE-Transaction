@@ -1,0 +1,274 @@
+@use '../../../../styling/variables.scss' as var;
+
+/* Error Message Styles */
+.error-message {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Is Nominee a Minor - Radio Group Styling */
+.form-label-bold {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.radio-group-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-top: 8px;
+}
+
+.custom-radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #495057;
+  margin: 0;
+}
+
+.radio-input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
+.radio-text {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #495057;
+  user-select: none;
+}
+
+.custom-radio-label:hover .radio-text {
+  color: #007bff;
+}
+
+/* Empty State Message in Table */
+.empty-state-cell {
+  text-align: center;
+  padding: 0 !important;
+  border: none !important;
+  background-color: #f8f9fa;
+}
+
+.empty-state-content {
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.empty-state-content i {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.empty-state-content p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+/* Guardian Date Input Styling */
+input[type="date"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #495057;
+  background-color: #fff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="date"]:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+input[type="date"]:disabled {
+  background-color: #e9ecef;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+/* Ensure date input shows calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Saved Nominees Table Styles */
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.nominee-table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  border-collapse: collapse;
+}
+
+.nominee-table.table-bordered {
+  border: 1px solid #dee2e6;
+  width: 100%;
+}
+
+.nominee-table thead {
+  background-color: #f8f9fa;
+}
+
+.nominee-table th {
+  background-color: #e9ecef;
+  font-weight: 600;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 14px;
+}
+
+.nominee-table td {
+  padding: 10px 12px;
+  border: 1px solid #dee2e6;
+  vertical-align: middle;
+  color: #212529;
+  font-size: 13px;
+}
+
+.nominee-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Action cell styling */
+.action-cell {
+  text-align: center !important;
+  width: 80px;
+}
+
+.delete-icon {
+  cursor: pointer;
+  color: red;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+
+
+.delete-icon:hover {
+  color: #c82333;
+  transform: scale(1.2);
+}
+
+/* Add Nominee Button Styles */
+
+
+ .dropdown-list {
+  position: absolute;
+  background: white;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  z-index: 2000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdown-list li:hover {
+  background: #f1f1f1;
+}
+
+/* Fix for mat-select dropdown transparency */
+::ng-deep .mat-mdc-select-panel {
+  background-color: white !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+::ng-deep .mat-mdc-option {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-option:hover {
+  background-color: #f5f5f5 !important;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: #e3f2fd !important;
+}
+
+/* Progress Bar Container */
+.progress-container {
+  background: var.$input-bgcolor;
+  padding: 20px 24px;
+  border-radius: 8px;
+  border: 1px solid var.$color-border-light;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  .progress-text {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var.$color-primary;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+::ng-deep .p-progressbar {
+  border-radius: 6px;
+  background-color: var.$color-primary-lighter !important;
+  height: 6px !important;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 400px;
+}
+
+::ng-deep .p-progressbar-value {
+  background: linear-gradient(90deg, var.$color-primary 0%, #0652DD 100%) !important;
+  box-shadow: 0 2px 6px rgba(4, 46, 141, 0.25);
+  animation: progressAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes progressAnimation {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}

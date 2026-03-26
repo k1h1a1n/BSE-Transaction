@@ -1,0 +1,38 @@
+<!-- <div class="text-center mt-4">
+  <img src="../../../../assets/Images/alert-icon.png" class="img-fluid" alt="">
+</div>
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<mat-dialog-content>
+    {{data.message}}
+ </mat-dialog-content>
+ 
+ <mat-dialog-actions align="center" class="d-flex">
+  <button class="btnCancel" [mat-dialog-close]="false">Cancel</button>
+  <button class="btnOk" [mat-dialog-close]="true">Ok</button>
+</mat-dialog-actions> -->
+
+
+
+
+<div class="text-center mt-4">
+  <img src="../../../../../assets/images/alert-icon.png" class="img-fluid" alt="">
+</div>
+
+<h2 mat-dialog-title style="text-align: center; margin-top: 5px">{{ data.title }}</h2>
+
+<mat-dialog-content>
+  <p [innerHTML]="data.message"></p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onOk()" style="margin: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 10px;
+    background: aliceblue;">Yes</button>
+  <button mat-raised-button color="primary" (click)="onClose()" style="    margin: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 10px;
+    background: aliceblue;">No</button>
+</mat-dialog-actions>

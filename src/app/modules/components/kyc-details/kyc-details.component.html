@@ -1,0 +1,135 @@
+<!-- <app-ucc-tabs [selectedIndex]="2" (onTabChange)="navigate($event)"></app-ucc-tabs> -->
+
+<div class="TabInputCntnr mt-3" [formGroup]="kycForm">
+    <h5 class="TabCntnrHead mb-0">KYC Details</h5>
+    <div class="TabInputSect">
+        <div class="row">
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>KYC Type-1st Holder <span class="RedTxt">*</span></label>
+                    <mat-form-field>
+                        <mat-select formControlName="kycType1Holder">
+                            <mat-option value="" disabled>Select KYC Type-1st Holder </mat-option>
+                            <mat-option *ngFor="let types of kycTypeOptions" [value]="types.key">{{ types.value
+                                }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>KYC Type-2nd Holder <span class="RedTxt"
+                            *ngIf="kycForm.get('kycType2Holder')?.hasValidator(Validators.required)">*</span></label>
+
+                    <mat-form-field>
+                        <mat-select formControlName="kycType2Holder">
+                            <mat-option value="" disabled>Select KYC Type-2nd Holder </mat-option>
+                            <mat-option *ngFor="let types of kycTypeOptions" [value]="types.key">{{ types.value
+                                }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div *ngIf="kycForm.controls['kycType2Holder'].touched && kycForm.controls['kycType2Holder'].hasError('required')"
+                        class="error-message">
+                        KYC Type-2nd Holder is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>KYC Type-3rd Holder <span class="RedTxt"
+                            *ngIf="kycForm.get('kycType3Holder')?.hasValidator(Validators.required)">*</span></label>
+                    <mat-form-field>
+                        <mat-select formControlName="kycType3Holder">
+                            <mat-option value="" disabled>Select KYC Type-3rd Holder </mat-option>
+                            <mat-option *ngFor="let types of kycTypeOptions" [value]="types.key">{{ types.value
+                                }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div *ngIf="kycForm.controls['kycType3Holder'].touched && kycForm.controls['kycType3Holder'].hasError('required')"
+                        class="error-message">
+                        KYC Type-3rd Holder is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>KYC Type Guardian <span class="RedTxt"
+                            *ngIf="kycForm.get('kycTypeGuardian')?.hasValidator(Validators.required)">*</span></label>
+                    <mat-form-field>
+                        <mat-select formControlName="kycTypeGuardian">
+                            <mat-option value="" disabled>Select KYC Type Guardian </mat-option>
+                            <mat-option *ngFor="let types of kycTypeOptions" [value]="types.key">{{ types.value
+                                }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div *ngIf="kycForm.controls['kycTypeGuardian'].touched && kycForm.controls['kycTypeGuardian'].hasError('required')"
+                        class="error-message">
+                        KYC Type Guardian is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>1st Holder CKYC No <span class="RedTxt"
+                            *ngIf="kycForm.get('ckycNo1Holder')?.hasValidator(Validators.required)">*</span></label>
+                    <input type="text" pInputText class="Width100perc" formControlName="ckycNo1Holder" />
+                    <div *ngIf="kycForm.controls['ckycNo1Holder'].touched && kycForm.controls['ckycNo1Holder'].hasError('required')"
+                        class="error-message">
+                        1st Holder CKYC No is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>2nd Holder CKYC No <span class="RedTxt"
+                            *ngIf="kycForm.get('ckycNo2Holder')?.hasValidator(Validators.required)">*</span></label>
+                    <input type="text" pInputText class="Width100perc" formControlName="ckycNo2Holder" />
+                    <div *ngIf="kycForm.controls['ckycNo2Holder'].touched && kycForm.controls['ckycNo2Holder'].hasError('required')"
+                        class="error-message">
+                        2nd Holder CKYC No is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>3rd Holder CKYC No <span class="RedTxt"
+                            *ngIf="kycForm.get('ckycNo3Holder')?.hasValidator(Validators.required)">*</span></label>
+                    <input type="text" pInputText class="Width100perc" formControlName="ckycNo3Holder" />
+                    <div *ngIf="kycForm.controls['ckycNo3Holder'].touched && kycForm.controls['ckycNo3Holder'].hasError('required')"
+                        class="error-message">
+                        3rd Holder CKYC No is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="InputControl">
+                    <label>Guardian CKYC No <span class="RedTxt"
+                            *ngIf="kycForm.get('ckycNoGuardian')?.hasValidator(Validators.required)">*</span></label>
+                    <input type="text" pInputText class="Width100perc" formControlName="ckycNoGuardian" />
+                    <div *ngIf="kycForm.controls['ckycNoGuardian'].touched && kycForm.controls['ckycNoGuardian'].hasError('required')"
+                        class="error-message">
+                        Guardian CKYC No is required
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end ">
+    <button pButton class="Grey_OutlineBtn ms-1" (click)="goBack()" [disabled]="isLoading">
+        <i class="pi pi-angle-left" pButtonIcon></i>
+        <span pButtonLabel>Back</span>
+    </button>
+    <button pButton class="Blue_FilledBtn ms-1" *ngIf="!isUpdate" (click)="kycVerification()" [disabled]="isLoading">
+        <span pButtonLabel>Save & Continue</span>
+    </button>
+        <button pButton class="Blue_FilledBtn ms-1" *ngIf="isUpdate" (click)="kycUpdateVerification()" [disabled]="isLoading">
+        <span pButtonLabel>Update & Continue</span>
+    </button>
+</div>
+
+<!-- Progress Bar -->
+<div class="progress-container mt-3" *ngIf="isLoading">
+    <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+    <p class="progress-text">⏳ Saving KYC details...</p>
+</div>

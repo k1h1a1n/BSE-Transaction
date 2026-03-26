@@ -1,0 +1,469 @@
+<!-- <p>depo-bank-detail works!</p> -->
+<!-- <app-ucc-tabs [selectedIndex]="4" (onTabChange)="navigate($event)"></app-ucc-tabs> -->
+
+
+<div class="TabMainCntnr Width100perc mt-3">
+    <!-- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [formGroup]="fatcaForm"> -->
+    <!-- <mat-tab label="Nominee Details"> -->
+    <div class="TabInputCntnr mt-3" [formGroup]="fatcaForm">
+        <h5 class="TabCntnrHead mb-0">Fatca Details</h5>
+        <div class="TabInputSect">
+            <div class="row">
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Investor Name <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="INV_NAME" />
+
+                        <div *ngIf="fatcaForm.controls['INV_NAME'].touched && fatcaForm.controls['INV_NAME'].hasError('required')"
+                            class="error-message">
+                            Name is required
+                        </div>
+
+                        <div *ngIf="fatcaForm.controls['INV_NAME'].touched && fatcaForm.controls['INV_NAME'].hasError('minlength')"
+                            class="error-message">
+                            Name must be at least 2 characters
+                        </div>
+
+                        <div *ngIf="fatcaForm.controls['INV_NAME'].touched && fatcaForm.controls['INV_NAME'].hasError('maxlength')"
+                            class="error-message">
+                            Name cannot exceed 70 characters
+                        </div>
+
+                        <div *ngIf="fatcaForm.controls['INV_NAME'].touched && fatcaForm.controls['INV_NAME'].hasError('pattern')"
+                            class="error-message">
+                            Only letters, spaces, dots, hyphens, and apostrophes are allowed
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Tax Status</label> <span class="RedTxt">*</span>
+                        <mat-form-field>
+                            <mat-select formControlName="TAX_STATUS">
+                                <mat-option value="" disabled>Select Tax Status </mat-option>
+                                <mat-option *ngFor="let status of taxStatusList" [value]="status.code">{{
+                                    status.label }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="fatcaForm.controls['TAX_STATUS'].touched && fatcaForm.controls['TAX_STATUS'].hasError('required')"
+                            class="error-message">
+                            Tax Status is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> Data Source</label> <span class="RedTxt">*</span>
+                        <mat-form-field>
+                            <mat-select formControlName="DATA_SRC">
+                                <mat-option value="" disabled>Select Data Source </mat-option>
+                                <mat-option *ngFor="let status of dataSourceList" [value]="status.code">{{
+                                    status.label }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['DATA_SRC'].touched && fatcaForm.controls['DATA_SRC'].hasError('required')"
+                            class="error-message">
+                            Data Source is required
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Address Type</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="ADDR_TYPE">
+                                <mat-option value="" disabled>Select Address Type </mat-option>
+                                <mat-option *ngFor="let status of addressTypeOptions" [value]="status.code">{{
+                                    status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="fatcaForm.controls['ADDR_TYPE'].touched && fatcaForm.controls['ADDR_TYPE'].hasError('required')"
+                            class="error-message">
+                            Address Type is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Place of Birth</label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="PO_BIR_INC" />
+                        <div *ngIf="fatcaForm.controls['PO_BIR_INC'].touched && fatcaForm.controls['PO_BIR_INC'].hasError('required')"
+                            class="error-message">
+                            Place of Birth is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Country of Birth</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="CO_BIR_INC">
+                                <mat-option value="" disabled>Select Country of Birth </mat-option>
+                                <mat-option *ngFor="let status of countryBirthNationalityList" [value]="status.key">{{
+                                    status.value
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="fatcaForm.controls['CO_BIR_INC'].touched && fatcaForm.controls['CO_BIR_INC'].hasError('required')"
+                            class="error-message">
+                            Country of Birth is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Tax Residence</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="TAX_RES1">
+                                <mat-option value="" disabled>Select Tax Residence </mat-option>
+                                <mat-option *ngFor="let status of taxResList" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="fatcaForm.controls['TAX_RES1'].touched && fatcaForm.controls['TAX_RES1'].hasError('required')"
+                            class="error-message">
+                            Tax Residence is required
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>ID Type</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="ID1_TYPE">
+                                <mat-option value="" disabled>Select ID Type </mat-option>
+                                <mat-option *ngFor="let status of idTypeList" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="fatcaForm.controls['ID1_TYPE'].touched && fatcaForm.controls['ID1_TYPE'].hasError('required')"
+                            class="error-message">
+                            ID Type is required
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label> TPIN </label> <span class="RedTxt">*</span>
+                        <input type="text" pInputText class="Width100perc" formControlName="TPIN1" />
+
+                        <div *ngIf="fatcaForm.controls['TPIN1'].touched && fatcaForm.controls['TPIN1'].hasError('required')"
+                            class="error-message">
+                            Tax Payer ID is required
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Source of Wealth</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="SRCE_WEALT">
+                                <mat-option value="" disabled>Select ID Type </mat-option>
+                                <mat-option *ngFor="let status of sourceOfWealthList" [value]="status.code">{{
+                                    status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="fatcaForm.controls['SRCE_WEALT'].touched && fatcaForm.controls['SRCE_WEALT'].hasError('required')"
+                            class="error-message">
+                            Source of Wealth is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Income Slab</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="INC_SLAB">
+                                <mat-option value="" disabled>Select Source of Income </mat-option>
+                                <mat-option *ngFor="let status of incomeList" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div *ngIf="fatcaForm.controls['INC_SLAB'].touched && fatcaForm.controls['INC_SLAB'].hasError('required')"
+                            class="error-message">
+                            Income Slab is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>PEP Flag</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="PEP_FLAG">
+                                <mat-option value="" disabled>Select PEP Flag </mat-option>
+                                <mat-option *ngFor="let status of pepOptions" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['PEP_FLAG'].touched && fatcaForm.controls['PEP_FLAG'].hasError('required')"
+                            class="error-message">
+                            PEP Flag is required
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Occupation Code</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="OCC_CODE">
+                                <mat-option value="" disabled>Select Occupation Code </mat-option>
+                                <mat-option *ngFor="let status of occupationCodesList" [value]="status.code">{{
+                                    status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['OCC_CODE'].touched && fatcaForm.controls['OCC_CODE'].hasError('required')"
+                            class="error-message">
+                            Occupation Code is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Occupation Type</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="OCC_TYPE">
+                                <mat-option value="" disabled>Select Occupation Type </mat-option>
+                                <mat-option *ngFor="let status of occupationTypeList" [value]="status.code">{{
+                                    status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['OCC_TYPE'].touched && fatcaForm.controls['OCC_TYPE'].hasError('required')"
+                            class="error-message">
+                            Occupation Type is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Exchange Name </label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="EXCH_NAME">
+                                <mat-option value="" disabled>Select Exchange Name </mat-option>
+                                <mat-option *ngFor="let status of exchangeNameList" [value]="status.code">{{
+                                    status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['EXCH_NAME'].touched && fatcaForm.controls['EXCH_NAME'].hasError('required')"
+                            class="error-message">
+                            Exchange Name is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>UBO Applicable</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="UBO_APPL">
+                                <mat-option value="" disabled>Select UBO Applicable </mat-option>
+                                <mat-option *ngFor="let status of UBOApplList" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['UBO_APPL'].touched && fatcaForm.controls['UBO_APPL'].hasError('required')"
+                            class="error-message">
+                            UBO Applicable is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>SDF Flag</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="SDF_FLAG">
+                                <mat-option value="" disabled>Select SDF Flag </mat-option>
+                                <mat-option *ngFor="let status of SDFList" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['SDF_FLAG'].touched && fatcaForm.controls['SDF_FLAG'].hasError('required')"
+                            class="error-message">
+                            SDF Flag is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>UBO ID</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="UBO_DF">
+                                <mat-option value="" disabled>Select UBO ID </mat-option>
+                                <mat-option *ngFor="let status of UBOdfList" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['UBO_DF'].touched && fatcaForm.controls['UBO_DF'].hasError('required')"
+                            class="error-message">
+                            UBO ID is required
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>New or Update Indicator</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="NewOrUpdateIndicator">
+                                <mat-option value="" disabled>Select New or Update Indicator </mat-option>
+                                <mat-option *ngFor="let status of NewOrUpdateIndicatorList" [value]="status.code">{{
+                                    status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['NewOrUpdateIndicator'].touched && fatcaForm.controls['NewOrUpdateIndicator'].hasError('required')"
+                            class="error-message">
+                            New or Update Indicator is required
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Log Name</label> 
+                        <input type="text" pInputText class="Width100perc" formControlName="Log_Name" />
+
+                        <div *ngIf="requiresLogName && fatcaForm.controls['Log_Name'].hasError('required')"
+                            class="error-message">
+                            Log Name is required when Data Source is Electronically.
+                        </div>
+
+
+                        <div *ngIf="requiresLogName && fatcaForm.controls['Log_Name'].hasError('minlength')"
+                            class="error-message">
+                            Log Name must have at least 1 character.
+                        </div>
+
+                        <div *ngIf="requiresLogName && fatcaForm.controls['Log_Name'].hasError('maxlength')"
+                            class="error-message">
+                            Maximum 30 characters allowed for Log Name.
+                        </div>
+                    </div>
+                </div>
+
+
+
+                 <div class="col-3">
+                    <div class="InputControl">
+                        <label>Investor Type</label> <span class="RedTxt">*</span>
+
+                        <mat-form-field>
+                            <mat-select formControlName="InvestorType">
+                                <mat-option value="" disabled>Select Investor Type </mat-option>
+                                <mat-option *ngFor="let status of InvestorTypeList" [value]="status.code">{{ status.label
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="fatcaForm.controls['InvestorType'].touched && fatcaForm.controls['InvestorType'].hasError('required')"
+                            class="error-message">
+                            Investor Type is required
+                        </div>
+                    </div>
+                </div> 
+
+
+
+
+            </div>
+        </div>
+
+
+  </div>
+        <!-- Progress Bar -->
+        <div class="progress-container mt-3" *ngIf="isLoading">
+            <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+            <p class="progress-text">⏳ Saving fatca details...</p>
+        </div>
+
+
+
+        <!-- Bottom Buttons -->
+   
+
+
+            <div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end">
+  
+
+        <button pButton class="Grey_OutlineBtn ms-1" (click)="cancelClick()" >
+            <i class="pi pi-angle-left" pButtonIcon></i>
+            <span pButtonLabel>Cancel</span>
+        </button>
+
+        <button pButton class="Blue_FilledBtn ms-1" (click)="saveAndExit()" >
+            <span pButtonLabel>Save & Submit</span>
+        </button>
+    </div>
+        </div>

@@ -1,0 +1,98 @@
+<!-- Nominee Details (copied/adapted from nominee-detail) -->
+<!-- <p-breadcrumb [model]="breadcrumb_items" [home]="home"></p-breadcrumb> -->
+
+<h5 class="PageHeading">BSE - Register Fatca</h5>
+
+<div class="TabMainCntnr MainTabSect Width100perc mt-3">
+    <mat-tab-group class="abcd">
+
+        <mat-tab label="Info for Individual">
+            <!-- <app-bse-registerinvestors (nextTab)="goToTab($event)"></app-bse-registerinvestors> -->
+        </mat-tab>
+
+        <mat-tab label="Address Details" class="abcd">
+            <!-- <app-address-details (nextTab)="goToTab($event)"></app-address-details> -->
+        </mat-tab>
+
+        <mat-tab label="Occupation Details">
+            <!-- <app-kyc-details (nextTab)="goToTab($event)"></app-kyc-details> -->
+        </mat-tab>
+
+        <mat-tab label="Depository and Bank Details">
+            <!-- <app-depo-bank-detail (nextTab)="goToTab($event)"></app-depo-bank-detail> -->
+        </mat-tab>
+
+        <mat-tab label="UBO Details">
+            <!-- <app-nominee-detail (nextTab)="goToTab($event)"></app-nominee-detail> -->
+        </mat-tab>
+
+    </mat-tab-group>
+
+</div>
+<router-outlet></router-outlet> 
+
+
+
+
+
+
+
+<div class="TabMainCntnr Width100perc mt-3">
+	<div class="TabInputCntnr mt-3" [formGroup]="nomineeForm">
+		<h5 class="TabCntnrHead mb-0">Nominee Details</h5>
+		<div class="TabInputSect">
+			<div class="row">
+				<div class="col-3">
+					<div class="InputControl">
+						<label>Full Name <span class="RedTxt">*</span></label>
+						<input type="text" pInputText class="Width100perc" formControlName="nomineeName" />
+						<div *ngIf="nomineeForm.controls['nomineeName'].touched && nomineeForm.controls['nomineeName'].hasError('required')" class="error-message">Nominee Name is required</div>
+						<div *ngIf="nomineeForm.controls['nomineeName'].touched && nomineeForm.controls['nomineeName'].hasError('pattern')" class="error-message">Only alphabets and spaces are allowed (2–25 characters)</div>
+					</div>
+				</div>
+
+				<div class="col-3">
+					<div class="InputControl">
+						<label> Relation <span class="RedTxt">*</span></label>
+						<mat-form-field>
+							<mat-select formControlName="relation">
+								<mat-option value="" disabled>Select Relation</mat-option>
+								<mat-option *ngFor="let status of nomineeRelations" [value]="status.value">{{ status.label }}</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<div *ngIf="nomineeForm.controls['relation'].touched && nomineeForm.controls['relation'].hasError('required')" class="error-message">Relation is required</div>
+					</div>
+				</div>
+
+				<div class="col-3">
+					<div class="InputControl">
+						<label>Applicable(%) <span class="RedTxt">*</span></label>
+						<input type="text" pInputText class="Width100perc" formControlName="applicablePercentage">
+						<div *ngIf="nomineeForm.controls['applicablePercentage'].touched && nomineeForm.controls['applicablePercentage'].hasError('required')" class="error-message">Applicable Percentage is required</div>
+						<div *ngIf="nomineeForm.controls['applicablePercentage'].touched && nomineeForm.controls['applicablePercentage'].hasError('pattern')" class="error-message">Enter a valid percentage between 1 and 100 (up to 2 decimal places)</div>
+					</div>
+				</div>
+
+				<div class="col-3">
+					<div class="InputControl">
+						<label>Identity Type <span class="RedTxt">*</span></label>
+						<mat-form-field>
+							<mat-select formControlName="identityType">
+								<mat-option value="" disabled>Select Identity Type</mat-option>
+								<mat-option *ngFor="let status of identityTypes" [value]="status.key">{{ status.label }}</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<div *ngIf="nomineeForm.controls['identityType'].touched && nomineeForm.controls['identityType'].hasError('required')" class="error-message">Identity type is required.</div>
+					</div>
+				</div>
+
+				<!-- Additional rows omitted for brevity in test preview; full layout follows same structure -->
+			</div>
+		</div>
+	</div>
+
+	<div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end">
+		<button pButton class="Grey_OutlineBtn ms-1" (click)="goBack()"> <i class="pi pi-angle-left" pButtonIcon></i> <span pButtonLabel>Back</span> </button>
+		<button pButton class="Blue_FilledBtn ms-1" (click)="addNomineeandExit()"> <span pButtonLabel>Save & Exit</span> </button>
+	</div>
+</div>

@@ -1,0 +1,21 @@
+::ng-deep .actions-row {
+  display: flex !important;
+  justify-content: center;
+  gap: 20px;   /* space between buttons */
+}
+
+::ng-deep .btnOk {
+  background: #095BB8;
+  border-radius: 4px;
+  color: #FFF;
+  padding: 5px 50px;
+  font-size: 18px;
+  border: none;
+}
+
+.headT{
+    font-size: 22px;
+    align-items: center !important;
+    display: flex;
+    flex-direction: column;
+}

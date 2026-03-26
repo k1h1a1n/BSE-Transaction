@@ -1,0 +1,53 @@
+<div class="TopHeader">
+    <div class="Logo_Sect">
+        <img class="DatacompLogo" src="assets/images/i_Magic_plus.png" alt="Datacomp Logo" />
+        <span class="MenuIcon">
+            <img src="assets/images/menuIcon.png" alt="Menu Icon"/>
+        </span>
+    </div>
+    <div class="TopHeader_RightSect">
+        <div class="SearchMenuBar">
+            <input type="text" placeholder="Search a menu item" />
+            <mat-icon>search</mat-icon>
+        </div>
+        <div class="UserLog_Sect">
+            <div class="UserPic_Div">
+                R
+                <span class="UserStatus Active"></span>
+            </div>
+            <div class="UserName_Div">
+                <button matButton [matMenuTriggerFor]="UserName" class="d-flex flex-row-reverse">
+                    <span>Rahul Gupta</span>
+                    <mat-icon class="ms-2">keyboard_arrow_down</mat-icon>
+                </button>
+                <mat-menu #UserName="matMenu">
+                    <button mat-menu-item class="User_Relation">
+                        <span class="UserName_Txt">Rahul Gupta</span>
+                        <span class="UserRelation_Txt">Relationship Manager</span>
+                    </button>
+                    <button mat-menu-item>
+                        <img src="assets/images/lock.png"/>Access Sales Empolyee Data
+                    </button>
+                    <button mat-menu-item>
+                        <img src="assets/images/lock.png"/>Access Sub Broker Data
+                    </button>
+                    <button mat-menu-item>
+                        <img src="assets/images/user.png"/>Edit Profile
+                    </button>
+                    <button mat-menu-item>
+                        <img src="assets/images/ticket.png"/>Raise a Ticket
+                    </button>
+                    <button mat-menu-item>
+                        <img src="assets/images/ticket2.png"/>My Tickets
+                    </button>
+                    <button mat-menu-item>
+                        <img src="assets/images/youtube.png"/>Video Tutorials
+                    </button>
+                    <button mat-menu-item class="Logout_Optn">
+                        <img src="assets/images/log-out.png"/>Logout
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+</div>

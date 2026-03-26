@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<mat-dialog-content>
+  <mat-form-field class="w-100">
+    <input matInput [(ngModel)]="inputText" (input)="onInputChange()" [placeholder]="data.placeholder" />
+  </mat-form-field>
+  <div *ngIf="showError" class="text-danger mt-2">Please enter a note</div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancelClick()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="onAddClick()">Add</button>
+</mat-dialog-actions>

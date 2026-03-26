@@ -1,0 +1,218 @@
+<div class="Width100perc ManageData_Sect">
+    <span>
+        <mat-icon fontSet="material-symbols-outlined" class="DatabaseIcon">database</mat-icon>
+        Manage Data 
+        <mat-icon>arrow_upward</mat-icon>
+    </span>
+</div>
+
+<!-- SSO Component - Pass Angular Menus -->
+<!-- <app-sso [angularMenus]="angularMenus"></app-sso> -->
+
+<!-- Loading State -->
+<div *ngIf="isLoading" style="padding: 20px; text-align: center;">
+    Loading menu...
+</div>
+
+<!-- Error State -->
+<div *ngIf="errorMessage && !isLoading" style="padding: 20px; color: red;">
+    {{ errorMessage }}
+</div>
+
+<!-- Dynamic Menu - Angular Routes -->
+<!-- <mat-accordion *ngIf="!isLoading && !errorMessage && angularMenus.length > 0">
+    <mat-expansion-panel 
+        *ngFor="let menuItem of angularMenus" 
+        class="Menu_FirstLevel"
+        [hideToggle]="!menuItem.hasChildren"
+        [disabled]="!menuItem.hasChildren">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <span class="MenuIcon_Div" *ngIf="menuItem.menuIcon">
+                    <img [src]="menuItem.menuIcon" [alt]="menuItem.menuName"/>
+                </span>
+                {{ menuItem.menuName }}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-accordion *ngIf="menuItem.hasChildren && menuItem.children.length > 0" multi class="Menu_SecondLevel">
+            <mat-expansion-panel 
+                *ngFor="let childMenu of menuItem.children"
+                [hideToggle]="!childMenu.hasChildren"
+                [disabled]="!childMenu.hasChildren">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <span class="MenuBullet"></span>
+                        <a *ngIf="childMenu.navigationPath && !childMenu.hasChildren" 
+                            [routerLink]="childMenu.navigationPath"
+                            (click)="onMenuClick(childMenu)">
+                            {{ childMenu.menuName }}
+                        </a>
+                        <span *ngIf="!childMenu.navigationPath || childMenu.hasChildren">
+                            {{ childMenu.menuName }}
+                        </span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <mat-accordion *ngIf="childMenu.hasChildren && childMenu.children.length > 0" multi class="Menu_ThirdLevel">
+                    <mat-expansion-panel *ngFor="let thirdMenu of childMenu.children" [hideToggle]="true" [disabled]="true">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <a *ngIf="thirdMenu.navigationPath" 
+                                    [routerLink]="thirdMenu.navigationPath"
+                                    (click)="onMenuClick(thirdMenu)">
+                                    {{ thirdMenu.menuName }}
+                                </a>
+                                <span *ngIf="!thirdMenu.navigationPath">{{ thirdMenu.menuName }}</span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-expansion-panel>
+</mat-accordion> -->
+
+<!-- Dynamic Menu - External Redirects (Non-Angular) -->
+<!-- <mat-accordion *ngIf="!isLoading && !errorMessage && nonAngularMenus.length > 0">
+    <mat-expansion-panel 
+        *ngFor="let menuItem of nonAngularMenus" 
+        class="Menu_FirstLevel"
+        [hideToggle]="!menuItem.hasChildren"
+        [disabled]="!menuItem.hasChildren">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <span class="MenuIcon_Div" *ngIf="menuItem.menuIcon">
+                    <img [src]="menuItem.menuIcon" [alt]="menuItem.menuName"/>
+                </span>
+                {{ menuItem.menuName }}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-accordion *ngIf="menuItem.hasChildren && menuItem.children.length > 0" multi class="Menu_SecondLevel">
+            <mat-expansion-panel 
+                *ngFor="let childMenu of menuItem.children"
+                [hideToggle]="!childMenu.hasChildren"
+                [disabled]="!childMenu.hasChildren">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <span class="MenuBullet"></span>
+                        <a *ngIf="childMenu.navigationPath && !childMenu.hasChildren" 
+                            [href]="childMenu.navigationPath"
+                            target="_blank"
+                            (click)="onMenuClick(childMenu)">
+                            {{ childMenu.menuName }}
+                        </a>
+                        <span *ngIf="!childMenu.navigationPath || childMenu.hasChildren">
+                            {{ childMenu.menuName }}
+                        </span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <mat-accordion *ngIf="childMenu.hasChildren && childMenu.children.length > 0" multi class="Menu_ThirdLevel">
+                    <mat-expansion-panel *ngFor="let thirdMenu of childMenu.children" [hideToggle]="true" [disabled]="true">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <a *ngIf="thirdMenu.navigationPath" 
+                                    [href]="thirdMenu.navigationPath"
+                                    target="_blank"
+                                    (click)="onMenuClick(thirdMenu)">
+                                    {{ thirdMenu.menuName }}
+                                </a>
+                                <span *ngIf="!thirdMenu.navigationPath">{{ thirdMenu.menuName }}</span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-expansion-panel>
+</mat-accordion> -->
+
+<!-- added by pooja -->
+ <!-- Dynamic Menu -->
+<!-- Dynamic Menu -->
+<mat-accordion *ngIf="!isLoading && !errorMessage">
+    <!-- First Level Menu Items -->
+    <mat-expansion-panel 
+        *ngFor="let menuItem of menuItems" 
+        class="Menu_FirstLevel"
+        [hideToggle]="!menuItem.hasChildren"
+        [disabled]="!menuItem.hasChildren">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <span class="MenuIcon_Div" *ngIf="menuItem.menuIcon">
+                    <img [src]="menuItem.menuIcon" [alt]="menuItem.menuName"/>
+                </span>
+                {{ menuItem.menuName }}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <!-- Second Level -->
+        <mat-accordion *ngIf="menuItem.hasChildren && menuItem.children.length > 0" multi class="Menu_SecondLevel">
+            <mat-expansion-panel 
+                *ngFor="let childMenu of menuItem.children"
+                [hideToggle]="!childMenu.hasChildren"
+                [disabled]="!childMenu.hasChildren">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <span class="MenuBullet"></span>
+                        <a *ngIf="childMenu.routerLink && !childMenu.hasChildren" 
+                            (click)="redirectToURL(childMenu)"
+                            style="cursor: pointer;">
+                            {{ childMenu.menuName }}
+                        </a>
+                        <span *ngIf="!childMenu.routerLink || childMenu.hasChildren">
+                            {{ childMenu.menuName }}
+                        </span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <!-- Third Level -->
+                <mat-accordion *ngIf="childMenu.hasChildren && childMenu.children.length > 0" multi class="Menu_ThirdLevel">
+                    <mat-expansion-panel 
+                        *ngFor="let subChildMenu of childMenu.children"
+                        [hideToggle]="!subChildMenu.hasChildren"
+                        [disabled]="!subChildMenu.hasChildren">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <span class="MenuBullet"></span>
+                                <a *ngIf="subChildMenu.routerLink && !subChildMenu.hasChildren" 
+                                    (click)="redirectToURL(subChildMenu)"
+                                    style="cursor: pointer;">
+                                    {{ subChildMenu.menuName }}
+                                </a>
+                                <span *ngIf="!subChildMenu.routerLink || subChildMenu.hasChildren">
+                                    {{ subChildMenu.menuName }}
+                                </span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <!-- Fourth Level (if needed) -->
+                        <mat-accordion *ngIf="subChildMenu.hasChildren && subChildMenu.children.length > 0" multi class="Menu_FourthLevel">
+                            <mat-expansion-panel 
+                                *ngFor="let deepChildMenu of subChildMenu.children"
+                                hideToggle
+                                disabled>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <span class="MenuBullet"></span>
+                                        <a *ngIf="deepChildMenu.routerLink" 
+                                            (click)="redirectToURL(deepChildMenu)"
+                                            style="cursor: pointer;">
+                                            {{ deepChildMenu.menuName }}
+                                        </a>
+                                        <span *ngIf="!deepChildMenu.routerLink">
+                                            {{ deepChildMenu.menuName }}
+                                        </span>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-expansion-panel>
+</mat-accordion>
+<!-- end here -->

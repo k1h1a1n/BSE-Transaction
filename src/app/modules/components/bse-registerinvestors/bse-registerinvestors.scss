@@ -1,0 +1,610 @@
+@use '../../../../styling/variables.scss' as var;
+
+  /* Error Message Styles */
+  .error-message {
+    color: #f44336;
+    font-size: 12px;
+    // margin-top: 5px;
+    margin-top:10px
+  }
+
+  .server-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .status-message {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .retry-link {
+    border: none;
+    background: transparent;
+    color: #0d51ff;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 4px;
+  }
+
+  .retry-link:disabled {
+    color: #9aa5b5;
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+  
+  /* Search Group Container */
+.search-group-container {
+  position: relative;
+}
+
+.search-row {
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.search-row .col-4 {
+  display: flex;
+  align-items: flex-end;
+}
+
+.search-row .col-4 .InputControl {
+  width: 100%;
+}
+
+/* Ensure PrimeNG autocomplete keeps padding for the clear icon */
+::ng-deep .search-group-container .p-autocomplete {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  gap: 0;
+}
+
+::ng-deep .search-group-container .p-autocomplete .p-inputtext,
+::ng-deep .search-group-container .p-autocomplete .p-autocomplete-input {
+  flex: 1 1 auto;
+  width: auto;
+  padding: 10px 44px 10px 12px !important;
+  height: 42px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+::ng-deep .search-group-container .p-autocomplete .p-autocomplete-clear-icon {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  height: 55px;
+  width: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+}
+
+/* Unified dropdown styling for both group and member autocomplete overlays */
+::ng-deep .search-group-container .p-autocomplete-panel,
+::ng-deep .search-member-container .p-autocomplete-panel {
+  margin-top: 4px;
+  border-radius: 10px;
+  border: 1px solid #dbe1f1;
+  box-shadow: 0 12px 32px rgba(10, 35, 80, 0.2);
+  overflow: hidden;
+  min-width: 100% !important;
+}
+
+::ng-deep .search-group-container .p-autocomplete-panel .p-autocomplete-items,
+::ng-deep .search-member-container .p-autocomplete-panel .p-autocomplete-items {
+  padding: 12px;
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+::ng-deep .search-group-container .p-autocomplete-panel .p-autocomplete-item,
+::ng-deep .search-member-container .p-autocomplete-panel .p-autocomplete-item {
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2b3553;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  white-space: normal;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(13, 81, 255, 0.08);
+}
+
+::ng-deep .search-group-container .p-autocomplete-panel .p-autocomplete-item.p-highlight,
+::ng-deep .search-member-container .p-autocomplete-panel .p-autocomplete-item.p-highlight,
+::ng-deep .search-group-container .p-autocomplete-panel .p-autocomplete-item:not(.p-disabled):hover,
+::ng-deep .search-member-container .p-autocomplete-panel .p-autocomplete-item:not(.p-disabled):hover {
+  background: #eef5ff;
+  color: #0d51ff;
+  border-color: #c7ddff;
+  transform: translateX(2px);
+}
+
+::ng-deep .search-group-container .p-autocomplete-panel .p-autocomplete-empty-message,
+::ng-deep .search-member-container .p-autocomplete-panel .p-autocomplete-empty-message {
+  padding: 16px;
+  font-size: 13px;
+  color: #7a889f;
+}
+
+.search-member-container {
+  position: relative;
+}
+
+/* Material dropdown styling for member search */
+.search-member-container .mat-form-field {
+  width: 100%;
+}
+
+.search-member-container .mat-mdc-select-trigger {
+  min-height: 42px;
+}
+
+  .dropdown-list {
+  position: absolute;
+  background: white;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  z-index: 2000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdown-list li:hover {
+  background: #f1f1f1;
+}
+
+/* Enhanced Group Dropdown Styles */
+.group-dropdown {
+  max-width: 450px;
+  max-height: 280px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.dropdown-header {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.result-count {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.group-item {
+  padding: 10px 12px !important;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.group-item:last-child {
+  border-bottom: none;
+}
+
+.group-item:hover {
+  background: #e8f4ff !important;
+  box-shadow: inset 3px 0 0 #0d6efd;
+}
+
+.group-description {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+.no-results {
+  padding: 16px 12px !important;
+  text-align: center;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.no-results i {
+  margin-right: 6px;
+  color: #ffc107;
+}
+
+/* Member Dropdown Styles */
+.member-dropdown {
+  max-width: 450px;
+  max-height: 280px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.member-item {
+  padding: 10px 12px !important;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+.member-item:hover {
+  background: #e8f4ff !important;
+  box-shadow: inset 3px 0 0 #0d6efd;
+}
+
+.member-name {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Disabled input styling */
+input[disabled] {
+  background-color: #f5f5f5 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+/* Error message with icon */
+.error-message i {
+  margin-right: 4px;
+  font-size: 13px;
+}
+
+/* Fix for mat-select dropdown transparency */
+::ng-deep .mat-mdc-select-panel {
+  background-color: white !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+::ng-deep .mat-mdc-option {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-option:hover {
+  background-color: #f5f5f5 !important;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: #e3f2fd !important;
+}
+
+/* Progress Bar Styling */
+.progress-container {
+  max-width: 320px;
+  margin: 15px auto;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+  border: 1px solid #C9E3FF;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(4, 46, 141, 0.08);
+  text-align: center;
+  animation: slideDown 0.4s ease-out forwards;
+  position: relative;
+  z-index: 1000;
+  display: block;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.progress-text {
+  margin-top: 8px;
+  margin-bottom: 0;
+  color: #042E8D;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.progress-text::before {
+  content: "";
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+// Progress Bar Container
+.progress-container {
+  background: var.$input-bgcolor;
+  padding: 20px 24px;
+  border-radius: 8px;
+  border: 1px solid var.$color-border-light;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  .progress-text {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var.$color-primary;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+::ng-deep .p-progressbar {
+  border-radius: 6px;
+  background-color: var.$color-primary-lighter !important;
+  height: 6px !important;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 400px;
+}
+
+::ng-deep .p-progressbar-value {
+  background: linear-gradient(90deg, var.$color-primary 0%, #0652DD 100%) !important;
+  box-shadow: 0 2px 6px rgba(4, 46, 141, 0.25);
+  animation: progressAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes progressAnimation {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+/* Style for registration type selectbutton (PrimeNG) */
+.registration-type {
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .registration-type .p-selectbutton {
+  display: flex;
+  width: 100%;
+}
+
+::ng-deep .registration-type .p-button {
+  border-radius: 0 !important;
+  border: 1px solid #cfe0ff;
+  background: #ffffff;
+  color: #333;
+  padding: 0.5rem 1rem;
+  flex: 1;
+  text-align: center;
+  margin: 0 !important;
+  border-right: none;
+}
+
+::ng-deep .registration-type .p-button:first-child {
+  border-top-left-radius: 6px !important;
+  border-bottom-left-radius: 6px !important;
+}
+
+::ng-deep .registration-type .p-button:last-child {
+  border-top-right-radius: 6px !important;
+  border-bottom-right-radius: 6px !important;
+  border-right: 1px solid #cfe0ff;
+}
+
+::ng-deep .registration-type .p-button.p-highlight {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  z-index: 1;
+}
+
+::ng-deep .registration-type .p-button:focus {
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
+  z-index: 2;
+}
+
+/* Keep disabled buttons visible and slightly muted */
+::ng-deep .registration-type .p-button.p-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* Applicant Section Styles */
+// .ApplicantSection {
+//   border: 1px solid #e0e0e0;
+//   border-radius: 8px;
+//   padding: 15px;
+//   background-color: #fafafa;
+//   margin-bottom: 8px;
+//   position: relative;
+// }
+
+.ApplicantSection.FirstApplicant {
+  background-color: #f5f9ff;
+  border-color: #007bff;
+  border-left: 5px solid #007bff;
+}
+
+.ApplicantSection.SecondApplicant {
+  background-color: #f0f8f0;
+  border-color: #28a745;
+  border-left: 5px solid #28a745;
+}
+
+.ApplicantSection.ThirdApplicant {
+  background-color: #fff8f0;
+  border-color: #ffc107;
+  border-left: 5px solid #ffc107;
+}
+
+.ApplicantHeader {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.ApplicantTitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.ApplicantSection.FirstApplicant .ApplicantTitle {
+  color: #007bff;
+}
+
+.ApplicantSection.SecondApplicant .ApplicantTitle {
+  color: #28a745;
+}
+
+.ApplicantSection.ThirdApplicant .ApplicantTitle {
+  color: #ffc107;
+}
+
+.ApplicantBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #007bff;
+  color: white;
+}
+
+.ApplicantSection.FirstApplicant .ApplicantBadge {
+  background: #007bff;
+}
+
+.ApplicantSection.SecondApplicant .ApplicantBadge {
+  background: #28a745;
+}
+
+.ApplicantSection.ThirdApplicant .ApplicantBadge {
+  background: #ffc107;
+  color: #333;
+}
+
+/* Tab Input Section - Form Fields Grid Layout */
+.TabInputSect {
+  width: 100%;
+}
+
+.TabInputSect .row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -12px;
+  margin-right: -12px;
+  margin-bottom: 0;
+}
+
+.TabInputSect .col-4,
+.TabInputSect .col-2 {
+  display: flex;
+  flex-direction: column;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-bottom: 16px;
+}
+
+.TabInputSect .col-4 {
+  flex: 0 0 33.3333%;
+  min-width: 0;
+  max-width: 33.3333%;
+}
+
+.TabInputSect .col-2 {
+  flex: 0 0 16.6666%;
+  min-width: 0;
+  max-width: 16.6666%;
+}
+
+.TabInputSect .InputControl {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.TabInputSect .InputControl label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  color: #333;
+}
+
+.TabInputSect .InputControl input,
+.TabInputSect .InputControl mat-form-field {
+  width: 100%;
+}
+
+/* Responsive Grid */
+@media (max-width: 1200px) {
+  .TabInputSect .col-4 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  .TabInputSect .col-4,
+  .TabInputSect .col-2 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
