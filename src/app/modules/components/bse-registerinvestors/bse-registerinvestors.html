@@ -1,13 +1,4 @@
-<!-- <app-ucc-tabs [selectedIndex]="0" (onTabChange)="navigate($event)"></app-ucc-tabs> -->
-
-<!-- /end here -->
-<!-- <app-sso></app-sso> -->
-
-
 <div>
-    <!-- <h5 class="PageHeading">BSE - Register Investors</h5> -->
-
-
     <div class="MainPageCntnr" [formGroup]="registrationForm">
         <div class="MaingPage_InnerNavHead">
             <div class="LeftSideItems">
@@ -20,25 +11,16 @@
             </div>
         </div>
 
-          <div class="row mt-3 search-row" *ngIf="!isEdit">
+        <div class="row mt-3 search-row" *ngIf="!isEdit">
             <div class="col-4">
                 <div class="InputControl">
                     <label>Search Group Code <span class="RedTxt">*</span></label>
                     <div class="search-group-container" *ngIf="!editMode">
-                        <p-autoComplete
-                            formControlName="groupSearch"
-                            [suggestions]="filteredGroups"
-                            field="GroupDescription"
-                            dataKey="GroupID"
-                            [minLength]="3"
-                            [forceSelection]="true"
-                            [showClear]="true"
-                            [dropdown]="false"
-                            [disabled]="isGroupLookupLoading"
-                            inputStyleClass="Width100perc search-input"
-                            placeholder="Search or select Group Code..."
-                            (completeMethod)="onGroupComplete($event)"
-                            (onSelect)="onGroupSelect($event)"
+                        <p-autoComplete formControlName="groupSearch" [suggestions]="filteredGroups"
+                            field="GroupDescription" dataKey="GroupID" [minLength]="3" [forceSelection]="true"
+                            [showClear]="true" [dropdown]="false" [disabled]="isGroupLookupLoading"
+                            inputStyleClass="Width100perc search-input" placeholder="Search or select Group Code..."
+                            (completeMethod)="onGroupComplete($event)" (onSelect)="onGroupSelect($event)"
                             (onClear)="clearGroupSelection()">
                             <ng-template let-group pTemplate="item">
                                 <div class="group-description">{{ group.GroupDescription }}</div>
@@ -50,7 +32,7 @@
                             </ng-template>
                         </p-autoComplete>
 
-                        <div *ngIf="isGroupLookupLoading" class="status-message">
+                        <div *ngIf="isGroupLookupLoading" class="status-message error-overlay">
                             <i class="pi pi-spin pi-spinner"></i>
                             <span>Fetching group codes...</span>
                         </div>
@@ -58,7 +40,8 @@
                         <div *ngIf="groupLookupError && !isGroupLookupLoading" class="error-message server-error">
                             <i class="pi pi-times-circle"></i>
                             <span>{{ groupLookupError }}</span>
-                            <button type="button" class="retry-link" (click)="getGroupByLogin()" [disabled]="isGroupLookupLoading">
+                            <button type="button" class="retry-link" (click)="getGroupByLogin()"
+                                [disabled]="isGroupLookupLoading">
                                 Retry
                             </button>
                         </div>
@@ -80,9 +63,7 @@
                     <label>Select Member <span class="RedTxt">*</span></label>
                     <div class="search-member-container">
                         <mat-form-field class="Width100perc">
-                            <mat-select
-                                formControlName="memberName"
-                                placeholder="Select member..."
+                            <mat-select formControlName="memberName" placeholder="Select member..."
                                 [disabled]="!registrationForm.get('groupId')?.value"
                                 (selectionChange)="selectMember($event.value)">
                                 <mat-option value="" disabled>Select member...</mat-option>
@@ -109,7 +90,6 @@
             </div>
         </div>
 
-        <!-- <div *ngIf="registrationForm.get('groupId')?.value && registrationForm.get('memberName')?.value"> -->
         <div class="GreyBoxCntnr mt-3">
             <div class="row ">
                 <div class="col-4">
@@ -188,8 +168,7 @@
                     <div class="InputControl">
                         <label>Nominee Opted <span class="RedTxt">*</span></label>
                         <mat-radio-group class="Width100perc d-flex" aria-label="Select an option"
-                            formControlName="nominationOpted"
-                           >
+                            formControlName="nominationOpted">
                             <mat-radio-button value="Y">Yes</mat-radio-button>
                             <mat-radio-button value="N">No</mat-radio-button>
                         </mat-radio-group>
@@ -227,25 +206,6 @@
                             <label>First Name <span class="RedTxt">*</span></label>
                             <input type="text" pInputText class="Width100perc" formControlName="firstName" required
                                 maxlength="25" />
-
-
-                            <!-- <input 
-    type="text"
-    pInputText
-    class="Width100perc"
-    formControlName="firstName"
-    maxlength="25"
- (focus)="openDropdown()"
-  (input)="syncSearchText()"
-
- 
-/>
-
-<ul *ngIf="dropdownOpen && filteredMembers.length > 0" class="dropdown-list">
-    <li *ngFor="let member of filteredMembers" (click)="selectMember(member)">
-        {{ member.LookUpDescription }}
-    </li>
-</ul>  -->
 
                             <div *ngIf="registrationForm.controls['firstName'].touched && registrationForm.controls['firstName'].hasError('required')"
                                 class="error-message">
@@ -494,27 +454,25 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Progress Bar -->
+
         <div class="progress-container mt-3" *ngIf="isLoading" [@slideDown]>
             <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
             <p class="progress-text">⏳ Saving registration details...</p>
         </div>
-        
+
         <div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end ">
-            <button pButton class="Grey_OutlineBtn ms-1" (click)="goBack()"  [disabled]="isLoading">
+            <button pButton class="Grey_OutlineBtn ms-1" (click)="goBack()" [disabled]="isLoading">
                 <i class="pi pi-angle-left" pButtonIcon></i>
                 <span pButtonLabel>Back</span>
             </button>
             <button pButton class="Blue_FilledBtn ms-1" *ngIf="!isEdit" (click)="goToNextTab()" [disabled]="isLoading">
                 <span pButtonLabel>Save & Continue</span>
             </button>
-               <button pButton class="Blue_FilledBtn ms-1" *ngIf="isEdit" (click)="updateDataandContinue()" [disabled]="isLoading">
+            <button pButton class="Blue_FilledBtn ms-1" *ngIf="isEdit" (click)="updateDataandContinue()"
+                [disabled]="isLoading">
                 <span pButtonLabel>Update & Continue</span>
             </button>
         </div>
 
-        <!-- </div> -->
-    <!-- </div> -->
-</div>
+    </div>
 </div>

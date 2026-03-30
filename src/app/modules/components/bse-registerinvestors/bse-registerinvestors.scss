@@ -57,6 +57,7 @@
 }
 
 .search-row .col-4 .InputControl {
+  min-height: 72px;
   width: 100%;
 }
 
@@ -74,8 +75,7 @@
   flex: 1 1 auto;
   width: auto;
   padding: 10px 44px 10px 12px !important;
-  height: 42px;
-  line-height: 1.4;
+  line-height: 1.2;
   box-sizing: border-box;
   display: flex;
   align-items: center;

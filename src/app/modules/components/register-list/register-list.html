@@ -1,6 +1,3 @@
-
-<!-- <app-sso></app-sso> -->
-
 <div>
     <!-- Modal overlay spinner for editing registration -->
     <div *ngIf="isEditingRegistration" class="modal-overlay">
@@ -9,20 +6,6 @@
             <div class="modal-spinner-text">⏳ Loading registration details...</div>
         </div>
     </div>
-
-    <!-- <div *ngIf="isUccFetching" class="modal-overlay">
-  <div class="modal-spinner">
-    <mat-progress-spinner
-      mode="indeterminate"
-      diameter="60"
-      color="primary">
-    </mat-progress-spinner>
-
-    <div class="modal-spinner-text">
-      ⏳ Fetching UCC status...
-    </div>
-  </div>
-</div> -->
 
     <p-breadcrumb [model]="breadcrumb_items" [home]="home"></p-breadcrumb>
 
@@ -73,7 +56,7 @@
                     <i class="pi pi-trash"></i>
                 </span>
 
-                 <!-- <span class="ControlIcons" (click)="editSelectedUcc()">
+                <!-- <span class="ControlIcons" (click)="editSelectedUcc()">
                     <i class="pi pi-pencil"></i>
                 </span> -->
                 <button pButton class="Blue_FilledBtn float-start ms-1" (click)="navigateToNewRegigster()">
@@ -140,17 +123,17 @@
             <p class="loading-text">⏳ Loading UCC investors data...</p>
         </div>
 
-           <div class="progress-container" *ngIf="isBseSubmitting">
+        <div class="progress-container" *ngIf="isBseSubmitting">
             <p-progressBar mode="indeterminate"></p-progressBar>
             <p class="loading-text">⏳ Submitting Data...</p>
         </div>
 
-         <div class="progress-container" *ngIf="isElogLoading">
+        <div class="progress-container" *ngIf="isElogLoading">
             <p-progressBar mode="indeterminate"></p-progressBar>
             <p class="loading-text">⏳ Redirecting to Authenticate Elog...</p>
         </div>
 
-          <div class="progress-container" *ngIf="isNomineeLoading">
+        <div class="progress-container" *ngIf="isNomineeLoading">
             <p-progressBar mode="indeterminate"></p-progressBar>
             <p class="loading-text">⏳ Redirecting to Authenticate Nominee...</p>
         </div>
@@ -189,8 +172,6 @@
                         <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleRowSelection(row, i)"
                             [checked]="selection.isSelected(row)"></mat-checkbox>
                     </td>
-
-
                 </ng-container>
 
 
@@ -200,8 +181,8 @@
                 <!-- Client ID Column -->
                 <ng-container matColumnDef="clientId">
                     <th mat-header-cell *matHeaderCellDef> Client ID </th>
-                     <!-- (click)="navToUccTabs(i)" -->
-                    <td mat-cell *matCellDef="let element; let i = index"><a>
+                    <!-- (click)="navToUccTabs(i)" -->
+                    <td (click)="navToUccTabs(i)" mat-cell *matCellDef="let element; let i = index"><a>
                             {{element.bseClientCode }}</a> </td>
                 </ng-container>
 
@@ -242,54 +223,52 @@
                 </ng-container> -->
 
                 <!-- end here -->
-   <ng-container matColumnDef="UCCStatus">
-  <th mat-header-cell *matHeaderCellDef> UCC Status </th>
+                <ng-container matColumnDef="UCCStatus">
+                    <th mat-header-cell *matHeaderCellDef> UCC Status </th>
 
-  <td mat-cell *matCellDef="let element">
+                    <td mat-cell *matCellDef="let element">
 
-    <ng-container [ngSwitch]="true">
+                        <ng-container [ngSwitch]="true">
 
-      <!-- 🔹 Loading -->
-      <span *ngSwitchCase="element.isUccStatusLoading"
-            style="color:#1976d2;">
-        Fetching...
-      </span>
+                            <!-- 🔹 Loading -->
+                            <span *ngSwitchCase="element.isUccStatusLoading" style="color:#1976d2;">
+                                Fetching...
+                            </span>
 
-      <!-- 🔹 ACTIVE -->
-      <span *ngSwitchCase="element.uccStatus === 'ACTIVE'"
-            style="color:#28a745; font-weight:500;">
-        ACTIVE
-      </span>
+                            <!-- 🔹 ACTIVE -->
+                            <span *ngSwitchCase="element.uccStatus === 'ACTIVE'"
+                                style="color:#28a745; font-weight:500;">
+                                ACTIVE
+                            </span>
 
-      <!-- 🔹 PENDING -->
-      <span *ngSwitchCase="element.uccStatus === 'PENDING_VERIFICATION'"
-            style="color:#ff9800; font-weight:500;">
-        Pending Verification
-      </span>
+                            <!-- 🔹 PENDING -->
+                            <span *ngSwitchCase="element.uccStatus === 'PENDING_VERIFICATION'"
+                                style="color:#ff9800; font-weight:500;">
+                                Pending Verification
+                            </span>
 
-          <!-- 🔹 PENDING -->
-      <span *ngSwitchCase="element.uccStatus === 'PENDING_AUTH'"
-            style="color:#ff9800; font-weight:500;">
-        Pending Auth
-      </span>
+                            <!-- 🔹 PENDING -->
+                            <span *ngSwitchCase="element.uccStatus === 'PENDING_AUTH'"
+                                style="color:#ff9800; font-weight:500;">
+                                Pending Auth
+                            </span>
 
-      <!-- 🔹 UNKNOWN / ERROR -->
-      <span *ngSwitchCase="['UNKNOWN','ERROR'].includes(element.uccStatus)"
-            style="color:#d32f2f; font-weight:500;">
-        {{ element.uccStatus }}
-      </span>
+                            <!-- 🔹 UNKNOWN / ERROR -->
+                            <span *ngSwitchCase="['UNKNOWN','ERROR'].includes(element.uccStatus)"
+                                style="color:#d32f2f; font-weight:500;">
+                                {{ element.uccStatus }}
+                            </span>
 
-      <!-- 🔹 Initial -->
-      <a *ngSwitchDefault
-         style="cursor:pointer; color:#1976d2;"
-         (click)="getParticularUccData(element.memberId, element.bseClientCode, element)">
-        Fetch Status
-      </a>
+                            <!-- 🔹 Initial -->
+                            <a *ngSwitchDefault style="cursor:pointer; color:#1976d2;"
+                                (click)="getParticularUccData(element.memberId, element.bseClientCode, element)">
+                                Fetch Status
+                            </a>
 
-    </ng-container>
+                        </ng-container>
 
-  </td>
-</ng-container>
+                    </td>
+                </ng-container>
 
 
 
@@ -313,19 +292,19 @@
                 <ng-container matColumnDef="fatcaStatus">
                     <th mat-header-cell *matHeaderCellDef> Fatca Status </th>
                     <td mat-cell *matCellDef="let element, let i = index">
-                  
+
 
                         <span *ngIf="element.fatcaStatus === '1'; else pendingFatcaTpl" class="greenText">
                             Success
                         </span>
 
                         <ng-template #pendingFatcaTpl>
-                            <a (click)="$event.preventDefault(); createFatcaStatus(i)" >
+                            <a (click)="$event.preventDefault(); createFatcaStatus(i)">
                                 Pending
                             </a>
                         </ng-template>
 
-                           
+
                     </td>
                 </ng-container>
 
@@ -359,10 +338,11 @@
                         <a>Upload/Auth Link</a>
                     </td>
                 </ng-container>
-                  
-                     <ng-container matColumnDef="nomAuthLink">
+
+                <ng-container matColumnDef="nomAuthLink">
                     <th mat-header-cell *matHeaderCellDef> Nominee Auth Link </th>
-                    <td mat-cell *matCellDef="let element" (click)="$event.preventDefault(); getNomineeLinkReq(element)" >
+                    <td mat-cell *matCellDef="let element"
+                        (click)="$event.preventDefault(); getNomineeLinkReq(element)">
                         <!-- [ngClass]="{'blueText':element.elogLink == '' }" -->
                         <!-- <i [class]="element.docStatus ? 'pi pi-check-circle' : 'pi pi-exclamation-circle'"></i> -->
                         <!-- {{element.docStaus ? 'Uploaded':'Pending'}}- "Auth Link"  -->
@@ -389,7 +369,7 @@
                         <span *ngIf="element.uccRegistration !== '0'; else pendingTpl" class="greenText">
                             Success
                         </span>
-                            
+
                         <ng-template #pendingTpl>
                             <button mat-flat-button color="primary" class="status-btn"
                                 (click)="$event.preventDefault(); saveDataToBSE(element.bseClientCode)">
@@ -437,8 +417,8 @@
         </mat-paginator>
     </div>
 
-<!-- ason 23-02-2026 -->
- 
+    <!-- ason 23-02-2026 -->
+
     <!-- ✅ EDIT DETAILS MODAL -->
     <div class="edit-modal-overlay" *ngIf="isShowEditModal" (click)="closeEditModal()">
         <div class="edit-modal-container" (click)="$event.stopPropagation()">
@@ -456,11 +436,8 @@
             <!-- Modal Body with Menu Items -->
             <div class="edit-modal-body">
                 <div class="edit-details-menu">
-                    <button 
-                        *ngFor="let tab of editTabs" 
-                        [class.active]="activeEditTab === tab.id"
-                        (click)="navigateToTab(tab)"
-                        class="edit-menu-item">
+                    <button *ngFor="let tab of editTabs" [class.active]="activeEditTab === tab.id"
+                        (click)="navigateToTab(tab)" class="edit-menu-item">
                         <i [class]="tab.icon"></i>
                         <span>{{ tab.label }}</span>
                     </button>
@@ -479,6 +456,6 @@
         </div>
     </div>
 
- <!-- end here -->
+    <!-- end here -->
 
 </div>

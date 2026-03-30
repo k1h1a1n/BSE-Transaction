@@ -1,7 +1,5 @@
 <p-breadcrumb [model]="breadcrumb_items" [home]="home"></p-breadcrumb>
-
 <h5 class="PageHeading">BSE - Register Investors</h5>
-
 <div class="TabMainCntnr MainTabSect Width100perc mt-3">
     <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="abcd">
 
@@ -9,23 +7,13 @@
             <app-bse-registerinvestors (nextTab)="goToTab($event)"></app-bse-registerinvestors>
         </mat-tab>
 
-        <!-- <mat-tab label="Address Details" class="abcd">
-            <app-address-details (nextTab)="goToTab($event)"></app-address-details>
-        </mat-tab> -->
+        <mat-tab label="Address Details">
+            <app-address-details (nextTab)="goToTab($event)" [tabState]="tabStates[2]">
+            </app-address-details>
+        </mat-tab>
 
-          <mat-tab label="Address Details">
-    <app-address-details
-    (nextTab)="goToTab($event)"   [tabState]="tabStates[2]">
-    </app-address-details>
-  </mat-tab>
-
-        <!-- <mat-tab label="KYC Details">
-            <app-kyc-details (nextTab)="goToTab($event)"></app-kyc-details>
-        </mat-tab> -->
-
-        
         <mat-tab label="KYC Details">
-            <app-kyc-details (nextTab)="goToTab($event)"  [tabState]="tabStates[3]"></app-kyc-details>
+            <app-kyc-details (nextTab)="goToTab($event)" [tabState]="tabStates[3]"></app-kyc-details>
         </mat-tab>
 
         <mat-tab label="Depository and Bank Details">
@@ -37,23 +25,6 @@
         </mat-tab>
 
     </mat-tab-group>
-
 </div>
-<router-outlet></router-outlet> 
 
-
- <!-- <p-breadcrumb [model]="breadcrumb_items" [home]="home"></p-breadcrumb> -->
-
-<!-- <h5 class="PageHeading">BSE - Register Investors</h5>
-
-<div class="TabMainCntnr Width100perc mt-3">
-<mat-tab-group [selectedIndex]="selectedIndex" (selectedIndexChange)="tabChanged($event)">
-    <mat-tab label="1st Applicant"></mat-tab>
-    <mat-tab label="Address Details"></mat-tab>
-    <mat-tab label="KYC Details"></mat-tab>
-    <mat-tab label="Depository and Bank Details"></mat-tab>
-    <mat-tab label="Nominee Details"></mat-tab>
-</mat-tab-group>
-
-</div> 
-<router-outlet></router-outlet> -->
+<router-outlet></router-outlet>

@@ -441,7 +441,7 @@ export class BseRegisterinvestors {
   registrationTypeOptions = [
     { label: 'New', value: 'New', disabled: false },
     { label: 'Mod', value: 'Mod', disabled: false },
-    { label: 'Nom', value: 'Nom', disabled: false },
+    // { label: 'Nom', value: 'Nom', disabled: false },
   ];
 
 
@@ -947,7 +947,7 @@ export class BseRegisterinvestors {
       this.registrationTypeOptions = [
         { label: 'New', value: 'New', disabled: false },
         { label: 'Mod', value: 'Mod', disabled: true },
-        { label: 'Nom', value: 'Nom', disabled: true },
+        // { label: 'Nom', value: 'Nom', disabled: true },
       ];
       // Ensure 'New' is selected in add mode
       this.registrationForm.get('registrationType')?.setValue('New', { emitEvent: false });
@@ -956,7 +956,7 @@ export class BseRegisterinvestors {
       this.registrationTypeOptions = [
         { label: 'New', value: 'New', disabled: true },
         { label: 'Mod', value: 'Mod', disabled: false },
-        { label: 'Nom', value: 'Nom', disabled: false },
+        // { label: 'Nom', value: 'Nom', disabled: false },
       ];
       // ✅ Set 'Mod' as default in edit mode to show background color
       this.registrationForm.get('registrationType')?.setValue('Mod', { emitEvent: false });

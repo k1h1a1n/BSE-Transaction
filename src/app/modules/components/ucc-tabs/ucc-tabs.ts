@@ -13,14 +13,13 @@ import { Router, RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-ucc-tabs',
   imports: [CommonModule, BreadcrumbModule, MatTabsModule, NomineeDetail, DepoBankDetail, BseRegisterinvestors,
-    KycDetailsComponent, RouterOutlet, AddressDetails ],
+    KycDetailsComponent, RouterOutlet, AddressDetails],
   //  imports: [CommonModule, RouterOutlet, BreadcrumbModule, MatTabsModule],
   templateUrl: './ucc-tabs.html',
-  styleUrl: './ucc-tabs.scss',
- 
+  styleUrl: './ucc-tabs.scss'
 })
 export class UccTabs {
-    @ViewChild(KycDetailsComponent) kycDetailsComp?: KycDetailsComponent;
+  @ViewChild(KycDetailsComponent) kycDetailsComp?: KycDetailsComponent;
   breadcrumb_items: MenuItem[] = [];
   home: MenuItem = {};
   selectedTabIndex: number = 0;  // First tab
@@ -29,83 +28,51 @@ export class UccTabs {
   tabState: any = null;  // Store state passed between tabs
 
   constructor(private router: Router) {
+    
   }
 
+  tabChanged(i: number) {
+    // this.onTabChange.emit(i);
+  }
 
-// @Input() selectedIndex: number = 0;
-// @Output() onTabChange = new EventEmitter<number>();
-
-tabChanged(i: number) {
-  // this.onTabChange.emit(i);
-}
-
-
-
-  
-  ngOnInit(){
+  ngOnInit() {
     console.log('ucc tabs called');
-        const navState = history.state;
-            console.log(navState,'nav state');
-            
+    const navState = history.state;
+    console.log(navState, 'nav state');
+
     this.isEdit = navState?.isEdit === true;
 
-    console.log(this.isEdit,'isEdit');
+    console.log(this.isEdit, 'isEdit');
 
-        this.breadcrumb_items = [
+    this.breadcrumb_items = [
       { label: 'Home', routerLink: '/' },
       { label: 'CRM', routerLink: '/crm' },
       { label: 'Online MF Transactions', routerLink: '/crm' },
       { label: 'BSE Register Investors' },
     ];
-        this.home = { icon: 'pi pi-home', routerLink: '/' };
-
-
-     
+    this.home = { icon: 'pi pi-home', routerLink: '/' };
   }
 
+  tabStates: { [index: number]: any } = {};
 
-// goToTab(event: {index: number, state?: any} | number) {
-//   // Handle both old format (number) and new format (object with index and state)
-//   if (typeof event === 'number') {
-//     this.selectedTabIndex = event;
-//   } else {
-//     this.selectedTabIndex = event.index;
-//     if (event.state) {
-//       this.tabState = event.state;
-//       console.log('Tab state received:', this.tabState);
-//     }
-//   }
-//   console.log(this.selectedTabIndex,' selected index');
+  goToTab(event: { index: number; state?: any } | number) {
 
-//   // If KYC Details tab is selected (index 2), refresh field states
-//   if (this.selectedTabIndex === 2 && this.kycDetailsComp) {
-//     this.kycDetailsComp.refreshFieldStates();
-//   }
-// }
+    if (typeof event === 'number') {
+      this.selectedTabIndex = event;
+      return;
+    }
 
+    this.selectedTabIndex = event.index;
 
-tabStates: { [index: number]: any } = {};
+    // ✅ store state ONLY for that tab - create new object reference to trigger change detection
+    this.tabStates[event.index] = event.state ? { ...event.state } : null;
 
-goToTab(event: { index: number; state?: any } | number) {
+    console.log('Tab state map:', this.tabStates);
 
-  if (typeof event === 'number') {
-    this.selectedTabIndex = event;
-    return;
+    // If KYC Details tab is selected (index 2), refresh field states
+    if (this.selectedTabIndex === 2 && this.kycDetailsComp) {
+      this.kycDetailsComp.refreshFieldStates();
+    }
   }
-
-  this.selectedTabIndex = event.index;
-
-  // ✅ store state ONLY for that tab - create new object reference to trigger change detection
-  this.tabStates[event.index] = event.state ? { ...event.state } : null;
-
-  console.log('Tab state map:', this.tabStates);
-
-   // If KYC Details tab is selected (index 2), refresh field states
-  if (this.selectedTabIndex === 2 && this.kycDetailsComp) {
-    this.kycDetailsComp.refreshFieldStates();
-  }
-}
-
- 
 
 }
