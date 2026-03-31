@@ -519,6 +519,76 @@ export class BseRegisterinvestors {
       emailDeclaration: ['', Validators.required],
       kycType: ['K', Validators.required],
 
+
+      // 2nt Applicant Section
+      firstName_2: ['',
+        [Validators.required,
+        Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+        Validators.minLength(2),
+        Validators.maxLength(25)]],
+      middleName_2: ['',
+        [
+          Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+          Validators.minLength(1),
+          Validators.maxLength(25)]],
+      lastName_2: ['',
+        [Validators.required,
+        Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+        Validators.minLength(2),
+        Validators.maxLength(25)]],
+      pan_2: ['', [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]$/)]],
+      gender_2: ['', Validators.required],
+      dob_2: ['', [Validators.required, this.minimumAgeValidator(18)]],
+
+      occupation_2: ['', Validators.required],
+      mobile_2: ['',
+        Validators.compose([
+          Validators.required,
+          Validators.pattern(/^[6-9]\d{9}$/)
+        ])],
+      mobileDeclaration_2: ['', Validators.required],
+      email_2: ['', Validators.compose([
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+      ])],
+
+      emailDeclaration_2: ['', Validators.required],
+      kycType_2: ['K', Validators.required],
+
+      // 2nt Applicant Section
+      firstName_3: ['',
+        [Validators.required,
+        Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+        Validators.minLength(2),
+        Validators.maxLength(25)]],
+      middleName_3: ['',
+        [
+          Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+          Validators.minLength(1),
+          Validators.maxLength(25)]],
+      lastName_3: ['',
+        [Validators.required,
+        Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+        Validators.minLength(2),
+        Validators.maxLength(25)]],
+      pan_3: ['', [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]$/)]],
+      gender_3: ['', Validators.required],
+      dob_3: ['', [Validators.required, this.minimumAgeValidator(18)]],
+
+      occupation_3: ['', Validators.required],
+      mobile_3: ['',
+        Validators.compose([
+          Validators.required,
+          Validators.pattern(/^[6-9]\d{9}$/)
+        ])],
+      mobileDeclaration_3: ['', Validators.required],
+      email_3: ['', Validators.compose([
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+      ])],
+
+      emailDeclaration_3: ['', Validators.required],
+      kycType_3: ['K', Validators.required],
     });
     this.getGroupByLogin();
 
@@ -811,10 +881,10 @@ export class BseRegisterinvestors {
     const defaults = this.buildFormDefaults(preserve);
     this.registrationForm.reset({}, { emitEvent: false });
     this.registrationForm.patchValue(defaults, { emitEvent: false });
-    
+
     // Re-disable nominationOpted after patching values
     // this.registrationForm.get('nominationOpted')?.disable({ emitEvent: false });
-    
+
     // this.ensureDisabledControls();
     this.registrationForm.markAsPristine();
     this.registrationForm.markAsUntouched();
@@ -1080,7 +1150,7 @@ export class BseRegisterinvestors {
 
     this.onMemberChange(this.selectedMemberId);
   }
-  
+
   setupSearch() {
     this.registrationForm.get('memberSearch')?.valueChanges.pipe(
       debounceTime(200),
@@ -1137,19 +1207,19 @@ export class BseRegisterinvestors {
     return `${day}/${month}/${year}`;
   }
 
-formatDateToYYYYMMDD(date: Date | string): string {
-  const d = date instanceof Date ? date : new Date(date);
+  formatDateToYYYYMMDD(date: Date | string): string {
+    const d = date instanceof Date ? date : new Date(date);
 
-  if (isNaN(d.getTime())) {
-    return '';
+    if (isNaN(d.getTime())) {
+      return '';
+    }
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
-
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-}
 
 
   formatDateForInput(dob: string): string | null {
@@ -1342,7 +1412,7 @@ formatDateToYYYYMMDD(date: Date | string): string {
 
     const input: UccMemberInfo = this.mapFormToUccMemberInfo(rawFormValue);
     console.log(input, 'input of registration');
-    
+
     if (this.isEdit && this.memberID) {
       input.membID = Number(this.memberID);
     }
@@ -1400,7 +1470,7 @@ formatDateToYYYYMMDD(date: Date | string): string {
 
     const rawFormValue = this.registrationForm.getRawValue();
     // rawFormValue.dob = this.formatDateToDDMMYYYY(rawFormValue.dob);
-        rawFormValue.dob = this.formatDateToYYYYMMDD(rawFormValue.dob);
+    rawFormValue.dob = this.formatDateToYYYYMMDD(rawFormValue.dob);
     console.log(rawFormValue, 'dob');
 
     localStorage.setItem('uccRegistrationData', JSON.stringify(rawFormValue));
@@ -1437,8 +1507,8 @@ formatDateToYYYYMMDD(date: Date | string): string {
     console.log(editedBseClientCode, 'edited BSE Client Code');
 
     const input: UccMemberInfo = this.mapFormToUccMemberInfo(rawFormValue);
-    console.log(input,'input of registration');
-    
+    console.log(input, 'input of registration');
+
     if (this.isEdit && this.memberID) {
       input.membID = Number(this.memberID);
       input.clieCode = editedBseClientCode || input.clieCode;
@@ -1519,7 +1589,7 @@ formatDateToYYYYMMDD(date: Date | string): string {
 
         // Handle both array and single object responses
         let groupsArray: any[] = [];
-        
+
         if (Array.isArray(res)) {
           groupsArray = res;
         } else if (res && typeof res === 'object' && res.lookUpID && res.lookUpDescription) {
@@ -1620,10 +1690,10 @@ formatDateToYYYYMMDD(date: Date | string): string {
     return this.bseUCCService.getGroupIdByMembId().pipe(
       map((res: any) => {
         console.log(res, 'group id by memb id response');
-        if(!res){
-            this.sharedService.OpenAlert( 'Unable to fetch the group identifier. Please try again.');
+        if (!res) {
+          this.sharedService.OpenAlert('Unable to fetch the group identifier. Please try again.');
         }
-        
+
         // Check if API returned success: false
         if (res?.success === false) {
           console.warn('⚠️ API returned failure:', res?.message);
@@ -1631,7 +1701,7 @@ formatDateToYYYYMMDD(date: Date | string): string {
           localStorage.removeItem('resSelectedGroupID');
           return null;
         }
-        
+
         // Handle success case
         const groupID = res?.grouID || res?.GroupID || null;
         if (groupID) {

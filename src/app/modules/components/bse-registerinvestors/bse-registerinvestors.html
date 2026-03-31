@@ -196,9 +196,9 @@
                 </div>
             </div>
         </div>
-
+        @if (['SI' , 'JO' , 'AS'].includes(registrationForm.get('holdingPattern')?.value)) {
         <div class="TabInputCntnr mt-3">
-            <h5 class="TabCntnrHead mb-0">Personal Details <span class="RedTxt">*</span></h5>
+            <h5 class="TabCntnrHead mb-0">Personal Details 1st Applicant <span class="RedTxt">*</span></h5>
             <div class="TabInputSect">
                 <div class="row">
                     <div class="col-4">
@@ -321,11 +321,11 @@
                         <div class="InputControl">
                             <label>Occupation <span class="RedTxt">*</span></label>
                             <!-- <select id="occupation" formControlName="occupation" required>
-                                <option value="" disabled>Select Occupation</option>
-                                <option *ngFor="let occupation of occupationList" [value]="occupation.key">
-                                    {{ occupation.value }}
-                                </option>
-                            </select> -->
+                            <option value="" disabled>Select Occupation</option>
+                            <option *ngFor="let occupation of occupationList" [value]="occupation.key">
+                                {{ occupation.value }}
+                            </option>
+                        </select> -->
 
                             <mat-form-field>
                                 <!-- <mat-label>Select</mat-label> -->
@@ -346,11 +346,11 @@
                         <div class="InputControl">
                             <label>Email Declaration <span class="RedTxt">*</span></label>
                             <!-- <select id="occupation" formControlName="emailDeclaration" required>
-                                <option value="" disabled>Select Email Declaration</option>
-                                <option *ngFor="let occupation of emailDeclarationOptions" [value]="occupation.key">
-                                    {{ occupation.value }}
-                                </option>
-                            </select> -->
+                            <option value="" disabled>Select Email Declaration</option>
+                            <option *ngFor="let occupation of emailDeclarationOptions" [value]="occupation.key">
+                                {{ occupation.value }}
+                            </option>
+                        </select> -->
                             <mat-form-field>
                                 <!-- <mat-label>Select</mat-label> -->
                                 <mat-select formControlName="emailDeclaration">
@@ -371,11 +371,11 @@
                         <div class="InputControl">
                             <label>Mobile Declaration <span class="RedTxt">*</span></label>
                             <!-- <select id="occupation" formControlName="mobileDeclaration" required>
-                                <option value="" disabled>Select Mobile Declaration</option>
-                                <option *ngFor="let occupation of mobileDeclarationOptions" [value]="occupation.key">
-                                    {{ occupation.value }}
-                                </option>
-                            </select> -->
+                            <option value="" disabled>Select Mobile Declaration</option>
+                            <option *ngFor="let occupation of mobileDeclarationOptions" [value]="occupation.key">
+                                {{ occupation.value }}
+                            </option>
+                        </select> -->
                             <mat-form-field>
                                 <!-- <mat-label>Select</mat-label> -->
                                 <mat-select formControlName="mobileDeclaration">
@@ -424,36 +424,557 @@
                     </div>
 
                     <!-- <div class="col-4">
-                                    <section class="example-section">
-                                        <mat-checkbox class="example-margin Width100perc"
-                                            formControlName="aadharLinked">Aadhar card linked with PAN
-                                            card</mat-checkbox>
-                                        <mat-checkbox class="example-margin Width100perc"
-                                            formControlName="kyc">KYC</mat-checkbox>
-                                    </section>
-                                </div> -->
+                                <section class="example-section">
+                                    <mat-checkbox class="example-margin Width100perc"
+                                        formControlName="aadharLinked">Aadhar card linked with PAN
+                                        card</mat-checkbox>
+                                    <mat-checkbox class="example-margin Width100perc"
+                                        formControlName="kyc">KYC</mat-checkbox>
+                                </section>
+                            </div> -->
 
 
                     <!-- <div class="col-4">
-                        <div class="InputControl">
-                            <label>KYC Type <span class="RedTxt">*</span></label>
-                       <mat-form-field>
-  <mat-select formControlName="kycType">
+                    <div class="InputControl">
+                        <label>KYC Type <span class="RedTxt">*</span></label>
+                   <mat-form-field>
+    <mat-select formControlName="kycType">
     <mat-option value="" disabled>Select KYC Type</mat-option>
     <mat-option  *ngFor="let occupation of kycTypeOptions" [value]="occupation.key">{{ occupation.value }}</mat-option>
-  </mat-select>
-</mat-form-field>
-                            <div *ngIf="registrationForm.controls['kycType'].touched && registrationForm.controls['kycType'].hasError('required')"
-                                class="error-message">
-                                KYC Holder type is required
-                            </div>
+    </mat-select>
+    </mat-form-field>
+                        <div *ngIf="registrationForm.controls['kycType'].touched && registrationForm.controls['kycType'].hasError('required')"
+                            class="error-message">
+                            KYC Holder type is required
                         </div>
-                    </div> -->
+                    </div>
+                </div> -->
 
 
                 </div>
             </div>
         </div>
+        }
+
+        @if (['JO'].includes(registrationForm.get('holdingPattern')?.value)) {
+        <div class="TabInputCntnr mt-3">
+            <h5 class="TabCntnrHead mb-0">Personal Details 2nd Applicant <span class="RedTxt">*</span></h5>
+            <div class="TabInputSect">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>First Name <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="firstName_2" required
+                                maxlength="25" />
+
+                            <div *ngIf="registrationForm.controls['firstName_2'].touched && registrationForm.controls['firstName_2'].hasError('required')"
+                                class="error-message">
+                                First Name is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['firstName_2'].touched && registrationForm.controls['firstName_2'].hasError('pattern')"
+                                class="error-message">
+                                Only letters and spaces are allowed
+                            </div>
+                            <div *ngIf="registrationForm.controls['firstName_2'].touched && registrationForm.controls['firstName_2'].hasError('minlength')"
+                                class="error-message">
+                                First Name must be at least 2 characters
+                            </div>
+                            <div *ngIf="registrationForm.controls['firstName_2'].touched && registrationForm.controls['firstName_2'].hasError('maxlength')"
+                                class="error-message">
+                                First Name cannot exceed 25 characters
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Middle Name </label>
+                            <input type="text" pInputText class="Width100perc" formControlName="middleName_2"
+                                maxlength="25" (input)="allowOnlyChars($event,'middleName_2')" />
+                            <div *ngIf="registrationForm.controls['middleName_2'].touched && registrationForm.controls['middleName_2'].hasError('pattern')"
+                                class="error-message">
+                                Only letters and spaces are allowed
+                            </div>
+                            <div *ngIf="registrationForm.controls['middleName_2'].touched && registrationForm.controls['middleName_2'].hasError('minlength')"
+                                class="error-message">
+                                Middle Name must be at least 1 character
+                            </div>
+                            <div *ngIf="registrationForm.controls['middleName_2'].touched && registrationForm.controls['middleName_2'].hasError('maxlength')"
+                                class="error-message">
+                                Middle Name cannot exceed 25 characters
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Last Name <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="lastName_2"
+                                maxlength="25" required (input)="allowOnlyChars($event,'lastName_2')" />
+
+                            <div *ngIf="registrationForm.controls['lastName_2'].touched && registrationForm.controls['lastName_2'].hasError('required')"
+                                class="error-message">
+                                Last Name is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['lastName_2'].touched && registrationForm.controls['lastName_2'].hasError('pattern')"
+                                class="error-message">
+                                Only letters and spaces are allowed
+                            </div>
+                            <div *ngIf="registrationForm.controls['lastName_2'].touched && registrationForm.controls['lastName_2'].hasError('minlength')"
+                                class="error-message">
+                                Last Name must be at least 2 characters
+                            </div>
+                            <div *ngIf="registrationForm.controls['lastName_2'].touched && registrationForm.controls['lastName_2'].hasError('maxlength')"
+                                class="error-message">
+                                Last Name cannot exceed 25 characters
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>PAN Number <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="pan_2"
+                                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" />
+                            <div *ngIf="registrationForm.controls['pan_2'].touched && registrationForm.controls['pan_2'].hasError('required')"
+                                class="error-message">
+                                PAN is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['pan_2'].touched && registrationForm.controls['pan_2'].hasError('pattern')"
+                                class="error-message">
+                                Enter a valid PAN (e.g., ABCDE1234F)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Gender<span class="RedTxt">*</span></label>
+                            <mat-radio-group class="Width100perc d-flex" aria-label="Select an option"
+                                formControlName="gender_2">
+                                <mat-radio-button value="F">Female</mat-radio-button>
+                                <mat-radio-button value="M">Male</mat-radio-button>
+                            </mat-radio-group>
+
+                            <div *ngIf="registrationForm.controls['gender_2'].touched && registrationForm.controls['gender_2'].hasError('required')"
+                                class="error-message">
+                                Gender is required
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>DOB <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="dob_2" type="date"
+                                [max]="today" />
+                            <div *ngIf="registrationForm.controls['dob_2'].touched && registrationForm.controls['dob_2'].hasError('required')"
+                                class="error-message">
+                                Date of Birth is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['dob_2'].touched && registrationForm.controls['dob_2'].hasError('underage')"
+                                class="error-message">
+                                You must be at least 18 years old.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Occupation <span class="RedTxt">*</span></label>
+                            <!-- <select id="occupation" formControlName="occupation" required>
+                            <option value="" disabled>Select Occupation</option>
+                            <option *ngFor="let occupation of occupationList" [value]="occupation.key">
+                                {{ occupation.value }}
+                            </option>
+                        </select> -->
+
+                            <mat-form-field>
+                                <!-- <mat-label>Select</mat-label> -->
+                                <mat-select formControlName="occupation_2">
+                                    <mat-option value="" disabled>Select Occupation </mat-option>
+                                    <mat-option *ngFor="let occupation of occupationList" [value]="occupation.key">{{
+                                        occupation.value }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <div *ngIf="registrationForm.controls['occupation_2'].touched && registrationForm.controls['occupation_2'].hasError('required')"
+                                class="error-message">
+                                Occupation is required
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Email Declaration <span class="RedTxt">*</span></label>
+                            <!-- <select id="occupation" formControlName="emailDeclaration" required>
+                            <option value="" disabled>Select Email Declaration</option>
+                            <option *ngFor="let occupation of emailDeclarationOptions" [value]="occupation.key">
+                                {{ occupation.value }}
+                            </option>
+                        </select> -->
+                            <mat-form-field>
+                                <!-- <mat-label>Select</mat-label> -->
+                                <mat-select formControlName="emailDeclaration_2">
+                                    <mat-option value="" disabled>Select Email Declaration</mat-option>
+                                    <mat-option *ngFor="let occupation of emailDeclarationOptions"
+                                        [value]="occupation.key">{{ occupation.value }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <div *ngIf="registrationForm.controls['emailDeclaration_2'].touched && registrationForm.controls['emailDeclaration_2'].hasError('required')"
+                                class="error-message">
+                                Email Declaration is required
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Mobile Declaration <span class="RedTxt">*</span></label>
+                            <!-- <select id="occupation" formControlName="mobileDeclaration" required>
+                            <option value="" disabled>Select Mobile Declaration</option>
+                            <option *ngFor="let occupation of mobileDeclarationOptions" [value]="occupation.key">
+                                {{ occupation.value }}
+                            </option>
+                        </select> -->
+                            <mat-form-field>
+                                <!-- <mat-label>Select</mat-label> -->
+                                <mat-select formControlName="mobileDeclaration_2">
+                                    <mat-option value="" disabled>Select Mobile Declaration</mat-option>
+                                    <mat-option *ngFor="let occupation of mobileDeclarationOptions"
+                                        [value]="occupation.key">{{ occupation.value }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <div *ngIf="registrationForm.controls['mobileDeclaration_2'].touched && registrationForm.controls['mobileDeclaration_2'].hasError('required')"
+                                class="error-message">
+                                Mobile Declaration is required
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Mobile Number <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="mobile_2" />
+                            <div *ngIf="registrationForm.controls['mobile_2'].touched && registrationForm.controls['mobile_2'].hasError('required')"
+                                class="error-message">
+                                Mobile Number is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['mobile_2'].touched && registrationForm.controls['mobile_2'].hasError('pattern')"
+                                class="error-message">
+                                Enter a valid 10-digit mobile number starting with 6, 7, 8, or 9
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-4">
+                        <div class="InputControl">
+                            <label>Email Number <span class="RedTxt">*</span></label>
+                            <input type="text" pInputText class="Width100perc" formControlName="email_2" />
+                            <div *ngIf="registrationForm.controls['email_2'].touched && registrationForm.controls['email_2'].hasError('required')"
+                                class="error-message">
+                                Email is required
+                            </div>
+                            <div *ngIf="registrationForm.controls['email_2'].touched && registrationForm.controls['email_2'].hasError('pattern')"
+                                class="error-message">
+                                Enter a valid Email Address
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-4">
+                                <section class="example-section">
+                                    <mat-checkbox class="example-margin Width100perc"
+                                        formControlName="aadharLinked">Aadhar card linked with PAN
+                                        card</mat-checkbox>
+                                    <mat-checkbox class="example-margin Width100perc"
+                                        formControlName="kyc">KYC</mat-checkbox>
+                                </section>
+                            </div> -->
+
+
+                    <!-- <div class="col-4">
+                    <div class="InputControl">
+                        <label>KYC Type <span class="RedTxt">*</span></label>
+                   <mat-form-field>
+<mat-select formControlName="kycType">
+<mat-option value="" disabled>Select KYC Type</mat-option>
+<mat-option  *ngFor="let occupation of kycTypeOptions" [value]="occupation.key">{{ occupation.value }}</mat-option>
+</mat-select>
+</mat-form-field>
+                        <div *ngIf="registrationForm.controls['kycType'].touched && registrationForm.controls['kycType'].hasError('required')"
+                            class="error-message">
+                            KYC Holder type is required
+                        </div>
+                    </div>
+                </div> -->
+
+
+                </div>
+            </div>
+        </div>
+        }
+
+        @if (['JO'].includes(registrationForm.get('holdingPattern')?.value)) {
+            <div class="TabInputCntnr mt-3">
+                <h5 class="TabCntnrHead mb-0">Personal Details 3rd Applicant <span class="RedTxt">*</span></h5>
+                <div class="TabInputSect">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>First Name <span class="RedTxt">*</span></label>
+                                <input type="text" pInputText class="Width100perc" formControlName="firstName_3" required
+                                    maxlength="25" />
+    
+                                <div *ngIf="registrationForm.controls['firstName_3'].touched && registrationForm.controls['firstName_3'].hasError('required')"
+                                    class="error-message">
+                                    First Name is required
+                                </div>
+                                <div *ngIf="registrationForm.controls['firstName_3'].touched && registrationForm.controls['firstName_3'].hasError('pattern')"
+                                    class="error-message">
+                                    Only letters and spaces are allowed
+                                </div>
+                                <div *ngIf="registrationForm.controls['firstName_3'].touched && registrationForm.controls['firstName_3'].hasError('minlength')"
+                                    class="error-message">
+                                    First Name must be at least 2 characters
+                                </div>
+                                <div *ngIf="registrationForm.controls['firstName_3'].touched && registrationForm.controls['firstName_3'].hasError('maxlength')"
+                                    class="error-message">
+                                    First Name cannot exceed 25 characters
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Middle Name </label>
+                                <input type="text" pInputText class="Width100perc" formControlName="middleName_3"
+                                    maxlength="25" (input)="allowOnlyChars($event,'middleName_3')" />
+                                <div *ngIf="registrationForm.controls['middleName_3'].touched && registrationForm.controls['middleName_3'].hasError('pattern')"
+                                    class="error-message">
+                                    Only letters and spaces are allowed
+                                </div>
+                                <div *ngIf="registrationForm.controls['middleName_3'].touched && registrationForm.controls['middleName_3'].hasError('minlength')"
+                                    class="error-message">
+                                    Middle Name must be at least 1 character
+                                </div>
+                                <div *ngIf="registrationForm.controls['middleName_3'].touched && registrationForm.controls['middleName_3'].hasError('maxlength')"
+                                    class="error-message">
+                                    Middle Name cannot exceed 25 characters
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Last Name <span class="RedTxt">*</span></label>
+                                <input type="text" pInputText class="Width100perc" formControlName="lastName_3"
+                                    maxlength="25" required (input)="allowOnlyChars($event,'lastName_3')" />
+    
+                                <div *ngIf="registrationForm.controls['lastName_3'].touched && registrationForm.controls['lastName_3'].hasError('required')"
+                                    class="error-message">
+                                    Last Name is required
+                                </div>
+                                <div *ngIf="registrationForm.controls['lastName_3'].touched && registrationForm.controls['lastName_3'].hasError('pattern')"
+                                    class="error-message">
+                                    Only letters and spaces are allowed
+                                </div>
+                                <div *ngIf="registrationForm.controls['lastName_3'].touched && registrationForm.controls['lastName_3'].hasError('minlength')"
+                                    class="error-message">
+                                    Last Name must be at least 2 characters
+                                </div>
+                                <div *ngIf="registrationForm.controls['lastName_3'].touched && registrationForm.controls['lastName_3'].hasError('maxlength')"
+                                    class="error-message">
+                                    Last Name cannot exceed 25 characters
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>PAN Number <span class="RedTxt">*</span></label>
+                                <input type="text" pInputText class="Width100perc" formControlName="pan_3"
+                                    pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" />
+                                <div *ngIf="registrationForm.controls['pan_3'].touched && registrationForm.controls['pan_3'].hasError('required')"
+                                    class="error-message">
+                                    PAN is required
+                                </div>
+                                <div *ngIf="registrationForm.controls['pan_3'].touched && registrationForm.controls['pan_3'].hasError('pattern')"
+                                    class="error-message">
+                                    Enter a valid PAN (e.g., ABCDE1234F)
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Gender<span class="RedTxt">*</span></label>
+                                <mat-radio-group class="Width100perc d-flex" aria-label="Select an option"
+                                    formControlName="gender_3">
+                                    <mat-radio-button value="F">Female</mat-radio-button>
+                                    <mat-radio-button value="M">Male</mat-radio-button>
+                                </mat-radio-group>
+    
+                                <div *ngIf="registrationForm.controls['gender_3'].touched && registrationForm.controls['gender_3'].hasError('required')"
+                                    class="error-message">
+                                    Gender is required
+                                </div>
+                            </div>
+                        </div>
+    
+    
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>DOB <span class="RedTxt">*</span></label>
+                                <input type="text" pInputText class="Width100perc" formControlName="dob_3" type="date"
+                                    [max]="today" />
+                                <div *ngIf="registrationForm.controls['dob_3'].touched && registrationForm.controls['dob_3'].hasError('required')"
+                                    class="error-message">
+                                    Date of Birth is required
+                                </div>
+                                <div *ngIf="registrationForm.controls['dob_3'].touched && registrationForm.controls['dob_3'].hasError('underage')"
+                                    class="error-message">
+                                    You must be at least 18 years old.
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Occupation <span class="RedTxt">*</span></label>
+                                <!-- <select id="occupation" formControlName="occupation" required>
+                                    <option value="" disabled>Select Occupation</option>
+                                    <option *ngFor="let occupation of occupationList" [value]="occupation.key">
+                                        {{ occupation.value }}
+                                    </option>
+                                </select> -->
+    
+                                <mat-form-field>
+                                    <!-- <mat-label>Select</mat-label> -->
+                                    <mat-select formControlName="occupation_3">
+                                        <mat-option value="" disabled>Select Occupation </mat-option>
+                                        <mat-option *ngFor="let occupation of occupationList" [value]="occupation.key">{{
+                                            occupation.value }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="registrationForm.controls['occupation_3'].touched && registrationForm.controls['occupation_3'].hasError('required')"
+                                    class="error-message">
+                                    Occupation is required
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Email Declaration <span class="RedTxt">*</span></label>
+                                <!-- <select id="occupation" formControlName="emailDeclaration" required>
+                                    <option value="" disabled>Select Email Declaration</option>
+                                    <option *ngFor="let occupation of emailDeclarationOptions" [value]="occupation.key">
+                                        {{ occupation.value }}
+                                    </option>
+                                </select> -->
+                                <mat-form-field>
+                                    <!-- <mat-label>Select</mat-label> -->
+                                    <mat-select formControlName="emailDeclaration_3">
+                                        <mat-option value="" disabled>Select Email Declaration</mat-option>
+                                        <mat-option *ngFor="let occupation of emailDeclarationOptions"
+                                            [value]="occupation.key">{{ occupation.value }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="registrationForm.controls['emailDeclaration_3'].touched && registrationForm.controls['emailDeclaration_3'].hasError('required')"
+                                    class="error-message">
+                                    Email Declaration is required
+                                </div>
+                            </div>
+                        </div>
+    
+    
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Mobile Declaration <span class="RedTxt">*</span></label>
+                                <!-- <select id="occupation" formControlName="mobileDeclaration" required>
+                                    <option value="" disabled>Select Mobile Declaration</option>
+                                    <option *ngFor="let occupation of mobileDeclarationOptions" [value]="occupation.key">
+                                        {{ occupation.value }}
+                                    </option>
+                                </select> -->
+                                <mat-form-field>
+                                    <!-- <mat-label>Select</mat-label> -->
+                                    <mat-select formControlName="mobileDeclaration_3">
+                                        <mat-option value="" disabled>Select Mobile Declaration</mat-option>
+                                        <mat-option *ngFor="let occupation of mobileDeclarationOptions"
+                                            [value]="occupation.key">{{ occupation.value }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <div *ngIf="registrationForm.controls['mobileDeclaration_3'].touched && registrationForm.controls['mobileDeclaration_3'].hasError('required')"
+                                    class="error-message">
+                                    Mobile Declaration is required
+                                </div>
+                            </div>
+                        </div>
+    
+    
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Mobile Number <span class="RedTxt">*</span></label>
+                                <input type="text" pInputText class="Width100perc" formControlName="mobile_3" />
+                                <div *ngIf="registrationForm.controls['mobile_3'].touched && registrationForm.controls['mobile_3'].hasError('required')"
+                                    class="error-message">
+                                    Mobile Number is required
+                                </div>
+                                <div *ngIf="registrationForm.controls['mobile_3'].touched && registrationForm.controls['mobile_3'].hasError('pattern')"
+                                    class="error-message">
+                                    Enter a valid 10-digit mobile number starting with 6, 7, 8, or 9
+                                </div>
+                            </div>
+                        </div>
+    
+    
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>Email Number <span class="RedTxt">*</span></label>
+                                <input type="text" pInputText class="Width100perc" formControlName="email_3" />
+                                <div *ngIf="registrationForm.controls['email_3'].touched && registrationForm.controls['email_3'].hasError('required')"
+                                    class="error-message">
+                                    Email is required
+                                </div>
+                                <div *ngIf="registrationForm.controls['email_3'].touched && registrationForm.controls['email_3'].hasError('pattern')"
+                                    class="error-message">
+                                    Enter a valid Email Address
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- <div class="col-4">
+                                        <section class="example-section">
+                                            <mat-checkbox class="example-margin Width100perc"
+                                                formControlName="aadharLinked">Aadhar card linked with PAN
+                                                card</mat-checkbox>
+                                            <mat-checkbox class="example-margin Width100perc"
+                                                formControlName="kyc">KYC</mat-checkbox>
+                                        </section>
+                                    </div> -->
+    
+    
+                        <!-- <div class="col-4">
+                            <div class="InputControl">
+                                <label>KYC Type <span class="RedTxt">*</span></label>
+                           <mat-form-field>
+      <mat-select formControlName="kycType">
+        <mat-option value="" disabled>Select KYC Type</mat-option>
+        <mat-option  *ngFor="let occupation of kycTypeOptions" [value]="occupation.key">{{ occupation.value }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+                                <div *ngIf="registrationForm.controls['kycType'].touched && registrationForm.controls['kycType'].hasError('required')"
+                                    class="error-message">
+                                    KYC Holder type is required
+                                </div>
+                            </div>
+                        </div> -->
+    
+    
+                    </div>
+                </div>
+            </div>
+        }
 
         <div class="progress-container mt-3" *ngIf="isLoading" [@slideDown]>
             <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
