@@ -1,12 +1,10 @@
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { MenuItem } from 'primeng/api';
 import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SelectButton } from 'primeng/selectbutton';
 import { InputTextModule } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatRadioModule } from '@angular/material/radio';
@@ -14,23 +12,15 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
-import { HttpClient } from '@angular/common/http';
 import { UccMemberInfo } from '../../models/bseUCCModel';
-import { DepoBankDetail } from '../depo-bank-detail/depo-bank-detail';
-import { NomineeDetail } from '../nominee-detail/nominee-detail';
 import { Shared } from '../../../shared/services/shared';
-import { KycDetailsComponent } from '../kyc-details/kyc-details.component';
-import { UccTabs } from '../ucc-tabs/ucc-tabs';
 import { Location } from '@angular/common';
 import { catchError, debounceTime, distinctUntilChanged, map, of } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { AddressDetails } from '../address-details/address-details';
 import { SharedEnv } from '../../../shared/environments/environment';
-import { Sso } from '../../../shared/components/sso/sso';
 
 
 
@@ -480,7 +470,7 @@ export class BseRegisterinvestors {
       ]],
       // memberID: [{ value: '', disabled: true }],
       taxStatus: ['01', Validators.required],
-      holdingPattern: ['SI', Validators.required],
+      holdingPattern: ['', Validators.required],
       nominationOpted: ['N', Validators.required],
       nominationAuthentication: ['O', Validators.required],
 
@@ -501,7 +491,7 @@ export class BseRegisterinvestors {
         Validators.minLength(2),
         Validators.maxLength(25)]],
       pan: ['', [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]$/)]],
-      gender: ['', Validators.required],
+      gender: ['M', Validators.required],
       dob: ['', [Validators.required, this.minimumAgeValidator(18)]],
 
       occupation: ['', Validators.required],
@@ -555,41 +545,61 @@ export class BseRegisterinvestors {
       emailDeclaration_2: ['', Validators.required],
       kycType_2: ['K', Validators.required],
 
-      // 2nt Applicant Section
+      // 3rd Applicant Section
       firstName_3: ['',
-        [Validators.required,
-        Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
-        Validators.minLength(2),
-        Validators.maxLength(25)]],
+
+        // [Validators.required,
+        // Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+        // Validators.minLength(2),
+        // Validators.maxLength(25)]
+        null
+      ],
+
       middleName_3: ['',
-        [
-          Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
-          Validators.minLength(1),
-          Validators.maxLength(25)]],
+        // [
+        //   Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+        //   Validators.minLength(1),
+        //   Validators.maxLength(25)]
+        null
+      ],
       lastName_3: ['',
-        [Validators.required,
-        Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
-        Validators.minLength(2),
-        Validators.maxLength(25)]],
-      pan_3: ['', [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]$/)]],
-      gender_3: ['', Validators.required],
-      dob_3: ['', [Validators.required, this.minimumAgeValidator(18)]],
+        // [Validators.required,
+        // Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
+        // Validators.minLength(2),
+        // Validators.maxLength(25)]
+        null
+      ],
+      pan_3: ['',
+        // [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]$/)]
+        null
+      ],
+      gender_3: ['', null],
+      dob_3: ['', null],
 
-      occupation_3: ['', Validators.required],
+      occupation_3: ['', null],
       mobile_3: ['',
-        Validators.compose([
-          Validators.required,
-          Validators.pattern(/^[6-9]\d{9}$/)
-        ])],
-      mobileDeclaration_3: ['', Validators.required],
-      email_3: ['', Validators.compose([
-        Validators.required,
-        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-      ])],
+        // Validators.compose([
+        //   Validators.required,
+        //   Validators.pattern(/^[6-9]\d{9}$/)
+        // ])
+        null
+      ],
+      mobileDeclaration_3: [''],
+      email_3: ['',
+        //    Validators.compose([
+        //   Validators.required,
+        //   Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        // ])
+        null
+      ],
 
-      emailDeclaration_3: ['', Validators.required],
-      kycType_3: ['K', Validators.required],
+      emailDeclaration_3: ['', null],
+      kycType_3: ['K', null],
     });
+    this.d_V();
+    this.registrationForm.patchValue({
+      holdingPattern : 'SI'
+    })
     this.getGroupByLogin();
 
     // Listen to holding pattern changes and update applicants
@@ -1221,7 +1231,6 @@ export class BseRegisterinvestors {
     return `${year}-${month}-${day}`;
   }
 
-
   formatDateForInput(dob: string): string | null {
     if (!dob) return null;
 
@@ -1280,8 +1289,6 @@ export class BseRegisterinvestors {
     return !isNaN(parsed.getTime()) ? parsed.toISOString().split('T')[0] : null;
   }
 
-
-
   onMemberChange(selectedLookUpID: any) {
     const targetId = selectedLookUpID?.toString();
     const selectedMember = this.fullMemberData.find(member => {
@@ -1299,7 +1306,6 @@ export class BseRegisterinvestors {
       this.sharedService.OpenAlert('Unable to load the selected member details. Please re-select the member.');
     }
   }
-
 
   prefillForm(member: any) {
     const formattedDOB = this.formatDateForInput(member.birtDate || member.birthDate);
@@ -1366,9 +1372,15 @@ export class BseRegisterinvestors {
 
   submitDataandContinue() {
     console.log('method called');
-    console.log(this.registrationForm.value, 'registration form');
+    console.log(this.registrationForm, 'registration form');
 
     if (this.registrationForm.invalid) {
+      Object.keys(this.registrationForm.controls).forEach(field => {
+        const control = this.registrationForm.get(field);
+        if (control?.invalid) {
+          console.log(field, control.errors);
+        }
+      });
       this.registrationForm.markAllAsTouched();
       return;
     }
@@ -1460,7 +1472,7 @@ export class BseRegisterinvestors {
 
   updateDataandContinue() {
     console.log('method called');
-    console.log(this.registrationForm.value, 'registration form');
+    console.log(this.registrationForm, 'registration form');
 
     if (this.registrationForm.invalid) {
       this.registrationForm.markAllAsTouched();
@@ -1685,7 +1697,6 @@ export class BseRegisterinvestors {
     localStorage.removeItem('selectedMemberData');
   }
 
-
   groupidbyMembId() {
     return this.bseUCCService.getGroupIdByMembId().pipe(
       map((res: any) => {
@@ -1775,6 +1786,26 @@ export class BseRegisterinvestors {
     }));
 
     console.log(`Holding Pattern: ${holdingPattern}, Applicant Count: ${applicantCount}`, this.applicants);
+  }
+
+ d_V(){
+    this.registrationForm.get('holdingPattern')?.valueChanges.subscribe((_)=>{
+      const __ = _;
+      if(_ == 'SI'){
+        this.registrationForm.get('firstName_2')?.disable();
+        this.registrationForm.get('middleName_2')?.disable();
+        this.registrationForm.get('lastName_2')?.disable();
+        this.registrationForm.get('pan_2')?.disable();
+        this.registrationForm.get('gender_2')?.disable();
+        this.registrationForm.get('dob_2')?.disable();
+        this.registrationForm.get('occupation_2')?.disable();
+        this.registrationForm.get('mobile_2')?.disable();
+        this.registrationForm.get('mobileDeclaration_2')?.disable();
+        this.registrationForm.get('email_2')?.disable();
+        this.registrationForm.get('emailDeclaration_2')?.disable();
+        this.registrationForm.get('kycType_2')?.disable();
+      }
+    })
   }
 
 }

@@ -456,7 +456,7 @@
         </div>
         }
 
-        @if (['JO'].includes(registrationForm.get('holdingPattern')?.value)) {
+        @if (['JO' , 'AS'].includes(registrationForm.get('holdingPattern')?.value)) {
         <div class="TabInputCntnr mt-3">
             <h5 class="TabCntnrHead mb-0">Personal Details 2nd Applicant <span class="RedTxt">*</span></h5>
             <div class="TabInputSect">
@@ -716,7 +716,7 @@
         </div>
         }
 
-        @if (['JO'].includes(registrationForm.get('holdingPattern')?.value)) {
+        @if (['JO' , 'AS'].includes(registrationForm.get('holdingPattern')?.value)) {
             <div class="TabInputCntnr mt-3">
                 <h5 class="TabCntnrHead mb-0">Personal Details 3rd Applicant <span class="RedTxt">*</span></h5>
                 <div class="TabInputSect">
@@ -724,7 +724,7 @@
                         <div class="col-4">
                             <div class="InputControl">
                                 <label>First Name <span class="RedTxt">*</span></label>
-                                <input type="text" pInputText class="Width100perc" formControlName="firstName_3" required
+                                <input type="text" pInputText class="Width100perc" formControlName="firstName_3"
                                     maxlength="25" />
     
                                 <div *ngIf="registrationForm.controls['firstName_3'].touched && registrationForm.controls['firstName_3'].hasError('required')"
@@ -768,7 +768,7 @@
                             <div class="InputControl">
                                 <label>Last Name <span class="RedTxt">*</span></label>
                                 <input type="text" pInputText class="Width100perc" formControlName="lastName_3"
-                                    maxlength="25" required (input)="allowOnlyChars($event,'lastName_3')" />
+                                    maxlength="25" (input)="allowOnlyChars($event,'lastName_3')" />
     
                                 <div *ngIf="registrationForm.controls['lastName_3'].touched && registrationForm.controls['lastName_3'].hasError('required')"
                                     class="error-message">

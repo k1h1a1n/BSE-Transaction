@@ -30,6 +30,7 @@ export interface TabNavigationEvent {
     isUpdateBank: boolean;
     MembID: any;
     clieCode: any;
+    h_p:string
   };
 }
 @Component({
@@ -506,7 +507,8 @@ this.bseUccReg.getKycVerification(input).subscribe(response => {
                       state: {
                         isUpdateBank: true,
                         MembID: this.MemberDetailID || null,
-                        clieCode:   editedBseClientCode || input.clientCode || ''
+                        clieCode:   editedBseClientCode || input.clientCode || '',
+                        h_p : ''
                       }
                     });
           }
