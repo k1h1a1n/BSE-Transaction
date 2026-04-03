@@ -62,7 +62,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    ButtonModule, MatCheckboxModule, MatPaginatorModule, CommonModule, FormsModule, ReactiveFormsModule, MatTooltipModule, MatProgressSpinnerModule, ],
+    ButtonModule, MatCheckboxModule, MatPaginatorModule, CommonModule, FormsModule, ReactiveFormsModule, MatTooltipModule, MatProgressSpinnerModule,],
   templateUrl: './register-list.html',
   styleUrl: './register-list.scss',
   providers: [
@@ -151,7 +151,7 @@ export class RegisterList {
   home: MenuItem = {};
 
   //for table with checkbox
-  displayedColumns: string[] = ['select', 'clientId', 'UCCStatus', 'taxStatus', 'holdingPattern', 'fatcaStatus', 'firstApplication', 'secondApplication', 'thirdApplication', 'docStatus', 'nomAuthLink', 'bseStatus', 'createdOn','actions',];
+  displayedColumns: string[] = ['select', 'clientId', 'UCCStatus', 'taxStatus', 'holdingPattern', 'fatcaStatus', 'firstApplication', 'secondApplication', 'thirdApplication', 'docStatus', 'nomAuthLink', 'bseStatus', 'createdOn', 'actions',];
   // 'memberId', 'eLog',
 
   dataSource = new MatTableDataSource<UccDetails>();
@@ -185,10 +185,10 @@ export class RegisterList {
   isUccFetching = false;
   hasUccErrorAlertShown = false;
   finalUccStatus: any;
- fatcaMembId: any;
-savedDataToBSE: boolean = false;
-isNomineeLoading: boolean = false;
- selectedEditRow: any = null;
+  fatcaMembId: any;
+  savedDataToBSE: boolean = false;
+  isNomineeLoading: boolean = false;
+  selectedEditRow: any = null;
   isShowEditModal: boolean = false;
   activeEditTab: string = 'registration';
   editTabs = [
@@ -206,7 +206,7 @@ isNomineeLoading: boolean = false;
     private route: ActivatedRoute,
     private dialog: MatDialog,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) { }
 
 
@@ -218,7 +218,7 @@ isNomineeLoading: boolean = false;
     if (navigation?.extras?.state) {
       let { IFAID, IFAEmailId, UserID, IFAKey } = navigation.extras.state;
       console.log('Received from SSO:', { IFAID, IFAEmailId, UserID, IFAKey });
-      
+
     }
     console.log('Before UpdateEnv - localStorage IFAID:', localStorage.getItem('IFAID'));
     this.sharedSer.UpdateEnv();
@@ -240,12 +240,11 @@ isNomineeLoading: boolean = false;
 
 
     const state = history.state;
-    if(state && state?.isFatcaSaved) {
-    console.log(state,'state from fatca');
-    
-    history.replaceState({}, ''); // Clear state to prevent repeated actions
+    if (state && state?.isFatcaSaved) {
+      console.log(state, 'state from fatca');
+
+      history.replaceState({}, ''); // Clear state to prevent repeated actions
     }
-    // this.fetchUccData();
     // Load FATCA data from localStorage (includes membId and status)
     const fatcaDataFromStorage = JSON.parse(localStorage.getItem('fatcaData') || '{}');
     this.fatcaMembId = fatcaDataFromStorage?.membId;
@@ -253,7 +252,7 @@ isNomineeLoading: boolean = false;
     // memberId
     console.log(this.fatcaMembId, fatcaSaved, 'FATCA Member ID and Status');
     this.refreshUccList();
-//  this.getFatcaBseStatus();
+    //  this.getFatcaBseStatus();
 
 
     // let savedData = localStorage.getItem('savedUccCard');
@@ -578,10 +577,10 @@ isNomineeLoading: boolean = false;
   }
 
 
-// ason 23-02-2026
+  // ason 23-02-2026
 
 
-  editSelectedUcc(){
+  editSelectedUcc() {
     const selectedRows = this.selection.selected;
 
     console.log(selectedRows, 'selected rows');
@@ -618,8 +617,8 @@ isNomineeLoading: boolean = false;
     this.selectedEditRow = row;
     this.isShowEditModal = true;
     this.activeEditTab = 'registration';
-    console.log(this.selectedEditRow,'selected edit row');
-    
+    console.log(this.selectedEditRow, 'selected edit row');
+
     console.log('Editing row:', row.bseClientCode);
   }
 
@@ -640,7 +639,7 @@ isNomineeLoading: boolean = false;
   // ✅ NEW METHOD: Navigate to different routes based on tab
   navigateToTab(tab: any) {
     this.activeEditTab = tab.id;
-    
+
     // Define route mapping for each tab
     const routeMap: { [key: string]: string } = {
       'registration': `/registeredList/registration/${this.selectedEditRow?.bseClientCode}`,
@@ -651,7 +650,7 @@ isNomineeLoading: boolean = false;
     };
 
     const route = routeMap[tab.id];
-    
+
     if (route) {
       console.log('Navigating to:', route);
       this.router.navigate([route], { relativeTo: this.route });
@@ -660,7 +659,7 @@ isNomineeLoading: boolean = false;
     }
   }
 
-// end here
+  // end here
 
 
 
@@ -731,195 +730,114 @@ isNomineeLoading: boolean = false;
     }
   }
 
-  fetchUccData() {
-    this.isLoadingUccData = true;
-    const input: getUccList = { topCount: 100 };
-    const mapToUccDetails = (res: UccApiResponse[]): UccDetails[] => res.map(data => ({
-      memberDetails: data.fullName?.trim(),
-      bseClientCode: data.clieCode,
-      taxStatusDetails: { label: data.taxStatus?.trim() },
-      holdingPatternDetails: { label: data.holdID?.trim() || 'NA' },
-      nominationopt: !!data.nominationopt,
-      elogLink: data.elogLink,
-      bseStatus: data.bseStaus,
-      docStatus: data.docStaus,
-      createDate: data.createDate,
-      memberId: data.membid?.trim(),
-      clieapplname1: data.fullName,
-      clieapplname2: data.clieapplname2,
-      clieapplname3: data.clieapplname3,
-      uccRegistration: data.uccRegistration,
-      fatcaStatus: data.fatcaStatus,
-      bseMemberID: data.bseMemberID,
-      panNo: data.panNo,
-      mobileNO: data.mobileNO,
-      emailID: data.emailID,
-      elogStatus: data.elogStatus,
-      holdingNature: data.holdingNature,
-      isCardActive: false,
-      isSubmitted: false,
-      bseSubmissionStatus: 'Pending', // Track actual BSE submission status
-    }) as UccDetails);
-
-    return this.idbsvc.getData('uccDetails', 'uccListData').pipe(
-      switchMap((cachedData) => {
-        if (cachedData) {
-          return of(cachedData as UccDetails[]);
-        }
-        return this.bscUccSer.getUccListData(input).pipe(
-          map(mapToUccDetails),
-          tap((res) => {
-            this.idbsvc.setNewCollectionData('uccDetails', 'uccListData', res, 'MM:15').subscribe({
-              error: (err) => console.error('Failed to cache UCC list', err)
-            });
-          })
-        );
-      }),
-      catchError((err) => {
-        console.error('Cache/API error, refetching from API', err);
-        return this.bscUccSer.getUccListData(input).pipe(map(mapToUccDetails));
-      })
-    ).subscribe({
-      next: (res: UccDetails[]) => {
-        this.dataSource.data = res;
-        this.dataSource.paginator = this.paginator;
-        this.uccDetailsList = res;
-        localStorage.setItem('uccDetailsList', JSON.stringify(this.uccDetailsList));
-      },
-      error: (err) => {
-        console.error('Error fetching UCC data:', err);
-      },
-      complete: () => {
-        this.isLoadingUccData = false;
-      }
-    });
-  }
-
   refreshUccList() {
     this.isLoadingUccData = true;
     const input: getUccList = { topCount: 100 };
 
-    // Fetch UCC list and FATCA/BSE status in parallel, then merge
-    this.bscUccSer.getUccListData(input).pipe(
-      switchMap((uccListResponse: UccApiResponse[]) => {
-        // After getting UCC list, fetch FATCA/BSE status
-        return this.bscUccSer.getFatcaBseStatus().pipe(
-          map((fatcaBseResponse: any) => {
-            // Extract the data array from the response
-            const fatcaBseArray = fatcaBseResponse?.data || [];
-            
-            // Create a lookup map for FATCA/BSE data by clieCode
-            const fatcaBseMap = new Map();
-            fatcaBseArray.forEach((item: any) => {
-              fatcaBseMap.set(item.clieCode, {
-                fatcaStatus: item.fatcaStatus,
-                uccRegistration: item.uccRegistration
-              });
-            });
-
-            // Map UCC list data and merge with FATCA/BSE status
-            return uccListResponse.map(data => {
-              const fatcaBseData = fatcaBseMap.get(data.clieCode);
-              
-              return {
-                memberDetails: data.fullName?.trim(),
-                bseClientCode: data.clieCode,
-                taxStatusDetails: { label: data.taxStatus?.trim() },
-                holdingPatternDetails: { label: data.holdID?.trim() || 'NA' },
-                nominationopt: !!data.nominationopt,
-                elogLink: data.elogLink,
-                bseStatus: data.bseStaus,
-                docStatus: data.docStaus,
-                createDate: data.createDate,
-                memberId: data.membid?.trim(),
-                clieapplname1: data.fullName,
-                clieapplname2: data.clieapplname2,
-                clieapplname3: data.clieapplname3,
-                // Override with FATCA/BSE API data if available
-                uccRegistration: fatcaBseData?.uccRegistration || data.uccRegistration,
-                fatcaStatus: fatcaBseData?.fatcaStatus || data.fatcaStatus,
-                bseMemberID: data.bseMemberID,
-                panNo: data.panNo,
-                mobileNO: data.mobileNO,
-                emailID: data.emailID,
-                elogStatus: data.elogStatus,
-                holdingNature: data.holdingNature,
-                isCardActive: false,
-                isSubmitted: false,
-                bseSubmissionStatus: 'Pending', // Track actual BSE submission status
-                uccStatus: null,
-                isUccStatusLoading: false
-              } as UccDetails;
-            });
-          })
-        );
-      }),
-      tap((res: UccDetails[]) => {
-        // Cache the merged data
-        this.idbsvc.setNewCollectionData('uccDetails', 'uccListData', res, 'MM:15').subscribe({
-          error: (err) => console.error('Failed to cache UCC list', err)
-        });
-      })
-    ).subscribe({
-      next: (res: UccDetails[]) => {
-        this.dataSource.data = res;
-        this.dataSource.paginator = this.paginator;
-        this.uccDetailsList = res;
-        console.log(this.uccDetailsList, 'ucc details list with merged FATCA/BSE status');
-        
-        localStorage.setItem('uccDetailsList', JSON.stringify(this.uccDetailsList));
-      },
-      error: (err) => {
-        console.error('Error fetching UCC data:', err);
-        
-        let errorMessage = 'Failed to refresh list. Please try again.';
-        
-        // Handle specific API response messages
-        if (err?.error?.message && err.error.message.toLowerCase().includes('no records found')) {
-          errorMessage = 'No UCC records found. Please add new registrations or check your search criteria.';
-        }
-        // Handle specific HTTP error codes
-        else if (err?.status) {
-          switch (err.status) {
-            case 404:
-              errorMessage = 'No UCC data found. The requested resource is unavailable or no records exist.';
-              break;
-            case 401:
-              errorMessage = 'Unauthorized access. Please log in again.';
-              break;
-            case 403:
-              errorMessage = 'Access forbidden. You do not have permission to view this data.';
-              break;
-            case 500:
-              errorMessage = 'Internal server error. Please try again later or contact support.';
-              break;
-            case 502:
-              errorMessage = 'Service temporarily unavailable. Please try again in a few moments.';
-              break;
-            case 503:
-              errorMessage = 'Service unavailable. The server is temporarily overloaded.';
-              break;
-            case 0:
-              errorMessage = 'Network connection error. Please check your internet connection.';
-              break;
-            default:
-              errorMessage = `Server error (${err.status}). Please try again later.`;
+    this.idbsvc.getData('UCCLIST', 'data')
+      .pipe(
+        switchMap((c_d) => {
+          if (c_d) {
+            return of(c_d);
           }
-        } else if (err?.name === 'TimeoutError') {
-          errorMessage = 'Request timeout. Please check your connection and try again.';
-        } else if (err?.message) {
-          errorMessage = `Error: ${err.message}`;
+
+          return this.bscUccSer.getUccListData(input).pipe(
+            switchMap((uccListResponse: UccApiResponse[]) => {
+              return this.bscUccSer.getFatcaBseStatus().pipe(
+                map((fatcaBseResponse: any) => {
+
+                  const fatcaBseArray = fatcaBseResponse?.data || [];
+
+                  const fatcaBseMap = new Map();
+                  fatcaBseArray.forEach((item: any) => {
+                    fatcaBseMap.set(item.clieCode, {
+                      fatcaStatus: item.fatcaStatus,
+                      uccRegistration: item.uccRegistration
+                    });
+                  });
+
+                  return uccListResponse.map(data => {
+                    const fatcaBseData = fatcaBseMap.get(data.clieCode);
+
+                    return {
+                      memberDetails: data.fullName?.trim(),
+                      bseClientCode: data.clieCode,
+                      taxStatusDetails: { label: data.taxStatus?.trim() },
+                      holdingPatternDetails: { label: data.holdID?.trim() || 'NA' },
+                      nominationopt: !!data.nominationopt,
+                      elogLink: data.elogLink,
+                      bseStatus: data.bseStaus,
+                      docStatus: data.docStaus,
+                      createDate: data.createDate,
+                      memberId: data.membid?.trim(),
+                      clieapplname1: data.fullName,
+                      clieapplname2: data.clieapplname2,
+                      clieapplname3: data.clieapplname3,
+                      uccRegistration: fatcaBseData?.uccRegistration || data.uccRegistration,
+                      fatcaStatus: fatcaBseData?.fatcaStatus || data.fatcaStatus,
+                      bseMemberID: data.bseMemberID,
+                      panNo: data.panNo,
+                      mobileNO: data.mobileNO,
+                      emailID: data.emailID,
+                      elogStatus: data.elogStatus,
+                      holdingNature: data.holdingNature,
+                      isCardActive: false,
+                      isSubmitted: false,
+                      bseSubmissionStatus: 'Pending',
+                      uccStatus: null,
+                      isUccStatusLoading: false
+                    } as UccDetails;
+                  });
+
+                })
+              );
+            }),
+            // ✅ Cache result properly (NO subscribe here)
+            tap((res: UccDetails[]) => {
+              this.idbsvc.setNewCollectionData('UCCLIST', 'data', res, 'MM:15')
+                .subscribe({
+                  error: (err) => console.error('Failed to cache UCC list', err)
+                });
+            })
+          );
+        })
+      )
+      // ✅ Single subscribe (correct)
+      .subscribe({
+        next: (res: UccDetails[]) => {
+          this.dataSource.data = res;
+          this.dataSource.paginator = this.paginator;
+          this.uccDetailsList = res;
+
+          console.log(this.uccDetailsList, 'UCC merged data');
+
+          localStorage.setItem('uccDetailsList', JSON.stringify(this.uccDetailsList));
+        },
+        error: (err) => {
+          console.error('Error fetching UCC data:', err);
+
+          let errorMessage = 'Failed to refresh list. Please try again.';
+
+          if (err?.error?.message?.toLowerCase().includes('no records found')) {
+            errorMessage = 'No UCC records found.';
+          } else if (err?.status) {
+            switch (err.status) {
+              case 404: errorMessage = 'No data found.'; break;
+              case 401: errorMessage = 'Unauthorized.'; break;
+              case 403: errorMessage = 'Forbidden.'; break;
+              case 500: errorMessage = 'Server error.'; break;
+              case 0: errorMessage = 'Network error.'; break;
+              default: errorMessage = `Error (${err.status})`;
+            }
+          }
+
+          this.sharedSer.OpenAlert(errorMessage);
+        },
+        complete: () => {
+          this.isLoadingUccData = false;
         }
-        
-        this.sharedSer.OpenAlert(errorMessage);
-      },
-      complete: () => {
-        this.isLoadingUccData = false;
-      }
-    });
+      });
   }
-
-
 
   toggleEditMenu() {
     this.showEditMenu = !this.showEditMenu;
@@ -1416,15 +1334,15 @@ isNomineeLoading: boolean = false;
   checkMandatoryFieldsBeforeSubmit(clieCode: string) {
     const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
     console.log(card, 'card');
-    let input : checkMandatoryFieldsResponse = {
+    let input: checkMandatoryFieldsResponse = {
       clieCode: clieCode
     }
-              this.bscUccSer.checkMandatoryFields(input).subscribe({
-            next: (validationRes) => {
-              console.log(validationRes, 'res from validate api');
+    this.bscUccSer.checkMandatoryFields(input).subscribe({
+      next: (validationRes) => {
+        console.log(validationRes, 'res from validate api');
 
-              if (validationRes?.missingFields?.length > 0) {
-                let message = `
+        if (validationRes?.missingFields?.length > 0) {
+          let message = `
     <div style="text-align:left;">
       <p style="color:black;"><strong>${validationRes.message}</strong></p>
       <ul style="list-style:none; padding:0; margin:0;">
@@ -1438,329 +1356,329 @@ isNomineeLoading: boolean = false;
       </ul>
     </div>`;
 
-                this.sharedSer.OpenAlert(message);
-              }
+          this.sharedSer.OpenAlert(message);
+        }
 
-              else if (validationRes.message == "All mandatory fields are present.") {
+        else if (validationRes.message == "All mandatory fields are present.") {
 
-                // const bsePayload = this.mapValidatedResponseToBsePayload(card);
-                // console.log(bsePayload, 'mapped BSE payload');
+          // const bsePayload = this.mapValidatedResponseToBsePayload(card);
+          // console.log(bsePayload, 'mapped BSE payload');
 
-                const cardToSubmit = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-                console.log(cardToSubmit,'card to submit');
-                cardToSubmit?.fatcaStatus == '1' ? this.isFatcaSummitSuccess = true : this.isFatcaSummitSuccess = false;
-                console.log(this.isFatcaSummitSuccess,'fatca status');
+          const cardToSubmit = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+          console.log(cardToSubmit, 'card to submit');
+          cardToSubmit?.fatcaStatus == '1' ? this.isFatcaSummitSuccess = true : this.isFatcaSummitSuccess = false;
+          console.log(this.isFatcaSummitSuccess, 'fatca status');
 
-                if (!this.isFatcaSummitSuccess) {
-                  this.sharedSer.OpenAlert(
-                    "Your FATCA verification is still pending. Kindly complete it from the FATCA Status section before submitting.",
-                    () => {}
-                  );
-                  this.isLoadingUccData = false;
-                  return;
-                }
-              }
-            },
+          if (!this.isFatcaSummitSuccess) {
+            this.sharedSer.OpenAlert(
+              "Your FATCA verification is still pending. Kindly complete it from the FATCA Status section before submitting.",
+              () => { }
+            );
+            this.isLoadingUccData = false;
+            return;
+          }
+        }
+      },
 
-            error: (err) => {
-              console.log(err);
-            }
-            });
-    
+      error: (err) => {
+        console.log(err);
+      }
+    });
+
   }
 
-// as on7-01-2025
-private isFatcaValid(clieCode: string): boolean {
-  const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-// const card = this.uccDetailsList.find(x => x.memberId === this.fatcaMembId);
-  console.log(card,'card index');
-  // Check if FATCA is valid via card status OR localStorage
-  // Treat both 'True' and empty string as success
-  // card?.fatcaStatus === ''
-  const isFatcaTrue = card?.fatcaStatus === '1';
-  // const isFatcaSaved = localStorage.getItem('fatcaSuccessMessage') === 'true';
-  
-  console.log(isFatcaTrue, 'fatcaValid check');
-  
-  return isFatcaTrue;
-}
+  // as on7-01-2025
+  private isFatcaValid(clieCode: string): boolean {
+    const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+    // const card = this.uccDetailsList.find(x => x.memberId === this.fatcaMembId);
+    console.log(card, 'card index');
+    // Check if FATCA is valid via card status OR localStorage
+    // Treat both 'True' and empty string as success
+    // card?.fatcaStatus === ''
+    const isFatcaTrue = card?.fatcaStatus === '1';
+    // const isFatcaSaved = localStorage.getItem('fatcaSuccessMessage') === 'true';
 
-// ason 28-01-2026
-// validateDataBeforeSubmit(clieCode: string) {
+    console.log(isFatcaTrue, 'fatcaValid check');
 
-//   const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-//   if (!card) return;
+    return isFatcaTrue;
+  }
 
-//   this.regnType = card.uccRegistration === '1' ? 'MOD' : 'NEW';
-//   this.isBseSubmitting = true; // ✅ Show loader
+  // ason 28-01-2026
+  // validateDataBeforeSubmit(clieCode: string) {
 
-//   const inputSaveToDB = { clieCode };
-//   const mandatoryInput: checkMandatoryFieldsResponse = { clieCode };
+  //   const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+  //   if (!card) return;
 
-//   this.bscUccSer.getFullValidatedResponse(inputSaveToDB).pipe(
+  //   this.regnType = card.uccRegistration === '1' ? 'MOD' : 'NEW';
+  //   this.isBseSubmitting = true; // ✅ Show loader
 
-//     /* STEP 1: Full validation */
-//     tap(fullValidatedResponse => {
-//       console.log(fullValidatedResponse, 'full validation response');
-//     }),
+  //   const inputSaveToDB = { clieCode };
+  //   const mandatoryInput: checkMandatoryFieldsResponse = { clieCode };
 
-//     /* STEP 2: Map payload */
-//     map(fullValidatedResponse =>
-//       this.mapValidatedResponseToBsePayload(fullValidatedResponse)
-//     ),
+  //   this.bscUccSer.getFullValidatedResponse(inputSaveToDB).pipe(
 
-//     /* STEP 3: FATCA check */
-//     switchMap((bsePayload) => {
+  //     /* STEP 1: Full validation */
+  //     tap(fullValidatedResponse => {
+  //       console.log(fullValidatedResponse, 'full validation response');
+  //     }),
 
-//       // Check FATCA status for the specific member being submitted
+  //     /* STEP 2: Map payload */
+  //     map(fullValidatedResponse =>
+  //       this.mapValidatedResponseToBsePayload(fullValidatedResponse)
+  //     ),
 
-//       // const cardBeingSubmitted = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-//       // if (!cardBeingSubmitted) {
-//       //   this.isBseSubmitting = false; // ✅ Hide loader immediately
-//       //   this.sharedSer.OpenAlert('Card not found for the selected client code.');
-//       //   return EMPTY;
-//       // }
+  //     /* STEP 3: FATCA check */
+  //     switchMap((bsePayload) => {
 
-//       // const fatcaStatus = this.getFatcaStatusForMember(cardBeingSubmitted.memberId);
-      
-//       // console.log(`FATCA check for client ${clieCode}, member ${cardBeingSubmitted.memberId}:`, fatcaStatus);
+  //       // Check FATCA status for the specific member being submitted
 
-//       // if (!fatcaStatus.isCompleted) {
-//       //   this.isBseSubmitting = false; // ✅ Hide loader immediately
-//       //   this.sharedSer.OpenAlert(
-//       //     'Your FATCA verification is still pending. Kindly complete it before submitting.'
-//       //   );
-//       //   return EMPTY;
-//       // }
+  //       // const cardBeingSubmitted = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+  //       // if (!cardBeingSubmitted) {
+  //       //   this.isBseSubmitting = false; // ✅ Hide loader immediately
+  //       //   this.sharedSer.OpenAlert('Card not found for the selected client code.');
+  //       //   return EMPTY;
+  //       // }
 
+  //       // const fatcaStatus = this.getFatcaStatusForMember(cardBeingSubmitted.memberId);
 
-//       if(this.isFatcaValid(clieCode) === false) {
-//          this.isBseSubmitting = false;
-         
-//          // Get the card index for FATCA navigation
-//          const cardIndex = this.uccDetailsList.findIndex(x => x.bseClientCode === clieCode);
-         
-//          this.sharedSer.openDialogBox(
-//           'Your FATCA verification is still pending. Kindly complete it before submitting.'
-//         ).subscribe(result => {
-//             console.log('Navigating to FATCA component for card index:', cardIndex);
-//           // if (result && cardIndex !== -1) {
-            
-//               this.createFatcaStatus(cardIndex);
-//             console.log('Navigating to FATCA component for card index:', cardIndex);
-//           // }
-//         });
-//         return EMPTY;
-//       }
+  //       // console.log(`FATCA check for client ${clieCode}, member ${cardBeingSubmitted.memberId}:`, fatcaStatus);
 
-//       return this.bscUccSer.checkMandatoryFields(mandatoryInput).pipe(
-//         map(validationRes => ({ validationRes, bsePayload }))
-//       );
-//     }),
-
-//     /* STEP 4: Mandatory field validation */
-//     switchMap(({ validationRes, bsePayload }) => {
-
-//       if (validationRes?.missingFields?.length > 0) {
-
-// const message = `
-// <div class="validation-message">
-//   <p class="validation-message-header">
-//     ${validationRes.message}
-//   </p>
-//   <ul class="validation-message-list">
-//     ${validationRes.missingFields.map((field: string) => `
-//       <li class="validation-message-item">
-//         <img src="assets/images/alert-circle.png" class="validation-message-icon" />
-//         <span class="validation-message-text">
-//           ${field}
-//         </span>
-//       </li>
-//     `).join('')}
-//   </ul>
-// </div>`;
-
-//         this.isBseSubmitting = false; // ✅ Hide loader immediately
-//         this.sharedSer.OpenAlert(message);
-//         return EMPTY; // ❌ STOP FLOW
-//       }
-
-//       if (validationRes.message !== 'All mandatory fields are present.') {
-//         this.isBseSubmitting = false; // ✅ Hide loader immediately
-//         return EMPTY;
-//       }
-  
-  
-//       /* STEP 5: FINAL SUBMIT TO BSE */
-//       return this.bscUccSer.saveDataToBSE(bsePayload);
-            
-//     }),
-
-//     finalize(() => {
-//       // ✅ Only hide loader if there was an error (success handler already handles it)
-//       // this.isBseSubmitting = false; // Removed to prevent double setting
-//     })
-
-//   ).subscribe({
-
-//     next: (res) => {
-//       this.isBseSubmitting = false; // ✅ Hide loader immediately on success
-//       console.log(res, 'BSE submit response');
-      
-//       // Update BSE submission status for the specific card
-//       // const submittedCard = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-//       // if (submittedCard && res?.successMsg) {
-//       //   submittedCard.bseSubmissionStatus = 'Success';
-//       //   this.dataSource.data = [...this.uccDetailsList];
-//       // }
-      
-//       if (res?.successMsg) {
-//         // ✅ Using custom successDia method
-//         const combinedMessage = `${res.successMsg}\n\nYour Elog is generated. Do you want to authenticate it?`;
-        
-//         this.sharedSer.successDia(combinedMessage).subscribe(result => {
-//           if (result === true) {
-//             // User confirmed - authenticate ELOG
-//             const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-//             console.log(card, 'card object');
-//             this.getElogLink(card);
-//             console.log('User wants to authenticate ELOG');
-//           }
-//         });
-//       }
-//       else {
-//         this.isBseSubmitting = false;
-//         this.sharedSer.OpenAlert(res?.errors?.request || res?.title || 'Something went wrong, Please try again later!');
-//       }
-//     },
-
-//     error: (error) => {
-//       this.isBseSubmitting = false; // ✅ Hide loader immediately on error
-//       console.log('error while saving data to BSE', error);
-
-//       let errorMsg = 'Failed to submit data. Please try again later.';
-      
-//       // ✅ Handle 400 Bad Request with validation errors
-//       if (error?.status === 400) {
-//         const apiError = error?.error || error;
-        
-//         errorMsg = `<div style='text-align:left;'>`;
-        
-//         // Display title
-//         if (apiError?.title) {
-//           errorMsg += `<p style='color:black; font-weight:bold; margin-bottom:12px;'>${apiError.title}</p>`;
-//         }
-        
-//         // Display request field errors
-//         if (apiError?.errors?.request && Array.isArray(apiError.errors.request)) {
-//           errorMsg += `<ul style='list-style:none; padding:0; margin:8px 0;'>`;
-//           apiError.errors.request.forEach((err: string) => {
-//             errorMsg += `
-//               <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
-//                 <img src='assets/images/alert-circle.png' 
-//                      style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
-//                 <span style='color:#C8102E;'>${err}</span>
-//               </li>
-//             `;
-//           });
-//           errorMsg += `</ul>`;
-//         }
-        
-//         // Display all other field errors
-//         if (apiError?.errors && typeof apiError.errors === 'object') {
-//           errorMsg += `<ul style='list-style:none; padding:0; margin:0;'>`;
-          
-//           Object.keys(apiError.errors).forEach((field: string) => {
-//             // Skip request field as we already displayed it
-//             if (field === 'request') return;
-            
-//             const fieldErrors = apiError.errors[field];
-//             if (Array.isArray(fieldErrors)) {
-//               fieldErrors.forEach((err: string) => {
-//                 errorMsg += `
-//                   <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
-//                     <img src='assets/images/alert-circle.png' 
-//                          style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
-//                     <span style='color:#C8102E;'>
-//                       <strong>${field}:</strong> ${err}
-//                     </span>
-//                   </li>
-//                 `;
-//               });
-//             }
-//           });
-          
-//           errorMsg += `</ul>`;
-//         }
-        
-//         errorMsg += `</div>`;
-//       }
-//       // ✅ Handle 422 Unprocessable Entity
-//       else if (error?.status === 422) {
-//         const apiError = error?.error || error;
-//         errorMsg = `<div style='text-align:left;'>`;
-//         if (apiError?.errorMsg) {
-//           errorMsg += `<strong>${apiError.errorMsg}</strong><br/>`;
-//         }
-//         if (apiError?.data?.messages?.length) {
-//           errorMsg += '<ul style="padding-left:16px;">';
-//           apiError.data.messages.forEach((msg: any) => {
-//             errorMsg += `<li><span style='color:#C8102E;'>${msg.errcode} - ${msg.field}</span></li>`;
-//           });
-//           errorMsg += '</ul>';
-//         }
-//         errorMsg += '</div>';
-//       }
-      
-//       this.sharedSer.OpenAlert(errorMsg);
-//     }
-//   });
-// }
+  //       // if (!fatcaStatus.isCompleted) {
+  //       //   this.isBseSubmitting = false; // ✅ Hide loader immediately
+  //       //   this.sharedSer.OpenAlert(
+  //       //     'Your FATCA verification is still pending. Kindly complete it before submitting.'
+  //       //   );
+  //       //   return EMPTY;
+  //       // }
 
 
+  //       if(this.isFatcaValid(clieCode) === false) {
+  //          this.isBseSubmitting = false;
 
-validateDataBeforeSubmit(clieCode: string) {
+  //          // Get the card index for FATCA navigation
+  //          const cardIndex = this.uccDetailsList.findIndex(x => x.bseClientCode === clieCode);
 
-  const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-  if (!card) return;
+  //          this.sharedSer.openDialogBox(
+  //           'Your FATCA verification is still pending. Kindly complete it before submitting.'
+  //         ).subscribe(result => {
+  //             console.log('Navigating to FATCA component for card index:', cardIndex);
+  //           // if (result && cardIndex !== -1) {
 
-  this.regnType = card.uccRegistration === '1' ? 'MOD' : 'NEW';
-  this.isBseSubmitting = true;
+  //               this.createFatcaStatus(cardIndex);
+  //             console.log('Navigating to FATCA component for card index:', cardIndex);
+  //           // }
+  //         });
+  //         return EMPTY;
+  //       }
 
-  // STEP 1 → Full validation
-//   let nominoptflag= this.getnomineeOptValue();
-//  if(nominoptflag=='Y'){
-//   this.getvalidatrespforNomineeopt(clieCode);
-//  }
-//  else{}
+  //       return this.bscUccSer.checkMandatoryFields(mandatoryInput).pipe(
+  //         map(validationRes => ({ validationRes, bsePayload }))
+  //       );
+  //     }),
 
- 
-  this.bscUccSer.getFullValidatedResponse({ clieCode }).subscribe({
-    next: (fullRes) => {
-      const bsePayload = this.mapValidatedResponseToBsePayload(fullRes);
+  //     /* STEP 4: Mandatory field validation */
+  //     switchMap(({ validationRes, bsePayload }) => {
 
-      // STEP 2 → FATCA Check
-      if (this.isFatcaValid(clieCode) === false) {
-        this.isBseSubmitting = false;
+  //       if (validationRes?.missingFields?.length > 0) {
 
-        const cardIndex = this.uccDetailsList.findIndex(x => x.bseClientCode === clieCode);
-        this.sharedSer.openDialogBox(
-          'Your FATCA verification is still pending. Kindly complete it before submitting.'
-        ).subscribe(() => {
-          this.createFatcaStatus(cardIndex);
-        });
+  // const message = `
+  // <div class="validation-message">
+  //   <p class="validation-message-header">
+  //     ${validationRes.message}
+  //   </p>
+  //   <ul class="validation-message-list">
+  //     ${validationRes.missingFields.map((field: string) => `
+  //       <li class="validation-message-item">
+  //         <img src="assets/images/alert-circle.png" class="validation-message-icon" />
+  //         <span class="validation-message-text">
+  //           ${field}
+  //         </span>
+  //       </li>
+  //     `).join('')}
+  //   </ul>
+  // </div>`;
 
-        return;
-      }
-    
-      // STEP 3 → Mandatory Field Check
-      this.bscUccSer.checkMandatoryFields({ clieCode }).subscribe({
-        next: (validationRes) => {
+  //         this.isBseSubmitting = false; // ✅ Hide loader immediately
+  //         this.sharedSer.OpenAlert(message);
+  //         return EMPTY; // ❌ STOP FLOW
+  //       }
 
-          if (validationRes?.missingFields?.length > 0) {
-            this.isBseSubmitting = false;
+  //       if (validationRes.message !== 'All mandatory fields are present.') {
+  //         this.isBseSubmitting = false; // ✅ Hide loader immediately
+  //         return EMPTY;
+  //       }
 
-            const message = `
+
+  //       /* STEP 5: FINAL SUBMIT TO BSE */
+  //       return this.bscUccSer.saveDataToBSE(bsePayload);
+
+  //     }),
+
+  //     finalize(() => {
+  //       // ✅ Only hide loader if there was an error (success handler already handles it)
+  //       // this.isBseSubmitting = false; // Removed to prevent double setting
+  //     })
+
+  //   ).subscribe({
+
+  //     next: (res) => {
+  //       this.isBseSubmitting = false; // ✅ Hide loader immediately on success
+  //       console.log(res, 'BSE submit response');
+
+  //       // Update BSE submission status for the specific card
+  //       // const submittedCard = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+  //       // if (submittedCard && res?.successMsg) {
+  //       //   submittedCard.bseSubmissionStatus = 'Success';
+  //       //   this.dataSource.data = [...this.uccDetailsList];
+  //       // }
+
+  //       if (res?.successMsg) {
+  //         // ✅ Using custom successDia method
+  //         const combinedMessage = `${res.successMsg}\n\nYour Elog is generated. Do you want to authenticate it?`;
+
+  //         this.sharedSer.successDia(combinedMessage).subscribe(result => {
+  //           if (result === true) {
+  //             // User confirmed - authenticate ELOG
+  //             const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+  //             console.log(card, 'card object');
+  //             this.getElogLink(card);
+  //             console.log('User wants to authenticate ELOG');
+  //           }
+  //         });
+  //       }
+  //       else {
+  //         this.isBseSubmitting = false;
+  //         this.sharedSer.OpenAlert(res?.errors?.request || res?.title || 'Something went wrong, Please try again later!');
+  //       }
+  //     },
+
+  //     error: (error) => {
+  //       this.isBseSubmitting = false; // ✅ Hide loader immediately on error
+  //       console.log('error while saving data to BSE', error);
+
+  //       let errorMsg = 'Failed to submit data. Please try again later.';
+
+  //       // ✅ Handle 400 Bad Request with validation errors
+  //       if (error?.status === 400) {
+  //         const apiError = error?.error || error;
+
+  //         errorMsg = `<div style='text-align:left;'>`;
+
+  //         // Display title
+  //         if (apiError?.title) {
+  //           errorMsg += `<p style='color:black; font-weight:bold; margin-bottom:12px;'>${apiError.title}</p>`;
+  //         }
+
+  //         // Display request field errors
+  //         if (apiError?.errors?.request && Array.isArray(apiError.errors.request)) {
+  //           errorMsg += `<ul style='list-style:none; padding:0; margin:8px 0;'>`;
+  //           apiError.errors.request.forEach((err: string) => {
+  //             errorMsg += `
+  //               <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
+  //                 <img src='assets/images/alert-circle.png' 
+  //                      style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
+  //                 <span style='color:#C8102E;'>${err}</span>
+  //               </li>
+  //             `;
+  //           });
+  //           errorMsg += `</ul>`;
+  //         }
+
+  //         // Display all other field errors
+  //         if (apiError?.errors && typeof apiError.errors === 'object') {
+  //           errorMsg += `<ul style='list-style:none; padding:0; margin:0;'>`;
+
+  //           Object.keys(apiError.errors).forEach((field: string) => {
+  //             // Skip request field as we already displayed it
+  //             if (field === 'request') return;
+
+  //             const fieldErrors = apiError.errors[field];
+  //             if (Array.isArray(fieldErrors)) {
+  //               fieldErrors.forEach((err: string) => {
+  //                 errorMsg += `
+  //                   <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
+  //                     <img src='assets/images/alert-circle.png' 
+  //                          style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
+  //                     <span style='color:#C8102E;'>
+  //                       <strong>${field}:</strong> ${err}
+  //                     </span>
+  //                   </li>
+  //                 `;
+  //               });
+  //             }
+  //           });
+
+  //           errorMsg += `</ul>`;
+  //         }
+
+  //         errorMsg += `</div>`;
+  //       }
+  //       // ✅ Handle 422 Unprocessable Entity
+  //       else if (error?.status === 422) {
+  //         const apiError = error?.error || error;
+  //         errorMsg = `<div style='text-align:left;'>`;
+  //         if (apiError?.errorMsg) {
+  //           errorMsg += `<strong>${apiError.errorMsg}</strong><br/>`;
+  //         }
+  //         if (apiError?.data?.messages?.length) {
+  //           errorMsg += '<ul style="padding-left:16px;">';
+  //           apiError.data.messages.forEach((msg: any) => {
+  //             errorMsg += `<li><span style='color:#C8102E;'>${msg.errcode} - ${msg.field}</span></li>`;
+  //           });
+  //           errorMsg += '</ul>';
+  //         }
+  //         errorMsg += '</div>';
+  //       }
+
+  //       this.sharedSer.OpenAlert(errorMsg);
+  //     }
+  //   });
+  // }
+
+
+
+  validateDataBeforeSubmit(clieCode: string) {
+
+    const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+    if (!card) return;
+
+    this.regnType = card.uccRegistration === '1' ? 'MOD' : 'NEW';
+    this.isBseSubmitting = true;
+
+    // STEP 1 → Full validation
+    //   let nominoptflag= this.getnomineeOptValue();
+    //  if(nominoptflag=='Y'){
+    //   this.getvalidatrespforNomineeopt(clieCode);
+    //  }
+    //  else{}
+
+
+    this.bscUccSer.getFullValidatedResponse({ clieCode }).subscribe({
+      next: (fullRes) => {
+        const bsePayload = this.mapValidatedResponseToBsePayload(fullRes);
+
+        // STEP 2 → FATCA Check
+        if (this.isFatcaValid(clieCode) === false) {
+          this.isBseSubmitting = false;
+
+          const cardIndex = this.uccDetailsList.findIndex(x => x.bseClientCode === clieCode);
+          this.sharedSer.openDialogBox(
+            'Your FATCA verification is still pending. Kindly complete it before submitting.'
+          ).subscribe(() => {
+            this.createFatcaStatus(cardIndex);
+          });
+
+          return;
+        }
+
+        // STEP 3 → Mandatory Field Check
+        this.bscUccSer.checkMandatoryFields({ clieCode }).subscribe({
+          next: (validationRes) => {
+
+            if (validationRes?.missingFields?.length > 0) {
+              this.isBseSubmitting = false;
+
+              const message = `
               <div class="validation-message">
                 <p class="validation-message-header">${validationRes.message}</p>
                 <ul class="validation-message-list">
@@ -1773,44 +1691,44 @@ validateDataBeforeSubmit(clieCode: string) {
                 </ul>
               </div>`;
 
-            // this.sharedSer.OpenAlert(message);
-            this.stopLoaderAndOpenAlert(message);
-            return;
-          }
+              // this.sharedSer.OpenAlert(message);
+              this.stopLoaderAndOpenAlert(message);
+              return;
+            }
 
-          if (validationRes.message !== 'All mandatory fields are present.') {
-            this.isBseSubmitting = false;
-            return;
-          }
-
-          // STEP 4 → Final Submit to BSE
-          this.bscUccSer.saveDataToBSE(bsePayload).subscribe({
-            next: (res) => {
+            if (validationRes.message !== 'All mandatory fields are present.') {
               this.isBseSubmitting = false;
+              return;
+            }
 
-              // Handle cases where API returns HTTP 200 but the body indicates a 422-style validation error
-              if (res?.httpStatus === 422 || res?.status === 422 || res?.data?.status === 'error' || res?.data?.status === 'ERROR') {
-                const apiError = res || {};
-                const messages = apiError?.data?.data?.messages || apiError?.data?.messages || apiError?.messages || [];
+            // STEP 4 → Final Submit to BSE
+            this.bscUccSer.saveDataToBSE(bsePayload).subscribe({
+              next: (res) => {
+                this.isBseSubmitting = false;
 
-                let errorMsg = `<div style='text-align:left;'>`;
+                // Handle cases where API returns HTTP 200 but the body indicates a 422-style validation error
+                if (res?.httpStatus === 422 || res?.status === 422 || res?.data?.status === 'error' || res?.data?.status === 'ERROR') {
+                  const apiError = res || {};
+                  const messages = apiError?.data?.data?.messages || apiError?.data?.messages || apiError?.messages || [];
 
-                if (!Array.isArray(messages) || messages.length === 0) {
-                  if (apiError?.errorMsg) {
-                    errorMsg += `<p>${apiError.errorMsg}</p>`;
-                  } else if (apiError?.message) {
-                    errorMsg += `<p>${apiError.message}</p>`;
+                  let errorMsg = `<div style='text-align:left;'>`;
+
+                  if (!Array.isArray(messages) || messages.length === 0) {
+                    if (apiError?.errorMsg) {
+                      errorMsg += `<p>${apiError.errorMsg}</p>`;
+                    } else if (apiError?.message) {
+                      errorMsg += `<p>${apiError.message}</p>`;
+                    } else {
+                      errorMsg += `<p>One or more validation errors occurred.</p>`;
+                    }
                   } else {
-                    errorMsg += `<p>One or more validation errors occurred.</p>`;
-                  }
-                } else {
-                  errorMsg += `<ul style='list-style:none; padding:0; margin:0;'>`;
-                  messages.forEach((m: any) => {
-                    const field = m?.field || m?.field_name || 'field';
-                    const errcode = m?.errcode || m?.error || 'error';
-                    const vals = Array.isArray(m?.vals) ? m.vals.filter((v: any) => v !== '').join(', ') : (m?.vals ?? '');
+                    errorMsg += `<ul style='list-style:none; padding:0; margin:0;'>`;
+                    messages.forEach((m: any) => {
+                      const field = m?.field || m?.field_name || 'field';
+                      const errcode = m?.errcode || m?.error || 'error';
+                      const vals = Array.isArray(m?.vals) ? m.vals.filter((v: any) => v !== '').join(', ') : (m?.vals ?? '');
 
-                    errorMsg += `
+                      errorMsg += `
                       <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
                         <img src='assets/images/alert-circle.png' 
                              style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
@@ -1819,124 +1737,124 @@ validateDataBeforeSubmit(clieCode: string) {
                           <div style='color:#C8102E;'>${errcode}${vals ? ' - ' + vals : ''}</div>
                         </div>
                       </li>`;
-                  });
-                  errorMsg += `</ul>`;
+                    });
+                    errorMsg += `</ul>`;
+                  }
+
+                  errorMsg += `</div>`;
+
+                  this.stopLoaderAndOpenAlert(errorMsg);
+                  return;
                 }
 
-                errorMsg += `</div>`;
+                if (res?.data?.status === 'error' || res?.data?.status === 'ERROR') {
 
-                this.stopLoaderAndOpenAlert(errorMsg);
-                return;
+                  const errorMessages = res.data.messages.map((msg: any) => {
+                    return `${msg.field} - ${msg.errcode}`;
+                  });
+
+                  console.log(errorMessages);
+                  this.stopLoaderAndOpenAlert(errorMessages.join('<br/>') || 'One or more validation errors occurred, Please try again later.');
+                  return;
+                }
+
+                if (res?.successMsg) {
+                  const combinedMessage =
+                    `${res.successMsg}\n\nYour Elog is generated. Do you want to authenticate it?`;
+
+                  this.sharedSer.successDia(combinedMessage).subscribe(result => {
+                    if (result === true) {
+                      const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
+                      this.getElogLink(card);
+                    }
+                  });
+                }
+                else {
+                  this.stopLoaderAndOpenAlert(
+                    res?.errors?.request || res?.title || 'One or more validation errors occurred, Please try again later.'
+                  );
+                }
+              },
+
+              error: (err) => {
+                this.isBseSubmitting = false;
+                this.handleBseError(err);
               }
+            });
+          },
 
-              if(res?.data?.status === 'error' || res?.data?.status === 'ERROR') {
-            
-               const errorMessages = res.data.messages.map((msg: any) => {
-               return `${msg.field} - ${msg.errcode}`;
-                    });
+          error: () => {
+            this.isBseSubmitting = false;
 
-                   console.log(errorMessages);
-                   this.stopLoaderAndOpenAlert(errorMessages.join('<br/>') || 'One or more validation errors occurred, Please try again later.');
-                return;
-              }
-
-              if (res?.successMsg) {
-                const combinedMessage =
-                  `${res.successMsg}\n\nYour Elog is generated. Do you want to authenticate it?`;
-
-                this.sharedSer.successDia(combinedMessage).subscribe(result => {
-                  if (result === true) {
-                    const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-                    this.getElogLink(card);
-                  }
-                });
-              } 
-              else {
-                 this.stopLoaderAndOpenAlert(
-           res?.errors?.request || res?.title || 'One or more validation errors occurred, Please try again later.'
+            this.stopLoaderAndOpenAlert(
+              'Mandatory field validation failed.'
             );
-              }
-            },
+            // this.sharedSer.OpenAlert('Mandatory field validation failed.');
+          }
+        });
+      },
 
-            error: (err) => {
-              this.isBseSubmitting = false;
-              this.handleBseError(err);
-            }
-          });
-        },
-
-        error: () => {
-          this.isBseSubmitting = false;
-          
-                 this.stopLoaderAndOpenAlert(
-   'Mandatory field validation failed.'
-  );
-          // this.sharedSer.OpenAlert('Mandatory field validation failed.');
-        }
-      });
-    },
-
-    error: () => {
-      this.isBseSubmitting = false;
-      this.stopLoaderAndOpenAlert(
-  'Validation failed. Please try again later.'
-);
-      //
-      // this.sharedSer.OpenAlert('Validation failed. Please try again.');
-    }
-  });
-}
-
-
-private handleBseError(error: any) {
-    this.isBseSubmitting = false;
-  let errorMsg = 'Failed to submit data. Please try again later.';
-
-  if (error?.status === 400) {
-      this.isBseSubmitting = false;
-    const apiError = error?.error || error;
-    errorMsg = `<div style='text-align:left;'>`;
-
-    if (apiError?.title) {
-      errorMsg += `<p style='font-weight:bold;'>${apiError.title}</p>`;
-    }
-
-    if (apiError?.errors?.request) {
-      errorMsg += `<ul>`;
-      apiError.errors.request.forEach((e: string) => {
-        errorMsg += `<li style="color:#C8102E">${e}</li>`;
-      });
-      errorMsg += `</ul>`;
-    }
-
-    errorMsg += `</div>`;
+      error: () => {
+        this.isBseSubmitting = false;
+        this.stopLoaderAndOpenAlert(
+          'Validation failed. Please try again later.'
+        );
+        //
+        // this.sharedSer.OpenAlert('Validation failed. Please try again.');
+      }
+    });
   }
 
-  // Handle 422 Unprocessable Entity with structured messages
-  else if (error?.status === 422) {
-    const apiError = error?.error || {};
-    const messages = apiError?.data?.messages || apiError?.messages || [];
 
-    errorMsg = `<div style='text-align:left;'>`;
+  private handleBseError(error: any) {
+    this.isBseSubmitting = false;
+    let errorMsg = 'Failed to submit data. Please try again later.';
 
-    if (!Array.isArray(messages) || messages.length === 0) {
-      // fallback to generic error message if structure is different
-      if (apiError?.errorMsg) {
-        errorMsg += `<p>${apiError.errorMsg}</p>`;
-      } else if (apiError?.message) {
-        errorMsg += `<p>${apiError.message}</p>`;
-      } else {
-        errorMsg += `<p>One or more validation errors occurred.</p>`;
+    if (error?.status === 400) {
+      this.isBseSubmitting = false;
+      const apiError = error?.error || error;
+      errorMsg = `<div style='text-align:left;'>`;
+
+      if (apiError?.title) {
+        errorMsg += `<p style='font-weight:bold;'>${apiError.title}</p>`;
       }
-    } else {
-      errorMsg += `<ul style='list-style:none; padding:0; margin:0;'>`;
-      messages.forEach((m: any) => {
-        const field = m?.field || m?.field_name || 'field';
-        const errcode = m?.errcode || m?.error || 'error';
-        const vals = Array.isArray(m?.vals) ? m.vals.join(', ') : (m?.vals ?? '');
 
-        // Format: field - errcode - vals
-        errorMsg += `
+      if (apiError?.errors?.request) {
+        errorMsg += `<ul>`;
+        apiError.errors.request.forEach((e: string) => {
+          errorMsg += `<li style="color:#C8102E">${e}</li>`;
+        });
+        errorMsg += `</ul>`;
+      }
+
+      errorMsg += `</div>`;
+    }
+
+    // Handle 422 Unprocessable Entity with structured messages
+    else if (error?.status === 422) {
+      const apiError = error?.error || {};
+      const messages = apiError?.data?.messages || apiError?.messages || [];
+
+      errorMsg = `<div style='text-align:left;'>`;
+
+      if (!Array.isArray(messages) || messages.length === 0) {
+        // fallback to generic error message if structure is different
+        if (apiError?.errorMsg) {
+          errorMsg += `<p>${apiError.errorMsg}</p>`;
+        } else if (apiError?.message) {
+          errorMsg += `<p>${apiError.message}</p>`;
+        } else {
+          errorMsg += `<p>One or more validation errors occurred.</p>`;
+        }
+      } else {
+        errorMsg += `<ul style='list-style:none; padding:0; margin:0;'>`;
+        messages.forEach((m: any) => {
+          const field = m?.field || m?.field_name || 'field';
+          const errcode = m?.errcode || m?.error || 'error';
+          const vals = Array.isArray(m?.vals) ? m.vals.join(', ') : (m?.vals ?? '');
+
+          // Format: field - errcode - vals
+          errorMsg += `
           <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
             <img src='assets/images/alert-circle.png' 
                  style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
@@ -1945,30 +1863,30 @@ private handleBseError(error: any) {
               <div style='color:#C8102E;'>${errcode}${vals ? ' - ' + vals : ''}</div>
             </div>
           </li>`;
-      });
-      errorMsg += `</ul>`;
+        });
+        errorMsg += `</ul>`;
+      }
+
+      errorMsg += `</div>`;
     }
-
-    errorMsg += `</div>`;
+    this.stopLoaderAndOpenAlert(errorMsg);
   }
-    this.stopLoaderAndOpenAlert(errorMsg); 
-}
 
 
-private stopLoaderAndOpenAlert(message: string) {
-  this.isBseSubmitting = false;
+  private stopLoaderAndOpenAlert(message: string) {
+    this.isBseSubmitting = false;
 
-  // 🔥 Force UI to update immediately
-  this.cdr.detectChanges();
+    // 🔥 Force UI to update immediately
+    this.cdr.detectChanges();
 
-  // Open dialog after UI repaint
-  setTimeout(() => {
-    this.sharedSer.OpenAlert(message);
-  }, 0);
-}
+    // Open dialog after UI repaint
+    setTimeout(() => {
+      this.sharedSer.OpenAlert(message);
+    }, 0);
+  }
 
 
-// end here
+  // end here
 
 
 
@@ -1991,9 +1909,9 @@ private stopLoaderAndOpenAlert(message: string) {
     return null;
   }
 
-  getnomineeOptValue(){
+  getnomineeOptValue() {
     // nominationOpted
-     const data = localStorage.getItem('uccRegistrationData');
+    const data = localStorage.getItem('uccRegistrationData');
     if (data) {
       try {
         const parsed = JSON.parse(data);
@@ -2061,7 +1979,7 @@ private stopLoaderAndOpenAlert(message: string) {
   applyFilter(value: string) {
     const search = value.trim().toLowerCase();
 
- 
+
 
 
 
@@ -2077,7 +1995,7 @@ private stopLoaderAndOpenAlert(message: string) {
         this.noResultsFound = true;
         this.uccDetailsList = []; // empty for now
 
-    
+
       }
     }
 
@@ -2100,17 +2018,17 @@ private stopLoaderAndOpenAlert(message: string) {
     try {
       // Check general FATCA success flag (backward compatibility)
       const generalFatcaSuccess = localStorage.getItem('fatcaSuccessMessage') === 'true';
-      
+
       // Check member-specific FATCA data
       const fatcaData = JSON.parse(localStorage.getItem('fatcaData') || '{}');
       const memberSpecificSuccess = fatcaData?.membId == memberId && fatcaData?.status === 'Success';
-      
+
       // Return success if either general flag is true OR member-specific data shows success
       const isCompleted = generalFatcaSuccess || memberSpecificSuccess;
       const status = isCompleted ? 'Success' : 'Pending';
-      
+
       console.log(`FATCA check for member ${memberId}: ${status}`, { generalFatcaSuccess, memberSpecificSuccess, fatcaData });
-      
+
       return { isCompleted, status };
     } catch (error) {
       console.error('Error checking FATCA status:', error);
@@ -2120,7 +2038,7 @@ private stopLoaderAndOpenAlert(message: string) {
 
   createFatcaStatus(index: number) {
     console.log(index, 'index');
-    
+
     this.getEditedUccData(index).subscribe({
       next: (res) => {
         this.router.navigate(['/app/fatca']
@@ -2141,7 +2059,7 @@ private stopLoaderAndOpenAlert(message: string) {
 
     const card = this.uccDetailsList[index]; // Get specific card by index, not all cards
     console.log(card.fatcaStatus); // "True" or "False"
-    
+
     if (card?.fatcaStatus !== "0" || card?.fatcaStatus === undefined || card?.fatcaStatus === null) {
       this.sharedSer.OpenAlert('You do not have completed your FATCA, Do you want to complete this?', () => {
         this.createFatcaStatus(index); // Call createFatcaStatus to navigate properly
@@ -2432,45 +2350,45 @@ private stopLoaderAndOpenAlert(message: string) {
   //   });
   // }
 
- getParticularUccData(memberId: string, clientCode: string, element: any) {
+  getParticularUccData(memberId: string, clientCode: string, element: any) {
 
-  if (element.isUccStatusLoading) {
-    return;
+    if (element.isUccStatusLoading) {
+      return;
+    }
+
+    element.isUccStatusLoading = true;
+    element.uccStatus = null;
+
+    const input = {
+      data: {
+        member_code: { member_id: memberId },
+        investor: { client_code: clientCode }
+      }
+    };
+
+    this.bscUccSer.getPartUcc(input).subscribe({
+      next: (res) => {
+        const rawStatus = res?.data?.data?.ucc_status;
+
+        element.uccStatus = rawStatus ? rawStatus.toUpperCase() : 'unknown';
+        console.log(element.uccStatus, 'ucc status');
+
+        if (!rawStatus) {
+          this.sharedSer.OpenAlert('Unable to fetch UCC status.');
+        }
+        element.isUccStatusLoading = false;
+        // this.cdr.detectChanges(); // 🔥 THIS FIXES IT
+        // or use below
+        this.dataSource.data = [...this.dataSource.data];
+
+      },
+
+      error: () => {
+        element.uccStatus = 'ERROR';
+        element.isUccStatusLoading = false;
+      }
+    });
   }
-
-  element.isUccStatusLoading = true;
-  element.uccStatus = null;
-
-  const input = {
-    data: {
-      member_code: { member_id: memberId },
-      investor: { client_code: clientCode }
-    }
-  };
-
-  this.bscUccSer.getPartUcc(input).subscribe({
-    next: (res) => {
-const rawStatus = res?.data?.data?.ucc_status;
-
-element.uccStatus = rawStatus ? rawStatus.toUpperCase() : 'unknown';
-console.log(element.uccStatus,'ucc status');
-
-if(!rawStatus) {
-  this.sharedSer.OpenAlert('Unable to fetch UCC status.');
-}
-element.isUccStatusLoading = false;
-  // this.cdr.detectChanges(); // 🔥 THIS FIXES IT
-  // or use below
-  this.dataSource.data = [...this.dataSource.data];
-
-    },
-  
-    error: () => {
-      element.uccStatus = 'ERROR';
-      element.isUccStatusLoading = false;
-    }
-  });
-}
 
 
 
@@ -2725,287 +2643,287 @@ element.isUccStatusLoading = false;
 
 
 
-getElogLink(card: any) {
-  // Use the passed card/element directly from the clicked row
-  if (!card) {
-    this.sharedSer.OpenAlert('No data available!');
-    return;
-  }
-  console.log(card, 'card');
-  
-  // Show loader
-  this.isElogLoading = true;
+  getElogLink(card: any) {
+    // Use the passed card/element directly from the clicked row
+    if (!card) {
+      this.sharedSer.OpenAlert('No data available!');
+      return;
+    }
+    console.log(card, 'card');
 
-  const input: UccElogRequest = {
-    data: [
-      {
-        event: 'ucc_elog',
-        memberCode: card.memberId, // "90064"
-        parentClientCode: card.parentClientCode || '',
-        investor: {
-          clientCode: card.bseClientCode, // "4231663410"
-          panHolder: [card.panNo || ''],
-          holdingNature: card.holdingNature || ''
+    // Show loader
+    this.isElogLoading = true;
+
+    const input: UccElogRequest = {
+      data: [
+        {
+          event: 'ucc_elog',
+          memberCode: card.memberId, // "90064"
+          parentClientCode: card.parentClientCode || '',
+          investor: {
+            clientCode: card.bseClientCode, // "4231663410"
+            panHolder: [card.panNo || ''],
+            holdingNature: card.holdingNature || ''
+          }
         }
-      }
-    ]
-  };
+      ]
+    };
 
-  this.bscUccSer.getElogLink(input).subscribe({
-    next: (res) => {
-      console.log('ELOG link response:', res);
+    this.bscUccSer.getElogLink(input).subscribe({
+      next: (res) => {
+        console.log('ELOG link response:', res);
 
-      // Check if API response is successful
-      if (res.successMsg === 'Success' && res.data?.data?.length > 0) {
-        // Extract 2FA URL from nested response structure
-        const twoFaUrl = res.data.data[0]?.action?.event_object?.[0]?.['2fa_url'];
-        console.log('Extracted 2FA URL:', twoFaUrl);
-        console.log('Full response data:', res.data.data[0]);
+        // Check if API response is successful
+        if (res.successMsg === 'Success' && res.data?.data?.length > 0) {
+          // Extract 2FA URL from nested response structure
+          const twoFaUrl = res.data.data[0]?.action?.event_object?.[0]?.['2fa_url'];
+          console.log('Extracted 2FA URL:', twoFaUrl);
+          console.log('Full response data:', res.data.data[0]);
 
-        if (twoFaUrl) {
-          // Validate and clean the URL
-          const cleanUrl = twoFaUrl.trim();
-          console.log('Cleaned URL:', cleanUrl);
-          
-          // Check if URL is valid
-          try {
-            const url = new URL(cleanUrl);
-            console.log('Valid URL detected:', url.href);
-            
-            // Try to open in new tab with better error handling
-            const newWindow = window.open(cleanUrl, '_blank', 'noopener,noreferrer');
+          if (twoFaUrl) {
+            // Validate and clean the URL
+            const cleanUrl = twoFaUrl.trim();
+            console.log('Cleaned URL:', cleanUrl);
 
-            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-              // Pop-up was blocked
-              console.warn('Pop-up blocked, trying alternative method');
-              
-              // Fallback: Create a temporary link and click it
-              const link = document.createElement('a');
-              link.href = cleanUrl;
-              link.target = '_blank';
-              link.rel = 'noopener noreferrer';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              // ✅ Hide loader immediately for fallback and trigger change detection
-              this.isElogLoading = false;
-              this.cdr.markForCheck();
-            } else {
+            // Check if URL is valid
+            try {
+              const url = new URL(cleanUrl);
+              console.log('Valid URL detected:', url.href);
+
+              // Try to open in new tab with better error handling
+              const newWindow = window.open(cleanUrl, '_blank', 'noopener,noreferrer');
+
+              if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                // Pop-up was blocked
+                console.warn('Pop-up blocked, trying alternative method');
+
+                // Fallback: Create a temporary link and click it
+                const link = document.createElement('a');
+                link.href = cleanUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // ✅ Hide loader immediately for fallback and trigger change detection
+                this.isElogLoading = false;
+                this.cdr.markForCheck();
+              } else {
+                // ✅ Show dialog and hide loader after short delay with change detection
+                this.sharedSer.openDialog('ELOG authentication link opened successfully. Please complete the 2FA verification.');
+                setTimeout(() => {
+                  this.isElogLoading = false;
+                  this.cdr.markForCheck();
+                }, 500);
+              }
+            } catch (urlError) {
+              console.error('Invalid URL format:', urlError);
               // ✅ Show dialog and hide loader after short delay with change detection
-              this.sharedSer.openDialog('ELOG authentication link opened successfully. Please complete the 2FA verification.');
+              this.sharedSer.openDialog('Invalid ELOG authentication URL format. Please contact support.');
               setTimeout(() => {
                 this.isElogLoading = false;
                 this.cdr.markForCheck();
               }, 500);
             }
-          } catch (urlError) {
-            console.error('Invalid URL format:', urlError);
+          } else {
+            console.error('2FA URL not found in response:', res.data.data[0]);
             // ✅ Show dialog and hide loader after short delay with change detection
-            this.sharedSer.openDialog('Invalid ELOG authentication URL format. Please contact support.');
+            this.sharedSer.openDialog('Unable to retrieve ELOG authentication link.');
             setTimeout(() => {
               this.isElogLoading = false;
               this.cdr.markForCheck();
             }, 500);
           }
         } else {
-          console.error('2FA URL not found in response:', res.data.data[0]);
+          console.error('API response error:', res);
           // ✅ Show dialog and hide loader after short delay with change detection
-          this.sharedSer.openDialog('Unable to retrieve ELOG authentication link.');
+          this.sharedSer.openDialog(res.successMsg || 'Failed to generate ELOG link. Please try again.');
           setTimeout(() => {
             this.isElogLoading = false;
             this.cdr.markForCheck();
           }, 500);
         }
-      } else {
-        console.error('API response error:', res);
+      },
+      error: (err) => {
+        console.error('ELOG link error:', err);
         // ✅ Show dialog and hide loader after short delay with change detection
-        this.sharedSer.openDialog(res.successMsg || 'Failed to generate ELOG link. Please try again.');
+        this.sharedSer.openDialog('Unable to fetch ELOG link.');
         setTimeout(() => {
           this.isElogLoading = false;
           this.cdr.markForCheck();
         }, 500);
       }
-    },
-    error: (err) => {
-      console.error('ELOG link error:', err);
-      // ✅ Show dialog and hide loader after short delay with change detection
-      this.sharedSer.openDialog('Unable to fetch ELOG link.');
-      setTimeout(() => {
-        this.isElogLoading = false;
-        this.cdr.markForCheck();
-      }, 500);
-    }
-  });
-}
-
-
-
-getNomineeLinkReq(card: any) {
-  // Use the passed card/element directly from the clicked row
-  if (!card) {
-    this.sharedSer.OpenAlert('No data available!');
-    return;
+    });
   }
-  console.log(card, 'card');
-  
-  // Show loader
-  this.isNomineeLoading = true;
 
-  const input: UccNominationLinkRequest = {
-    data: [
-      {
-        event: 'ucc_nom',
-        member_Code: card.memberId, // "90064"
-        parent_Client_Code: card.parentClientCode || '',
-        investor: {
-          client_Code: card.bseClientCode, // "4231663410"
-          pan_holder: [card.panNo || ''],
-          holding_Nature: card.holdingNature || ''
+
+
+  getNomineeLinkReq(card: any) {
+    // Use the passed card/element directly from the clicked row
+    if (!card) {
+      this.sharedSer.OpenAlert('No data available!');
+      return;
+    }
+    console.log(card, 'card');
+
+    // Show loader
+    this.isNomineeLoading = true;
+
+    const input: UccNominationLinkRequest = {
+      data: [
+        {
+          event: 'ucc_nom',
+          member_Code: card.memberId, // "90064"
+          parent_Client_Code: card.parentClientCode || '',
+          investor: {
+            client_Code: card.bseClientCode, // "4231663410"
+            pan_holder: [card.panNo || ''],
+            holding_Nature: card.holdingNature || ''
+          }
         }
-      }
-    ]
-  };
+      ]
+    };
 
-  this.bscUccSer.getNomineeLink(input).subscribe({
-    next: (res: any) => {
-      console.log('Nomination link response:', res);
+    this.bscUccSer.getNomineeLink(input).subscribe({
+      next: (res: any) => {
+        console.log('Nomination link response:', res);
 
-      // Check if API response is successful
-      if (res.successMsg === 'Success' && res.data?.data?.length > 0) {
-        // Extract 2FA URL from nested response structure
-        const nominationItem = res.data.data[0];
-        const twoFaUrl = nominationItem?.action?.event_object?.[0]?.['2fa_url'];
-        console.log('Extracted 2FA URL:', twoFaUrl);
-        console.log('Full response data:', nominationItem);
+        // Check if API response is successful
+        if (res.successMsg === 'Success' && res.data?.data?.length > 0) {
+          // Extract 2FA URL from nested response structure
+          const nominationItem = res.data.data[0];
+          const twoFaUrl = nominationItem?.action?.event_object?.[0]?.['2fa_url'];
+          console.log('Extracted 2FA URL:', twoFaUrl);
+          console.log('Full response data:', nominationItem);
 
-        if (twoFaUrl) {
-          // Validate and clean the URL
-          const cleanUrl = twoFaUrl.trim();
-          console.log('Cleaned URL:', cleanUrl);
-          
-          // Check if URL is valid
-          try {
-            const url = new URL(cleanUrl);
-            console.log('Valid URL detected:', url.href);
-            
-            // Try to open in new tab with better error handling
-            const newWindow = window.open(cleanUrl, '_blank', 'noopener,noreferrer');
+          if (twoFaUrl) {
+            // Validate and clean the URL
+            const cleanUrl = twoFaUrl.trim();
+            console.log('Cleaned URL:', cleanUrl);
 
-            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-              // Pop-up was blocked
-              console.warn('Pop-up blocked, trying alternative method');
-              
-              // Fallback: Create a temporary link and click it
-              const link = document.createElement('a');
-              link.href = cleanUrl;
-              link.target = '_blank';
-              link.rel = 'noopener noreferrer';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              // ✅ Hide loader immediately for fallback and trigger change detection
-              this.isNomineeLoading = false;
-              this.cdr.markForCheck();
-            } else {
+            // Check if URL is valid
+            try {
+              const url = new URL(cleanUrl);
+              console.log('Valid URL detected:', url.href);
+
+              // Try to open in new tab with better error handling
+              const newWindow = window.open(cleanUrl, '_blank', 'noopener,noreferrer');
+
+              if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                // Pop-up was blocked
+                console.warn('Pop-up blocked, trying alternative method');
+
+                // Fallback: Create a temporary link and click it
+                const link = document.createElement('a');
+                link.href = cleanUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // ✅ Hide loader immediately for fallback and trigger change detection
+                this.isNomineeLoading = false;
+                this.cdr.markForCheck();
+              } else {
+                // ✅ Show dialog and hide loader after short delay with change detection
+                this.sharedSer.openDialog('Nominee authentication link opened successfully. Please complete the 2FA verification.');
+                setTimeout(() => {
+                  this.isNomineeLoading = false;
+                  this.cdr.markForCheck();
+                }, 500);
+              }
+            } catch (urlError) {
+              console.error('Invalid URL format:', urlError);
               // ✅ Show dialog and hide loader after short delay with change detection
-              this.sharedSer.openDialog('Nominee authentication link opened successfully. Please complete the 2FA verification.');
+              this.sharedSer.openDialog('Invalid Nominee authentication URL format. Please contact support.');
               setTimeout(() => {
                 this.isNomineeLoading = false;
                 this.cdr.markForCheck();
               }, 500);
             }
-          } catch (urlError) {
-            console.error('Invalid URL format:', urlError);
+          } else {
+            console.error('2FA URL not found in response:', res.data.data[0]);
             // ✅ Show dialog and hide loader after short delay with change detection
-            this.sharedSer.openDialog('Invalid Nominee authentication URL format. Please contact support.');
+            this.sharedSer.openDialog('Unable to retrieve Nominee authentication link.');
             setTimeout(() => {
               this.isNomineeLoading = false;
               this.cdr.markForCheck();
             }, 500);
           }
         } else {
-          console.error('2FA URL not found in response:', res.data.data[0]);
+          console.error('API response error:', res);
           // ✅ Show dialog and hide loader after short delay with change detection
-          this.sharedSer.openDialog('Unable to retrieve Nominee authentication link.');
+          this.sharedSer.openDialog(res.successMsg || 'Failed to generate Nominee link. Please try again.');
           setTimeout(() => {
             this.isNomineeLoading = false;
             this.cdr.markForCheck();
           }, 500);
         }
-      } else {
-        console.error('API response error:', res);
+      },
+      error: (err) => {
+        console.error('Nominee link error:', err);
         // ✅ Show dialog and hide loader after short delay with change detection
-        this.sharedSer.openDialog(res.successMsg || 'Failed to generate Nominee link. Please try again.');
+        this.sharedSer.openDialog('Unable to fetch Nominee link.');
         setTimeout(() => {
           this.isNomineeLoading = false;
           this.cdr.markForCheck();
         }, 500);
       }
-    },
-    error: (err) => {
-      console.error('Nominee link error:', err);
-      // ✅ Show dialog and hide loader after short delay with change detection
-      this.sharedSer.openDialog('Unable to fetch Nominee link.');
-      setTimeout(() => {
-        this.isNomineeLoading = false;
-        this.cdr.markForCheck();
-      }, 500);
-    }
-  });
-}
-
-
-getFatcaBseStatus(){
-  this.bscUccSer.getFatcaBseStatus().subscribe({
-    next: (res) => {
-      console.log(res, 'res of fatca bse status');
-  console.log(res, 'res from fatcaBseStatus');
-   
-    },
-    error: (err) => {
-      console.log(err, 'error while fetching fatca bse status');    
-
-}
-
-  })
-}
-
-
-
-
-
-
-// as on 6-02-2026 start here for valid nominee
-
-getvalidatrespforNomineeopt(clieCode: string) {
-  let input: validDatawithNomineeopt ={
-    clieCode: clieCode
+    });
   }
-  // Step 1: Get full validated response from API
-      this.bscUccSer.getFullValidresWithNomination(input).subscribe({
-        next: (res) => {
-          console.log(res, 'res of valid resp with nomination');
-          console.log(res, 'res from valid resp with nomination');
 
-      const mappedRes = this.mapBSESubmissionRequestToUserValidateInput(res);
-      
-      console.log(mappedRes, 'mapped input for nominee validation');
-          // Handle the nomination validation response here
-          if (res?.successMsg) {
-            this.sharedSer.OpenAlert('Nominee validation successful');
-          }
-        },
-        error: (err) => {
-          console.log(err, 'error during nominee validation');
-          this.sharedSer.OpenAlert('Error validating nominee details');
-        }
-      });
+
+  getFatcaBseStatus() {
+    this.bscUccSer.getFatcaBseStatus().subscribe({
+      next: (res) => {
+        console.log(res, 'res of fatca bse status');
+        console.log(res, 'res from fatcaBseStatus');
+
+      },
+      error: (err) => {
+        console.log(err, 'error while fetching fatca bse status');
+
+      }
+
+    })
+  }
+
+
+
+
+
+
+  // as on 6-02-2026 start here for valid nominee
+
+  getvalidatrespforNomineeopt(clieCode: string) {
+    let input: validDatawithNomineeopt = {
+      clieCode: clieCode
     }
+    // Step 1: Get full validated response from API
+    this.bscUccSer.getFullValidresWithNomination(input).subscribe({
+      next: (res) => {
+        console.log(res, 'res of valid resp with nomination');
+        console.log(res, 'res from valid resp with nomination');
 
-  
+        const mappedRes = this.mapBSESubmissionRequestToUserValidateInput(res);
 
-// end here
+        console.log(mappedRes, 'mapped input for nominee validation');
+        // Handle the nomination validation response here
+        if (res?.successMsg) {
+          this.sharedSer.OpenAlert('Nominee validation successful');
+        }
+      },
+      error: (err) => {
+        console.log(err, 'error during nominee validation');
+        this.sharedSer.OpenAlert('Error validating nominee details');
+      }
+    });
+  }
+
+
+
+  // end here
 }
 

@@ -15,12 +15,13 @@ import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
 import { UccMemberInfo } from '../../models/bseUCCModel';
 import { Shared } from '../../../shared/services/shared';
 import { Location } from '@angular/common';
-import { catchError, debounceTime, distinctUntilChanged, map, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SharedEnv } from '../../../shared/environments/environment';
+import { IndexedDBService } from '../../../shared';
 
 
 
@@ -453,6 +454,7 @@ export class BseRegisterinvestors {
   groupLookupError: string | null = null;
   isGroupLookupLoading = false;
   applicants: any[] = [];  // Array to hold applicant data
+  private idbsvc = inject(IndexedDBService)
   @Output() nextTab = new EventEmitter<{ index: number, state?: any }>();
 
   ngOnInit() {
@@ -1584,67 +1586,87 @@ export class BseRegisterinvestors {
     return ifaDetails;
   }
 
-  getGroupByLogin() {
-    const ifaEmailId = this.getIfaEmailIdFromLocalStorage;
+getGroupByLogin() {
+  const ifaEmailId = this.getIfaEmailIdFromLocalStorage;
 
-    const input = {
-      loginId: ifaEmailId,
-    };
+  const input = {
+    loginId: ifaEmailId,
+  };
 
-    this.groupLookupError = null;
-    this.isGroupLookupLoading = true;
+  this.groupLookupError = null;
+  this.isGroupLookupLoading = true;
 
-    this.bseUCCService.getGroupByLogin(input).subscribe({
-      next: (res: any) => {
-        this.isGroupLookupLoading = false;
-        console.log(res, 'group by login response');
+  this.idbsvc.getData('GROUP_BY_LOGIN', 'data')
+    .pipe(
+      switchMap((cachedData) => {
 
-        // Handle both array and single object responses
-        let groupsArray: any[] = [];
-
-        if (Array.isArray(res)) {
-          groupsArray = res;
-        } else if (res && typeof res === 'object' && res.lookUpID && res.lookUpDescription) {
-          // Single group object - wrap in array
-          groupsArray = [res];
-        } else if (res?.data && Array.isArray(res.data)) {
-          groupsArray = res.data;
+        // ✅ If cache exists → use it
+        if (cachedData && cachedData.length > 0) {
+          return of(cachedData);
         }
 
-        const hasData = groupsArray.length > 0;
+        // ❌ Else call API
+        return this.bseUCCService.getGroupByLogin(input).pipe(
 
-        if (hasData) {
-          localStorage.setItem('GroupByLogin_TTL', JSON.stringify(groupsArray));
+          map((res: any) => {
+            let groupsArray: any[] = [];
 
-          // Transform groups array - use lookUpDescription directly
-          this.groupList = groupsArray.map((group: any) => ({
-            GroupID: group.lookUpID,
-            GroupDescription: group.lookUpDescription || ''
-          }));
+            if (Array.isArray(res)) {
+              groupsArray = res;
+            } else if (res && typeof res === 'object' && res.lookUpID && res.lookUpDescription) {
+              groupsArray = [res];
+            } else if (res?.data && Array.isArray(res.data)) {
+              groupsArray = res.data;
+            }
 
-          this.filteredGroups = [...this.groupList];
-          this.groupLookupError = null;
-          console.log(this.groupList, '✅ Group list loaded');
-        } else {
-          console.warn('⚠️ Unexpected response format:', res);
-          this.groupList = [];
-          this.filteredGroups = [];
-          const message = res?.message || 'Unable to fetch group codes. Please try again in a moment.';
-          this.groupLookupError = message;
-          this.sharedService.OpenAlert(message);
-        }
+            if (!groupsArray.length) {
+              throw new Error(res?.message || 'No group data found');
+            }
+
+            return groupsArray;
+          }),
+
+          tap((groupsArray: any[]) => {
+            this.idbsvc.setNewCollectionData('GROUP_BY_LOGIN', 'data', groupsArray, 'MM:15')
+              .subscribe({
+                error: (err) => console.error('Cache failed', err)
+              });
+          })
+        );
+      }),
+
+      // ✅ Transform data for UI
+      map((groupsArray: any[]) => {
+        return groupsArray.map((group: any) => ({
+          GroupID: group.lookUpID,
+          GroupDescription: group.lookUpDescription || ''
+        }));
+      })
+    )
+    .subscribe({
+      next: (groupList) => {
+        this.groupList = groupList;
+        this.filteredGroups = [...groupList];
+        this.groupLookupError = null;
+
+        console.log(groupList, '✅ Group list loaded (with cache)');
       },
       error: (err) => {
-        this.isGroupLookupLoading = false;
-        console.error('❌ API Error:', err);
+        console.error('❌ Error:', err);
+
         this.groupList = [];
         this.filteredGroups = [];
-        const message = err?.error?.message || err?.message || 'Unable to fetch group codes. Please try again in a moment.';
+
+        const message = err?.message || 'Unable to fetch group codes.';
         this.groupLookupError = message;
+
         this.sharedService.OpenAlert(message);
+      },
+      complete: () => {
+        this.isGroupLookupLoading = false;
       }
     });
-  }
+}
 
   selectGroup(group: any) {
     this.isSelectingGroup = true;
