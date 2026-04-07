@@ -600,7 +600,7 @@ export class BseRegisterinvestors {
     });
     this.d_V();
     this.registrationForm.patchValue({
-      holdingPattern : 'SI'
+      holdingPattern: 'SI'
     })
     this.getGroupByLogin();
 
@@ -1572,11 +1572,7 @@ export class BseRegisterinvestors {
   }
 
   goBack() {
-    this.location.back();
-    const saved = localStorage.getItem('uccRegistrationData');
-    if (saved) {
-      this.registrationForm.patchValue(JSON.parse(saved));
-    }
+    this.router.navigate(['/app/registerdList']);
   }
 
   get getIfaEmailIdFromLocalStorage() {
@@ -1586,87 +1582,87 @@ export class BseRegisterinvestors {
     return ifaDetails;
   }
 
-getGroupByLogin() {
-  const ifaEmailId = this.getIfaEmailIdFromLocalStorage;
+  getGroupByLogin() {
+    const ifaEmailId = this.getIfaEmailIdFromLocalStorage;
 
-  const input = {
-    loginId: ifaEmailId,
-  };
+    const input = {
+      loginId: ifaEmailId,
+    };
 
-  this.groupLookupError = null;
-  this.isGroupLookupLoading = true;
+    this.groupLookupError = null;
+    this.isGroupLookupLoading = true;
 
-  this.idbsvc.getData('GROUP_BY_LOGIN', 'data')
-    .pipe(
-      switchMap((cachedData) => {
+    this.idbsvc.getData('GROUP_BY_LOGIN', 'data')
+      .pipe(
+        switchMap((cachedData) => {
 
-        // ✅ If cache exists → use it
-        if (cachedData && cachedData.length > 0) {
-          return of(cachedData);
+          // ✅ If cache exists → use it
+          if (cachedData && cachedData.length > 0) {
+            return of(cachedData);
+          }
+
+          // ❌ Else call API
+          return this.bseUCCService.getGroupByLogin(input).pipe(
+
+            map((res: any) => {
+              let groupsArray: any[] = [];
+
+              if (Array.isArray(res)) {
+                groupsArray = res;
+              } else if (res && typeof res === 'object' && res.lookUpID && res.lookUpDescription) {
+                groupsArray = [res];
+              } else if (res?.data && Array.isArray(res.data)) {
+                groupsArray = res.data;
+              }
+
+              if (!groupsArray.length) {
+                throw new Error(res?.message || 'No group data found');
+              }
+
+              return groupsArray;
+            }),
+
+            tap((groupsArray: any[]) => {
+              this.idbsvc.setNewCollectionData('GROUP_BY_LOGIN', 'data', groupsArray, 'MM:15')
+                .subscribe({
+                  error: (err) => console.error('Cache failed', err)
+                });
+            })
+          );
+        }),
+
+        // ✅ Transform data for UI
+        map((groupsArray: any[]) => {
+          return groupsArray.map((group: any) => ({
+            GroupID: group.lookUpID,
+            GroupDescription: group.lookUpDescription || ''
+          }));
+        })
+      )
+      .subscribe({
+        next: (groupList) => {
+          this.groupList = groupList;
+          this.filteredGroups = [...groupList];
+          this.groupLookupError = null;
+
+          console.log(groupList, '✅ Group list loaded (with cache)');
+        },
+        error: (err) => {
+          console.error('❌ Error:', err);
+
+          this.groupList = [];
+          this.filteredGroups = [];
+
+          const message = err?.message || 'Unable to fetch group codes.';
+          this.groupLookupError = message;
+
+          this.sharedService.OpenAlert(message);
+        },
+        complete: () => {
+          this.isGroupLookupLoading = false;
         }
-
-        // ❌ Else call API
-        return this.bseUCCService.getGroupByLogin(input).pipe(
-
-          map((res: any) => {
-            let groupsArray: any[] = [];
-
-            if (Array.isArray(res)) {
-              groupsArray = res;
-            } else if (res && typeof res === 'object' && res.lookUpID && res.lookUpDescription) {
-              groupsArray = [res];
-            } else if (res?.data && Array.isArray(res.data)) {
-              groupsArray = res.data;
-            }
-
-            if (!groupsArray.length) {
-              throw new Error(res?.message || 'No group data found');
-            }
-
-            return groupsArray;
-          }),
-
-          tap((groupsArray: any[]) => {
-            this.idbsvc.setNewCollectionData('GROUP_BY_LOGIN', 'data', groupsArray, 'MM:15')
-              .subscribe({
-                error: (err) => console.error('Cache failed', err)
-              });
-          })
-        );
-      }),
-
-      // ✅ Transform data for UI
-      map((groupsArray: any[]) => {
-        return groupsArray.map((group: any) => ({
-          GroupID: group.lookUpID,
-          GroupDescription: group.lookUpDescription || ''
-        }));
-      })
-    )
-    .subscribe({
-      next: (groupList) => {
-        this.groupList = groupList;
-        this.filteredGroups = [...groupList];
-        this.groupLookupError = null;
-
-        console.log(groupList, '✅ Group list loaded (with cache)');
-      },
-      error: (err) => {
-        console.error('❌ Error:', err);
-
-        this.groupList = [];
-        this.filteredGroups = [];
-
-        const message = err?.message || 'Unable to fetch group codes.';
-        this.groupLookupError = message;
-
-        this.sharedService.OpenAlert(message);
-      },
-      complete: () => {
-        this.isGroupLookupLoading = false;
-      }
-    });
-}
+      });
+  }
 
   selectGroup(group: any) {
     this.isSelectingGroup = true;
@@ -1810,10 +1806,10 @@ getGroupByLogin() {
     console.log(`Holding Pattern: ${holdingPattern}, Applicant Count: ${applicantCount}`, this.applicants);
   }
 
- d_V(){
-    this.registrationForm.get('holdingPattern')?.valueChanges.subscribe((_)=>{
+  d_V() {
+    this.registrationForm.get('holdingPattern')?.valueChanges.subscribe((_) => {
       const __ = _;
-      if(_ == 'SI'){
+      if (_ == 'SI') {
         this.registrationForm.get('firstName_2')?.disable();
         this.registrationForm.get('middleName_2')?.disable();
         this.registrationForm.get('lastName_2')?.disable();
