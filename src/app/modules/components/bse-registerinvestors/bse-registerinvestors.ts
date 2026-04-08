@@ -1373,103 +1373,109 @@ export class BseRegisterinvestors {
   }
 
   submitDataandContinue() {
-    console.log('method called');
-    console.log(this.registrationForm, 'registration form');
-
-    if (this.registrationForm.invalid) {
-      Object.keys(this.registrationForm.controls).forEach(field => {
-        const control = this.registrationForm.get(field);
-        if (control?.invalid) {
-          console.log(field, control.errors);
-        }
-      });
-      this.registrationForm.markAllAsTouched();
-      return;
-    }
-    console.log('method called');
-
-    const rawFormValue = this.registrationForm.getRawValue();
-    // rawFormValue.dob = this.formatDateToDDMMYYYY(rawFormValue.dob);
-    rawFormValue.dob = this.formatDateToYYYYMMDD(rawFormValue.dob);
-    console.log(rawFormValue, 'dob');
-
-    localStorage.setItem('uccRegistrationData', JSON.stringify(rawFormValue));
-    const selectedLookUpID = this.registrationForm?.controls['memberName']?.value;
-    const selectedMemberId = (selectedLookUpID || '').toString();
-    const selectedMember = this.memberList.find(member => member.LookUpID === selectedMemberId);
-
-    const formValue = this.registrationForm.getRawValue();
-    formValue.memberDetails = {
-      id: selectedMember?.LookUpID,
-      name: selectedMember?.LookUpDescription
-    };
-
-    const selectedTaxStatus = this.taxStatusList.find(
-      ts => ts.value === formValue.taxStatus
-    );
-    formValue.taxStatusDetails = {
-      value: selectedTaxStatus?.value,
-      label: selectedTaxStatus?.label
-    };
-
-    const selectedHoldingPattern = this.holdingPatternList.find(
-      pattern => pattern.value === formValue.holdingPattern
-    );
-    formValue.holdingPatternDetails = {
-      value: selectedHoldingPattern?.value,
-      label: selectedHoldingPattern?.label
-    };
-
-    localStorage.setItem('uccRegistrationData', JSON.stringify(formValue));
-    console.log(rawFormValue, 'raw form value');
-
-
-    const input: UccMemberInfo = this.mapFormToUccMemberInfo(rawFormValue);
-    console.log(input, 'input of registration');
-
-    if (this.isEdit && this.memberID) {
-      input.membID = Number(this.memberID);
-    }
-    console.log(this.memberID, 'memb id');
-    console.log(input, 'edited input');
-
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-
-    const bseClieCode = parsedData?.bseClientCode || '';
-    console.log('BSE Client Code:', bseClieCode);
-
-    this.isLoading = true;
-
-    this.bseUCCService.getUccRegisterData(input).subscribe({
-      next: (response: { success: boolean; message: string }) => {
-        console.log('API Response:', response);
-        this.isLoading = false;
-        if (response.success) {
-          this.sharedService.successDia(response.message).subscribe(result => {
-            if (result) {   // result === true when OK clicked
-              // Pass state with tab navigation
-              this.nextTab.emit({
+    this.nextTab.emit({
                 index: 1,
                 state: {
                   isUpdate: false,
-                  MembID: input.membID || null,
-                  clieCode: bseClieCode || ''
+                  MembID: null,
+                  clieCode: 'test',
                 }
               });
-            }
-          });
-        } else {
-          this.isLoading = false;
-          this.sharedService.OpenAlert('Failed to save registration details.');
-        }
-      },
-      error: (err: any) => {
-        this.isLoading = false;
-        console.error('API Error:', err);
-        this.sharedService.OpenAlert('Something went wrong while saving registration details.');
-      }
-    });
+    // console.log('method called');
+    // console.log(this.registrationForm, 'registration form');
+
+    // if (this.registrationForm.invalid) {
+    //   Object.keys(this.registrationForm.controls).forEach(field => {
+    //     const control = this.registrationForm.get(field);
+    //     if (control?.invalid) {
+    //       console.log(field, control.errors);
+    //     }
+    //   });
+    //   this.registrationForm.markAllAsTouched();
+    //   return;
+    // }
+    // console.log('method called');
+
+    // const rawFormValue = this.registrationForm.getRawValue();
+    // rawFormValue.dob = this.formatDateToYYYYMMDD(rawFormValue.dob);
+    // console.log(rawFormValue, 'dob');
+
+    // localStorage.setItem('uccRegistrationData', JSON.stringify(rawFormValue));
+    // const selectedLookUpID = this.registrationForm?.controls['memberName']?.value;
+    // const selectedMemberId = (selectedLookUpID || '').toString();
+    // const selectedMember = this.memberList.find(member => member.LookUpID === selectedMemberId);
+
+    // const formValue = this.registrationForm.getRawValue();
+    // formValue.memberDetails = {
+    //   id: selectedMember?.LookUpID,
+    //   name: selectedMember?.LookUpDescription
+    // };
+
+    // const selectedTaxStatus = this.taxStatusList.find(
+    //   ts => ts.value === formValue.taxStatus
+    // );
+    // formValue.taxStatusDetails = {
+    //   value: selectedTaxStatus?.value,
+    //   label: selectedTaxStatus?.label
+    // };
+
+    // const selectedHoldingPattern = this.holdingPatternList.find(
+    //   pattern => pattern.value === formValue.holdingPattern
+    // );
+    // formValue.holdingPatternDetails = {
+    //   value: selectedHoldingPattern?.value,
+    //   label: selectedHoldingPattern?.label
+    // };
+
+    // localStorage.setItem('uccRegistrationData', JSON.stringify(formValue));
+    // console.log(rawFormValue, 'raw form value');
+
+
+    // const input: UccMemberInfo = this.mapFormToUccMemberInfo(rawFormValue);
+    // console.log(input, 'input of registration');
+
+    // if (this.isEdit && this.memberID) {
+    //   input.membID = Number(this.memberID);
+    // }
+    // console.log(this.memberID, 'memb id');
+    // console.log(input, 'edited input');
+
+    // const storedData = localStorage.getItem('uccRegistrationData');
+    // const parsedData = storedData ? JSON.parse(storedData) : null;
+
+    // const bseClieCode = parsedData?.bseClientCode || '';
+    // console.log('BSE Client Code:', bseClieCode);
+
+    // this.isLoading = true;
+
+    // this.bseUCCService.getUccRegisterData(input).subscribe({
+    //   next: (response: { success: boolean; message: string }) => {
+    //     console.log('API Response:', response);
+    //     this.isLoading = false;
+    //     if (response.success) {
+    //       this.sharedService.successDia(response.message).subscribe(result => {
+    //         if (result) { 
+    //           this.nextTab.emit({
+    //             index: 1,
+    //             state: {
+    //               isUpdate: false,
+    //               MembID: input.membID || null,
+    //               clieCode: bseClieCode || '',
+    //             }
+    //           });
+    //         }
+    //       });
+    //     } else {
+    //       this.isLoading = false;
+    //       this.sharedService.OpenAlert('Failed to save registration details.');
+    //     }
+    //   },
+    //   error: (err: any) => {
+    //     this.isLoading = false;
+    //     console.error('API Error:', err);
+    //     this.sharedService.OpenAlert('Something went wrong while saving registration details.');
+    //   }
+    // });
   }
 
   updateDataandContinue() {
@@ -1542,8 +1548,7 @@ export class BseRegisterinvestors {
         this.isLoading = false;
         if (response.success) {
           this.sharedService.successDia(response.message).subscribe(result => {
-            if (result) {   // result === true when OK clicked
-              // Pass state with tab navigation for update mode
+            if (result) {
               this.nextTab.emit({
                 index: 1,
                 state: {

@@ -2,6 +2,7 @@
 @use'../../../../styling/variables.scss' as var;
 
 // Modal overlay spinner for editing registration
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -52,6 +53,14 @@
             }
         }
     }
+}
+
+@mixin grid($columns , $columnGap , $rowGap , $contentJustification) {
+    display: grid;
+    grid-template-columns: $columns;
+    column-gap: $columnGap;
+    row-gap: $rowGap;
+    justify-content: $contentJustification;
 }
 
 .greenText {
@@ -636,4 +645,24 @@ table.mat-elevation-z8 * {
   i {
     display: inline-block;
   }
+}
+
+.filtergrid{
+    @include grid(400px auto, 24px, 0, space-between);
+}
+
+.paginator{
+    position: sticky;
+  bottom: 0;
+  background: white;       /* prevent overlap transparency */
+  z-index: 10;
+  padding: 10px;
+}
+
+.pageContainer{
+    display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 122px); /* FULL SCREEN HEIGHT */
+  padding-top: 8px;
 }

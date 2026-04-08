@@ -1,425 +1,416 @@
 <div>
-    <!-- Modal overlay spinner for editing registration -->
     <div *ngIf="isEditingRegistration" class="modal-overlay">
         <div class="modal-spinner">
             <mat-progress-spinner mode="indeterminate" diameter="60" color="primary"></mat-progress-spinner>
             <div class="modal-spinner-text">⏳ Loading registration details...</div>
         </div>
     </div>
-
-    <p-breadcrumb [model]="breadcrumb_items" [home]="home"></p-breadcrumb>
+        <div style="height: 14px;">
+            <p-breadcrumb [model]="breadcrumb_items" [home]="home"></p-breadcrumb>
+        </div>
 
     <h5 class="PageHeading">BSE - Registered Investors List</h5>
 
-    <div class="MainPageCntnr">
-        <div class="MaingPage_InnerNavHead">
-            <!-- <div class="LeftSideItems">
-                <span class="BackNavigation">List of Register Investors <span class="YellowTxt"></span></span>
-            </div> -->
-            <div class="RightSideItems d-flex align-items-center">
-                <!-- <span class="ControlIcons">
-                    <i class="pi pi-download"></i>
-                </span> -->
-                <span class="ControlIcons" [ngClass]="{ 'filter-active': showFilter }" (click)="toggleFilter()">
-                    <i class="pi pi-filter"></i>
-                </span>
-                <!-- by pooja -->
-                <div class="filter-container" *ngIf="showFilter">
-
-                    <mat-form-field appearance="outline" class="filter-select">
-                        <mat-label>Filter By</mat-label>
-                        <mat-select [(ngModel)]="selectedFilter">
-                            <mat-option *ngFor="let opt of filterOptions" [value]="opt.value">
-                                {{ opt.label }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-
-                    <mat-form-field appearance="outline" class="filter-input">
-                        <mat-label>Enter Search Text</mat-label>
-                        <input matInput [(ngModel)]="searchText" (keyup.enter)="applyHeaderFilter()">
-                    </mat-form-field>
-
-                    <button mat-icon-button class="search-icon-btn" (click)="applyHeaderFilter()"
-                        [disabled]="!selectedFilter">
-                        <mat-icon>search</mat-icon>
-                    </button>
-
-                    <button mat-icon-button class="search-icon-btn" (click)="resetFilter()">
-                        <mat-icon>refresh</mat-icon>
-                    </button>
-
-                </div>
-
-                <!-- end here -->
-                <span class="ControlIcons" (click)="deleteSelectedUcc()">
-                    <i class="pi pi-trash"></i>
-                </span>
-
-                <!-- <span class="ControlIcons" (click)="editSelectedUcc()">
-                    <i class="pi pi-pencil"></i>
-                </span> -->
-                <button pButton class="Blue_FilledBtn float-start ms-1" (click)="navigateToNewRegigster()">
-                    <i class="pi pi-plus-circle" pButtonIcon></i>
-                    <span pButtonLabel class="px-1">Add New</span>
-                </button>
-
-
-                <button pButton class="Blue_FilledBtn float-start ms-1" (click)="refreshUccList()">
-                    <i class="pi pi-refresh" pButtonIcon></i>
-                </button>
-
-                <!-- <button pButton class="Blue_FilledBtn float-start ms-1" (click)="refreshSelectedUccStatus()">
-                    <i class="pi pi-refresh" pButtonIcon></i>
-                </button> -->
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-5">
-                <div class="InputControl d-flex">
-                    <mat-form-field>
-                        <mat-date-range-input [rangePicker]="picker" [formGroup]="dateForm">
-                            <input matStartDate formControlName="startDate" placeholder="Start date" readonly>
-                            <input matEndDate formControlName="endDate" placeholder="End date" readonly>
-                        </mat-date-range-input>
-                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                        <mat-date-range-picker #picker></mat-date-range-picker>
-                    </mat-form-field>
-                    <div class="text-danger" *ngIf="dateForm.errors?.['invalidRange']">
-                        End date must be greater than start date.
-                    </div>
-
-                    <div class="text-danger" *ngIf="dateForm.errors?.['exceedsMaxRange']">
-                        Date range cannot exceed 90 days.
-                    </div>
-
-                    <!-- <div class="text-danger" *ngIf="dateForm.errors?.['sameDate']">
-                     Start and End date cannot be the same.
-                 </div> -->
-
-                    <button pButton class="Blue_OutlineBtn  ms-2" (click)="applyDateRange()"
-                        [disabled]="dateForm.invalid">
-                        <span pButtonLabel>Apply</span>
-                    </button>
-
-                    <button pButton class="Blue_OutlineBtn  ms-2" (click)="resetDateRange()">
-                        <span pButtonLabel>Reset</span>
-                    </button>
-
-
-                </div>
-            </div>
-            <!-- <div class="col-6">
-                <button pButton class="Blue_OutlineBtn mt-2 ms-2 float-end">
-                    <img src="../../../../assets/images/images/import_blue.png" />
-                    <span pButtonLabel>Import Registration Status File</span>
-                </button>
-            </div> -->
-        </div>
-
-        <!-- Progress Bar for Loading UCC Data -->
-        <div class="progress-container" *ngIf="isLoadingUccData">
-            <p-progressBar mode="indeterminate"></p-progressBar>
-            <p class="loading-text">⏳ Loading UCC investors data...</p>
-        </div>
-
-        <div class="progress-container" *ngIf="isBseSubmitting">
-            <p-progressBar mode="indeterminate"></p-progressBar>
-            <p class="loading-text">⏳ Submitting Data...</p>
-        </div>
-
-        <div class="progress-container" *ngIf="isElogLoading">
-            <p-progressBar mode="indeterminate"></p-progressBar>
-            <p class="loading-text">⏳ Redirecting to Authenticate Elog...</p>
-        </div>
-
-        <div class="progress-container" *ngIf="isNomineeLoading">
-            <p-progressBar mode="indeterminate"></p-progressBar>
-            <p class="loading-text">⏳ Redirecting to Authenticate Nominee...</p>
-        </div>
-
-        <div class="Width100perc BlueHeadTable overflow-hidden" *ngIf="!isLoadingUccData">
-            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-                <!-- Checkbox Column -->
-                <!-- <ng-container matColumnDef="select">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox (change)="$event ? toggleAllRows() : null"
-                            [checked]="selection.hasValue() && isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()"  [aria-label]="checkboxLabel()">
-                        </mat-checkbox>
-                    </th>
-     <td mat-cell *matCellDef="let row">
-                        <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
-                         [aria-label]="checkboxLabel(row)"  >
-                        </mat-checkbox>
-                    </td>
-                          </ng-container> -->
-
-                <!-- Checkbox Column -->
-                <ng-container matColumnDef="select">
-
-                    <!-- Select All -->
-                    <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox (change)="toggleAllRows()" [checked]="isAllSelected()"
-                            [indeterminate]="selection.hasValue() && !isAllSelected()">
-                        </mat-checkbox>
-                    </th>
-
-                    <!-- Row Checkbox -->
-
-                    <td mat-cell *matCellDef="let row; let i = index">
-                        <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleRowSelection(row, i)"
-                            [checked]="selection.isSelected(row)"></mat-checkbox>
-                    </td>
-                </ng-container>
-
-
-
-
-
-                <!-- Client ID Column -->
-                <ng-container matColumnDef="clientId">
-                    <th mat-header-cell *matHeaderCellDef> Client ID </th>
-                    <!-- (click)="navToUccTabs(i)" -->
-                    <td (click)="navToUccTabs(i)" mat-cell *matCellDef="let element; let i = index"><a>
-                            {{element.bseClientCode }}</a> </td>
-                </ng-container>
-
-
-                <!-- added from here -->
-                <!-- <ng-container matColumnDef="UCCStatus">
-                    <th mat-header-cell *matHeaderCellDef> UCC Status </th>
-
-                    <td mat-cell *matCellDef="let element">
-
-                        <mat-progress-spinner *ngIf="element.isUccStatusLoading" diameter="18" mode="indeterminate"
-                            color="primary" style="display:inline-block; vertical-align:middle;">
-                        </mat-progress-spinner>
-
-                        <ng-container *ngIf="!element.isUccStatusLoading && element.uccStatus; else pendingTpl">
-                            <span [ngStyle]="{
-          color: element.uccStatus === 'ACTIVE' ? '#28a745' : '#d32f2f',
-          fontWeight: '450'
-        }">
-                                {{ element.uccStatus }}
-                            </span>
-                        </ng-container>
-
-                        <ng-template #pendingTpl>
-                            <span (click)="
-          $event.preventDefault();
-          getParticularUccData(
-            element.memberId,
-            element.bseClientCode,
-            element
-          )
-        " matTooltip="Click to fetch status" style="cursor:pointer; color:#1976d2; text-decoration:underline;">
-                                Pending
-                            </span>
-                        </ng-template>
-
-                    </td>
-                </ng-container> -->
-
-                <!-- end here -->
-                <ng-container matColumnDef="UCCStatus">
-                    <th mat-header-cell *matHeaderCellDef> UCC Status </th>
-
-                    <td mat-cell *matCellDef="let element">
-
-                        <ng-container [ngSwitch]="true">
-
-                            <!-- 🔹 Loading -->
-                            <span *ngSwitchCase="element.isUccStatusLoading" style="color:#1976d2;">
-                                Fetching...
-                            </span>
-
-                            <!-- 🔹 ACTIVE -->
-                            <span *ngSwitchCase="element.uccStatus === 'ACTIVE'"
-                                style="color:#28a745; font-weight:500;">
-                                ACTIVE
-                            </span>
-
-                            <!-- 🔹 PENDING -->
-                            <span *ngSwitchCase="element.uccStatus === 'PENDING_VERIFICATION'"
-                                style="color:#ff9800; font-weight:500;">
-                                Pending Verification
-                            </span>
-
-                            <!-- 🔹 PENDING -->
-                            <span *ngSwitchCase="element.uccStatus === 'PENDING_AUTH'"
-                                style="color:#ff9800; font-weight:500;">
-                                Pending Auth
-                            </span>
-
-                            <!-- 🔹 UNKNOWN / ERROR -->
-                            <span *ngSwitchCase="['UNKNOWN','ERROR'].includes(element.uccStatus)"
-                                style="color:#d32f2f; font-weight:500;">
-                                {{ element.uccStatus }}
-                            </span>
-
-                            <!-- 🔹 Initial -->
-                            <a *ngSwitchDefault style="cursor:pointer; color:#1976d2;"
-                                (click)="getParticularUccData(element.memberId, element.bseClientCode, element)">
-                                Fetch Status
-                            </a>
-
-                        </ng-container>
-
-                    </td>
-                </ng-container>
-
-
-
-
-
-
-
-                <!-- tax status -->
-                <ng-container matColumnDef="taxStatus">
-                    <th mat-header-cell *matHeaderCellDef> Tax Status </th>
-                    <td mat-cell *matCellDef="let element"> {{element.taxStatusDetails.label }} </td>
-                </ng-container>
-
-                <!-- Holding Pattern Column -->
-                <ng-container matColumnDef="holdingPattern">
-                    <th mat-header-cell *matHeaderCellDef> Holding Pattern </th>
-                    <td mat-cell *matCellDef="let element"> {{element.holdingPatternDetails.label }} </td>
-                </ng-container>
-
-                <!-- fatca details -->
-                <ng-container matColumnDef="fatcaStatus">
-                    <th mat-header-cell *matHeaderCellDef> Fatca Status </th>
-                    <td mat-cell *matCellDef="let element, let i = index">
-
-
-                        <span *ngIf="element.fatcaStatus === '1'; else pendingFatcaTpl" class="greenText">
-                            Success
-                        </span>
-
-                        <ng-template #pendingFatcaTpl>
-                            <a (click)="$event.preventDefault(); createFatcaStatus(i)">
-                                Pending
-                            </a>
-                        </ng-template>
-
-
-                    </td>
-                </ng-container>
-
-                <!-- 1st Application Column -->
-                <ng-container matColumnDef="firstApplication">
-                    <th mat-header-cell *matHeaderCellDef> 1st Applicant </th>
-                    <td mat-cell *matCellDef="let element"> {{element.memberDetails}} </td>
-                </ng-container>
-
-                <!-- 2nd Application Column -->
-                <ng-container matColumnDef="secondApplication">
-                    <th mat-header-cell *matHeaderCellDef> 2nd Applicant </th>
-                    <td mat-cell *matCellDef="let element"> {{element.secondApplication}} </td>
-                </ng-container>
-
-                <!-- 3rd Application Column -->
-                <ng-container matColumnDef="thirdApplication">
-                    <th mat-header-cell *matHeaderCellDef> 3rd Applicant </th>
-                    <td mat-cell *matCellDef="let element"> {{element.thirdApplication}} </td>
-                </ng-container>
-
-
-
-                <!-- Doc Status Column -->
-                <ng-container matColumnDef="docStatus">
-                    <th mat-header-cell *matHeaderCellDef> Doc Status/Elog </th>
-                    <td mat-cell *matCellDef="let element" (click)="$event.preventDefault(); getElogLink(element)">
-                        <!-- [ngClass]="{'blueText':element.elogLink == '' }" -->
-                        <!-- <i [class]="element.docStatus ? 'pi pi-check-circle' : 'pi pi-exclamation-circle'"></i> -->
-                        <!-- {{element.docStaus ? 'Uploaded':'Pending'}}- "Auth Link"  -->
-                        <a>Upload/Auth Link</a>
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="nomAuthLink">
-                    <th mat-header-cell *matHeaderCellDef> Nominee Auth Link </th>
-                    <td mat-cell *matCellDef="let element"
-                        (click)="$event.preventDefault(); getNomineeLinkReq(element)">
-                        <!-- [ngClass]="{'blueText':element.elogLink == '' }" -->
-                        <!-- <i [class]="element.docStatus ? 'pi pi-check-circle' : 'pi pi-exclamation-circle'"></i> -->
-                        <!-- {{element.docStaus ? 'Uploaded':'Pending'}}- "Auth Link"  -->
-                        <a>Auth Link</a>
-                    </td>
-                </ng-container>
-
-                <!-- <ng-container matColumnDef="bseMemberID">
-                    <th mat-header-cell *matHeaderCellDef> BSE Member ID </th>
-                    <td mat-cell *matCellDef="let element"> {{element.bseMemberID }} </td>
-                </ng-container> -->
-
-
-
-                <!-- BSE Status Column -->
-                <ng-container matColumnDef="bseStatus">
-                    <th mat-header-cell *matHeaderCellDef> BSE Status </th>
-                    <td mat-cell *matCellDef="let element">
-                        <!-- <button mat-flat-button color="primary" class="status-btn" (click)="$event.preventDefault(); saveDataToBSE(element.bseClientCode)">
-                            Submit Now
-                        </button> -->
-
-
-                        <span *ngIf="element.uccRegistration !== '0'; else pendingTpl" class="greenText">
-                            Success
-                        </span>
-
-                        <ng-template #pendingTpl>
-                            <button mat-flat-button color="primary" class="status-btn"
-                                (click)="$event.preventDefault(); saveDataToBSE(element.bseClientCode)">
-                                Submit Now
-                            </button>
-                        </ng-template>
-                    </td>
-                </ng-container>
-
-                <!-- Created on Column -->
-                <ng-container matColumnDef="createdOn">
-                    <th mat-header-cell *matHeaderCellDef> Created on </th>
-                    <td mat-cell *matCellDef="let element">
-                        <!-- <div><strong>{{ element.createDate | date: 'dd MMM yyyy' }}</strong></div> -->
-                        <div>{{ element.createDate | date: 'dd MMM yyyy' }}</div>
-                        <small class="CreatedOnTime">{{ element.createDate | date: 'hh:mm a' }}</small>
-                    </td>
-                </ng-container>
-
-                <!-- ✅ ACTIONS COLUMN (Edit Icon) -->
-                <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef> Actions </th>
-                    <td mat-cell *matCellDef="let element">
-                        <button class="action-icon-btn" (click)="editRow(element)" matTooltip="Edit Details">
-                            <i class="pi pi-pencil"></i>
+    <div class="pageContainer">
+        <div class="MainPageCntnr">
+            <div class="filtergrid">
+                <div>
+                    <div class="InputControl d-flex">
+                        <mat-form-field>
+                            <mat-date-range-input [rangePicker]="picker" [formGroup]="dateForm">
+                                <input matStartDate formControlName="startDate" placeholder="Start date" readonly>
+                                <input matEndDate formControlName="endDate" placeholder="End date" readonly>
+                            </mat-date-range-input>
+                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-date-range-picker #picker></mat-date-range-picker>
+                        </mat-form-field>
+                        <div class="text-danger" *ngIf="dateForm.errors?.['invalidRange']">
+                            End date must be greater than start date.
+                        </div>
+    
+                        <div class="text-danger" *ngIf="dateForm.errors?.['exceedsMaxRange']">
+                            Date range cannot exceed 90 days.
+                        </div>
+    
+                        <!-- <div class="text-danger" *ngIf="dateForm.errors?.['sameDate']">
+                         Start and End date cannot be the same.
+                     </div> -->
+    
+                        <button pButton class="Blue_OutlineBtn  ms-2" (click)="applyDateRange()"
+                            [disabled]="dateForm.invalid">
+                            <span pButtonLabel>Apply</span>
                         </button>
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
-                </tr> -->
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;">
-                </tr>
-
-            </table>
-
-            <div *ngIf="noDataFound" class="no-data-message">
-                <i class="pi pi-info-circle"></i>
-                <p>No data found matching your search criteria.</p>
+    
+                        <button pButton class="Blue_OutlineBtn  ms-2" (click)="resetDateRange()">
+                            <span pButtonLabel>Reset</span>
+                        </button>
+    
+    
+                    </div>
+                </div>
+                <div>
+                    <div class="MaingPage_InnerNavHead">
+    
+                        <div class="RightSideItems d-flex align-items-center">
+                            <span class="ControlIcons" [ngClass]="{ 'filter-active': showFilter }" (click)="toggleFilter()">
+                                <i class="pi pi-filter"></i>
+                            </span>
+                            <!-- by pooja -->
+                            <div class="filter-container" *ngIf="showFilter">
+    
+                                <mat-form-field appearance="outline" class="filter-select">
+                                    <mat-label>Filter By</mat-label>
+                                    <mat-select [(ngModel)]="selectedFilter">
+                                        <mat-option *ngFor="let opt of filterOptions" [value]="opt.value">
+                                            {{ opt.label }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+    
+                                <mat-form-field appearance="outline" class="filter-input">
+                                    <mat-label>Enter Search Text</mat-label>
+                                    <input matInput [(ngModel)]="searchText" (keyup.enter)="applyHeaderFilter()">
+                                </mat-form-field>
+    
+                                <button mat-icon-button class="search-icon-btn" (click)="applyHeaderFilter()"
+                                    [disabled]="!selectedFilter">
+                                    <mat-icon>search</mat-icon>
+                                </button>
+    
+                                <button mat-icon-button class="search-icon-btn" (click)="resetFilter()">
+                                    <mat-icon>refresh</mat-icon>
+                                </button>
+    
+                            </div>
+    
+                            <!-- end here -->
+                            <span class="ControlIcons" (click)="deleteSelectedUcc()">
+                                <i class="pi pi-trash"></i>
+                            </span>
+    
+                            <!-- <span class="ControlIcons" (click)="editSelectedUcc()">
+                        <i class="pi pi-pencil"></i>
+                    </span> -->
+                            <button pButton class="Blue_FilledBtn float-start ms-1" (click)="navigateToNewRegigster()">
+                                <i class="pi pi-plus-circle" pButtonIcon></i>
+                                <span pButtonLabel class="px-1">Add New</span>
+                            </button>
+    
+    
+                            <button pButton class="Blue_FilledBtn float-start ms-1" (click)="refreshUccList()">
+                                <i class="pi pi-refresh" pButtonIcon></i>
+                            </button>
+    
+                            <!-- <button pButton class="Blue_FilledBtn float-start ms-1" (click)="refreshSelectedUccStatus()">
+                        <i class="pi pi-refresh" pButtonIcon></i>
+                    </button> -->
+                        </div>
+                    </div>
+    
+                </div>
+            </div>
+    
+            <!-- Progress Bar for Loading UCC Data -->
+            <div class="progress-container" *ngIf="isLoadingUccData">
+                <p-progressBar mode="indeterminate"></p-progressBar>
+                <p class="loading-text">⏳ Loading UCC investors data...</p>
+            </div>
+    
+            <div class="progress-container" *ngIf="isBseSubmitting">
+                <p-progressBar mode="indeterminate"></p-progressBar>
+                <p class="loading-text">⏳ Submitting Data...</p>
+            </div>
+    
+            <div class="progress-container" *ngIf="isElogLoading">
+                <p-progressBar mode="indeterminate"></p-progressBar>
+                <p class="loading-text">⏳ Redirecting to Authenticate Elog...</p>
+            </div>
+    
+            <div class="progress-container" *ngIf="isNomineeLoading">
+                <p-progressBar mode="indeterminate"></p-progressBar>
+                <p class="loading-text">⏳ Redirecting to Authenticate Nominee...</p>
+            </div>
+    
+            <div class="Width100perc BlueHeadTable overflow-hidden" *ngIf="!isLoadingUccData">
+                <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                    <!-- Checkbox Column -->
+                    <!-- <ng-container matColumnDef="select">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                                [checked]="selection.hasValue() && isAllSelected()"
+                                [indeterminate]="selection.hasValue() && !isAllSelected()"  [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+         <td mat-cell *matCellDef="let row">
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
+                             [aria-label]="checkboxLabel(row)"  >
+                            </mat-checkbox>
+                        </td>
+                              </ng-container> -->
+    
+                    <!-- Checkbox Column -->
+                    <ng-container matColumnDef="select">
+    
+                        <!-- Select All -->
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-checkbox (change)="toggleAllRows()" [checked]="isAllSelected()"
+                                [indeterminate]="selection.hasValue() && !isAllSelected()">
+                            </mat-checkbox>
+                        </th>
+    
+                        <!-- Row Checkbox -->
+    
+                        <td mat-cell *matCellDef="let row; let i = index">
+                            <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleRowSelection(row, i)"
+                                [checked]="selection.isSelected(row)"></mat-checkbox>
+                        </td>
+                    </ng-container>
+    
+    
+    
+    
+    
+                    <!-- Client ID Column -->
+                    <ng-container matColumnDef="clientId">
+                        <th mat-header-cell *matHeaderCellDef> Client ID </th>
+                        <!-- (click)="navToUccTabs(i)" -->
+                        <td (click)="navToUccTabs(i)" mat-cell *matCellDef="let element; let i = index"><a>
+                                {{element.bseClientCode }}</a> </td>
+                    </ng-container>
+    
+    
+                    <!-- added from here -->
+                    <!-- <ng-container matColumnDef="UCCStatus">
+                        <th mat-header-cell *matHeaderCellDef> UCC Status </th>
+    
+                        <td mat-cell *matCellDef="let element">
+    
+                            <mat-progress-spinner *ngIf="element.isUccStatusLoading" diameter="18" mode="indeterminate"
+                                color="primary" style="display:inline-block; vertical-align:middle;">
+                            </mat-progress-spinner>
+    
+                            <ng-container *ngIf="!element.isUccStatusLoading && element.uccStatus; else pendingTpl">
+                                <span [ngStyle]="{
+              color: element.uccStatus === 'ACTIVE' ? '#28a745' : '#d32f2f',
+              fontWeight: '450'
+            }">
+                                    {{ element.uccStatus }}
+                                </span>
+                            </ng-container>
+    
+                            <ng-template #pendingTpl>
+                                <span (click)="
+              $event.preventDefault();
+              getParticularUccData(
+                element.memberId,
+                element.bseClientCode,
+                element
+              )
+            " matTooltip="Click to fetch status" style="cursor:pointer; color:#1976d2; text-decoration:underline;">
+                                    Pending
+                                </span>
+                            </ng-template>
+    
+                        </td>
+                    </ng-container> -->
+    
+                    <!-- end here -->
+                    <ng-container matColumnDef="UCCStatus">
+                        <th mat-header-cell *matHeaderCellDef> UCC Status </th>
+    
+                        <td mat-cell *matCellDef="let element">
+    
+                            <ng-container [ngSwitch]="true">
+    
+                                <!-- 🔹 Loading -->
+                                <span *ngSwitchCase="element.isUccStatusLoading" style="color:#1976d2;">
+                                    Fetching...
+                                </span>
+    
+                                <!-- 🔹 ACTIVE -->
+                                <span *ngSwitchCase="element.uccStatus === 'ACTIVE'"
+                                    style="color:#28a745; font-weight:500;">
+                                    ACTIVE
+                                </span>
+    
+                                <!-- 🔹 PENDING -->
+                                <span *ngSwitchCase="element.uccStatus === 'PENDING_VERIFICATION'"
+                                    style="color:#ff9800; font-weight:500;">
+                                    Pending Verification
+                                </span>
+    
+                                <!-- 🔹 PENDING -->
+                                <span *ngSwitchCase="element.uccStatus === 'PENDING_AUTH'"
+                                    style="color:#ff9800; font-weight:500;">
+                                    Pending Auth
+                                </span>
+    
+                                <!-- 🔹 UNKNOWN / ERROR -->
+                                <span *ngSwitchCase="['UNKNOWN','ERROR'].includes(element.uccStatus)"
+                                    style="color:#d32f2f; font-weight:500;">
+                                    {{ element.uccStatus }}
+                                </span>
+    
+                                <!-- 🔹 Initial -->
+                                <a *ngSwitchDefault style="cursor:pointer; color:#1976d2;"
+                                    (click)="getParticularUccData(element.memberId, element.bseClientCode, element)">
+                                    Fetch Status
+                                </a>
+    
+                            </ng-container>
+    
+                        </td>
+                    </ng-container>
+    
+    
+    
+    
+    
+    
+    
+                    <!-- tax status -->
+                    <ng-container matColumnDef="taxStatus">
+                        <th mat-header-cell *matHeaderCellDef> Tax Status </th>
+                        <td mat-cell *matCellDef="let element"> {{element.taxStatusDetails.label }} </td>
+                    </ng-container>
+    
+                    <!-- Holding Pattern Column -->
+                    <ng-container matColumnDef="holdingPattern">
+                        <th mat-header-cell *matHeaderCellDef> Holding Pattern </th>
+                        <td mat-cell *matCellDef="let element"> {{element.holdingPatternDetails.label }} </td>
+                    </ng-container>
+    
+                    <!-- fatca details -->
+                    <ng-container matColumnDef="fatcaStatus">
+                        <th mat-header-cell *matHeaderCellDef> Fatca Status </th>
+                        <td mat-cell *matCellDef="let element, let i = index">
+    
+    
+                            <span *ngIf="element.fatcaStatus === '1'; else pendingFatcaTpl" class="greenText">
+                                Success
+                            </span>
+    
+                            <ng-template #pendingFatcaTpl>
+                                <a (click)="$event.preventDefault(); createFatcaStatus(i)">
+                                    Pending
+                                </a>
+                            </ng-template>
+    
+    
+                        </td>
+                    </ng-container>
+    
+                    <!-- 1st Application Column -->
+                    <ng-container matColumnDef="firstApplication">
+                        <th mat-header-cell *matHeaderCellDef> 1st Applicant </th>
+                        <td mat-cell *matCellDef="let element"> {{element.memberDetails}} </td>
+                    </ng-container>
+    
+                    <!-- 2nd Application Column -->
+                    <ng-container matColumnDef="secondApplication">
+                        <th mat-header-cell *matHeaderCellDef> 2nd Applicant </th>
+                        <td mat-cell *matCellDef="let element"> {{element.secondApplication}} </td>
+                    </ng-container>
+    
+                    <!-- 3rd Application Column -->
+                    <ng-container matColumnDef="thirdApplication">
+                        <th mat-header-cell *matHeaderCellDef> 3rd Applicant </th>
+                        <td mat-cell *matCellDef="let element"> {{element.thirdApplication}} </td>
+                    </ng-container>
+    
+    
+    
+                    <!-- Doc Status Column -->
+                    <ng-container matColumnDef="docStatus">
+                        <th mat-header-cell *matHeaderCellDef> Doc Status/Elog </th>
+                        <td mat-cell *matCellDef="let element" (click)="$event.preventDefault(); getElogLink(element)">
+                            <!-- [ngClass]="{'blueText':element.elogLink == '' }" -->
+                            <!-- <i [class]="element.docStatus ? 'pi pi-check-circle' : 'pi pi-exclamation-circle'"></i> -->
+                            <!-- {{element.docStaus ? 'Uploaded':'Pending'}}- "Auth Link"  -->
+                            <a>Upload/Auth Link</a>
+                        </td>
+                    </ng-container>
+    
+                    <ng-container matColumnDef="nomAuthLink">
+                        <th mat-header-cell *matHeaderCellDef> Nominee Auth Link </th>
+                        <td mat-cell *matCellDef="let element"
+                            (click)="$event.preventDefault(); getNomineeLinkReq(element)">
+                            <!-- [ngClass]="{'blueText':element.elogLink == '' }" -->
+                            <!-- <i [class]="element.docStatus ? 'pi pi-check-circle' : 'pi pi-exclamation-circle'"></i> -->
+                            <!-- {{element.docStaus ? 'Uploaded':'Pending'}}- "Auth Link"  -->
+                            <a>Auth Link</a>
+                        </td>
+                    </ng-container>
+    
+                    <!-- <ng-container matColumnDef="bseMemberID">
+                        <th mat-header-cell *matHeaderCellDef> BSE Member ID </th>
+                        <td mat-cell *matCellDef="let element"> {{element.bseMemberID }} </td>
+                    </ng-container> -->
+    
+    
+    
+                    <!-- BSE Status Column -->
+                    <ng-container matColumnDef="bseStatus">
+                        <th mat-header-cell *matHeaderCellDef> BSE Status </th>
+                        <td mat-cell *matCellDef="let element">
+                            <!-- <button mat-flat-button color="primary" class="status-btn" (click)="$event.preventDefault(); saveDataToBSE(element.bseClientCode)">
+                                Submit Now
+                            </button> -->
+    
+    
+                            <span *ngIf="element.uccRegistration !== '0'; else pendingTpl" class="greenText">
+                                Success
+                            </span>
+    
+                            <ng-template #pendingTpl>
+                                <button mat-flat-button color="primary" class="status-btn"
+                                    (click)="$event.preventDefault(); saveDataToBSE(element.bseClientCode)">
+                                    Submit Now
+                                </button>
+                            </ng-template>
+                        </td>
+                    </ng-container>
+    
+                    <!-- Created on Column -->
+                    <ng-container matColumnDef="createdOn">
+                        <th mat-header-cell *matHeaderCellDef> Created on </th>
+                        <td mat-cell *matCellDef="let element">
+                            <!-- <div><strong>{{ element.createDate | date: 'dd MMM yyyy' }}</strong></div> -->
+                            <div>{{ element.createDate | date: 'dd MMM yyyy' }}</div>
+                            <small class="CreatedOnTime">{{ element.createDate | date: 'hh:mm a' }}</small>
+                        </td>
+                    </ng-container>
+    
+                    <!-- ✅ ACTIONS COLUMN (Edit Icon) -->
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let element">
+                            <button class="action-icon-btn" (click)="editRow(element)" matTooltip="Edit Details">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                        </td>
+                    </ng-container>
+    
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+                    </tr> -->
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                    </tr>
+    
+                </table>
+    
+                <div *ngIf="noDataFound" class="no-data-message">
+                    <i class="pi pi-info-circle"></i>
+                    <p>No data found matching your search criteria.</p>
+                </div>
             </div>
         </div>
-        <mat-paginator class="Width100perc" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+        <mat-paginator class="Width100perc paginator" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
             aria-label="Select page of periodic elements">
         </mat-paginator>
     </div>
 
-    <!-- ason 23-02-2026 -->
-
-    <!-- ✅ EDIT DETAILS MODAL -->
     <div class="edit-modal-overlay" *ngIf="isShowEditModal" (click)="closeEditModal()">
         <div class="edit-modal-container" (click)="$event.stopPropagation()">
             <!-- Modal Header -->
@@ -455,7 +446,4 @@
             </div>
         </div>
     </div>
-
-    <!-- end here -->
-
 </div>

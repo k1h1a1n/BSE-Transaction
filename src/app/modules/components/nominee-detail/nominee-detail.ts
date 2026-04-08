@@ -11,7 +11,7 @@ import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
 import { Router } from '@angular/router';
 import { bseNomineeListApiInput, uccNomineeDetails } from '../../models/bseUCCModel';
 import { Shared } from '../../../shared/services/shared';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { Location } from '@angular/common';
@@ -21,21 +21,21 @@ import { COUNTRY_CODE_LIST } from '../address-details/country-list';
 
 @Component({
   selector: 'app-nominee-detail',
-imports: [BreadcrumbModule, FormsModule, ButtonModule, ReactiveFormsModule, CommonModule,MatSelectModule,
-     InputTextModule,   MatRadioModule, MatTabsModule, MatCheckboxModule, MatFormFieldModule,MatOptionModule, ProgressBarModule],
+  imports: [BreadcrumbModule, FormsModule, ButtonModule, ReactiveFormsModule, CommonModule, MatSelectModule,
+    InputTextModule, MatRadioModule, MatTabsModule, MatCheckboxModule, MatFormFieldModule, MatOptionModule, ProgressBarModule],
   templateUrl: './nominee-detail.html',
   styleUrl: './nominee-detail.scss',
 })
 
 
 export class NomineeDetail {
-isLoading: boolean = false;
-requiresContactDetails: boolean = false;
+  isLoading: boolean = false;
+  requiresContactDetails: boolean = false;
 
-nomineeForm!: FormGroup;
-activeTab: number = 0;
+  nomineeForm!: FormGroup;
+  activeTab: number = 0;
   today!: string;
-selectedIdentityType: string = '';
+  selectedIdentityType: string = '';
   private identityPlaceholderMap: Record<string, string> = {
     '1': 'Enter PAN (e.g., ABCDE1234F)',
     '2': 'Enter last 4 digits of Aadhaar',
@@ -81,7 +81,7 @@ selectedIdentityType: string = '';
     { label: 'COURT APPOINTED LEGAL GUARDIAN', value: '23' }
   ];
 
-country_code_list = COUNTRY_CODE_LIST;
+  country_code_list = COUNTRY_CODE_LIST;
 
   countryList = [
     { key: '', value: '-- Select --' },
@@ -353,7 +353,7 @@ country_code_list = COUNTRY_CODE_LIST;
   ];
 
 
-emailOwnershipOptions = [
+  emailOwnershipOptions = [
     { value: 'SE', label: 'Self' },
     { value: 'SP', label: 'Spouse' },
     { value: 'DC', label: 'Dependent Children' },
@@ -375,7 +375,7 @@ emailOwnershipOptions = [
   // asnew journey on 15-08-2025
   storedData = [];
   nomiDataFromPatch = [];
-  
+
   // Multi-nominee management
   savedNominees: any[] = []; // Array to store up to 3 nominees
   currentNomineeIndex: number = 0; // Track which nominee form user is filling
@@ -392,18 +392,18 @@ emailOwnershipOptions = [
   // update-edit mode = add
   isAddNewNomi: boolean = false;
   isAddNomiClieCode: any;
-isAddNomiMembID: any; 
+  isAddNomiMembID: any;
 
-//update-edit mode = edit
-isEditNomiDetail: boolean = false;
-isEditNomiClieCode: any;
-isEditNomiMembID: any;
-nomiInEdit: any;
-nomiKeyInEdit: any;
-nomiIndexInEdit: any;
-@Output() nextTab =  new EventEmitter<number>();
+  //update-edit mode = edit
+  isEditNomiDetail: boolean = false;
+  isEditNomiClieCode: any;
+  isEditNomiMembID: any;
+  nomiInEdit: any;
+  nomiKeyInEdit: any;
+  nomiIndexInEdit: any;
+  @Output() nextTab = new EventEmitter<number>();
 
-constructor(private fb: FormBuilder, private location: Location, private router: Router, private bseUccSer: BseUCCRegister, private sharedService: Shared) { }
+  constructor(private fb: FormBuilder, private location: Location, private router: Router, private bseUccSer: BseUCCRegister, private sharedService: Shared) { }
 
   ngOnInit(): void {
 
@@ -439,8 +439,8 @@ constructor(private fb: FormBuilder, private location: Location, private router:
     this.isAddNomiClieCode = navState?.isAddNomiClieCode;
     this.isAddNomiMembID = navState?.isAddNomiMembID;
 
-    console.log('isAddNewNomi, isAddNomiClieCode, isAddNomiMembID', this.isAddNewNomi, this.isAddNomiClieCode, this.isAddNomiMembID  );
-    
+    console.log('isAddNewNomi, isAddNomiClieCode, isAddNomiMembID', this.isAddNewNomi, this.isAddNomiClieCode, this.isAddNomiMembID);
+
 
 
     // FRO UPDATE-EDIT mode = EDIT
@@ -448,38 +448,38 @@ constructor(private fb: FormBuilder, private location: Location, private router:
     this.isEditNomiClieCode = navState?.isEditNomiClieCode;
     this.isEditNomiMembID = navState?.isEditNomiMembID;
     this.nomiInEdit = navState?.nomiInEdit;
-    this.nomiKeyInEdit =  navState?.nomiKeyInEdit;
-    this.nomiIndexInEdit =  navState?.nomiIndexInEdit;
+    this.nomiKeyInEdit = navState?.nomiKeyInEdit;
+    this.nomiIndexInEdit = navState?.nomiIndexInEdit;
 
-    console.log('isEditNomiDetail, isEditNomiClieCode, isEditNomiMembID, nomiInEdit, nomiKeyInEdit, nomiIndexInEdit', this.isEditNomiDetail, this.isEditNomiClieCode, this.isEditNomiMembID,  this.nomiInEdit,  this.nomiKeyInEdit,  this.nomiIndexInEdit  );
-   
-        if (this.isEditNomiDetail) {
+    console.log('isEditNomiDetail, isEditNomiClieCode, isEditNomiMembID, nomiInEdit, nomiKeyInEdit, nomiIndexInEdit', this.isEditNomiDetail, this.isEditNomiClieCode, this.isEditNomiMembID, this.nomiInEdit, this.nomiKeyInEdit, this.nomiIndexInEdit);
+
+    if (this.isEditNomiDetail) {
       // this.patchDataForEdit(navState);
       this.patchDataForEditinEdit(navState);  // by key exchanging
     }
-   
+
     // end here
 
   }
 
 
 
-//       navigate(index: number) {
-//   const pages = [
-//     'BseRegisterinvestors',
-//     'addressDetails',
-//     'kycDetails',
-//     'depoBankDetails',
-//     'nomineeDetails'
-//   ];
+  //       navigate(index: number) {
+  //   const pages = [
+  //     'BseRegisterinvestors',
+  //     'addressDetails',
+  //     'kycDetails',
+  //     'depoBankDetails',
+  //     'nomineeDetails'
+  //   ];
 
-//   this.router.navigate([pages[index]]);
-// }
+  //   this.router.navigate([pages[index]]);
+  // }
 
-goToNextTab() {
-  this.nextTab.emit(5);  // navigate to tab index 1
-}
-  
+  goToNextTab() {
+    this.nextTab.emit(5);  // navigate to tab index 1
+  }
+
   createNomineeForm(index: number) {
     const isRequired = index === 0;
 
@@ -523,17 +523,17 @@ goToNextTab() {
       country_code: ['+91', [Validators.required, Validators.maxLength(5), Validators.pattern(/^\+\d{1,4}$/)]],
 
       // contact_number: [''],
-      mobile: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/) ]],
+      mobile: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
 
       whose_contact_number: ['', [Validators.required, Validators.maxLength(100)]],
       contact_type: ['', [Validators.required, Validators.maxLength(50)]],
-      extension: ['', [ Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
+      extension: ['', [Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       fax_no: ['', [Validators.maxLength(20)]],
 
       // email_address: ['', [Validators.email, Validators.minLength(10), Validators.maxLength(200)]],
-       email: ['', [Validators.required, Validators.email, Validators.minLength(10), Validators.maxLength(200)]],
-     
-       whose_email_address: ['', [Validators.required, Validators.maxLength(100)]],
+      email: ['', [Validators.required, Validators.email, Validators.minLength(10), Validators.maxLength(200)]],
+
+      whose_email_address: ['', [Validators.required, Validators.maxLength(100)]],
       address1: ['', isRequired ? [Validators.required, Validators.maxLength(50)] : []],
       address2: ['', Validators.maxLength(50)],
       address3: ['', Validators.maxLength(50)],
@@ -541,7 +541,7 @@ goToNextTab() {
       city: ['', isRequired ? [
         Validators.required,
         Validators.pattern(/^[a-zA-Z .'-]+$/),
-            Validators.minLength(2),
+        Validators.minLength(2),
         Validators.maxLength(20)
       ] : []],
 
@@ -557,7 +557,7 @@ goToNextTab() {
 
       // added by backoffice
       dob: [''],
-      
+
 
     });
 
@@ -777,10 +777,10 @@ goToNextTab() {
     return `${day}/${month}/${year}`;
   }
 
-   ///// new journey ason 15-08-2025
+  ///// new journey ason 15-08-2025
   // normla mode add
 
-    private resolveMembID(): string | null {
+  private resolveMembID(): string | null {
     if (this.isAddNewNomi) {
       return this.isAddNomiMembID;
     }
@@ -788,7 +788,7 @@ goToNextTab() {
       return this.isEditNomiMembID;
     }
     else if (this.isEditNomiNormalMode) {
-      return this.MemberDetailID; 
+      return this.MemberDetailID;
     } else {
       return this.MemberDetailID;
     }
@@ -798,11 +798,11 @@ goToNextTab() {
     if (this.isAddNewNomi) {
       return this.isAddNomiClieCode;
     }
-    else if (this.isEditNomiDetail) { 
+    else if (this.isEditNomiDetail) {
       return this.isEditNomiClieCode;
     }
     else if (this.isEditNomiNormalMode) {
-      return this.BseClientCode;  
+      return this.BseClientCode;
     }
     else {
       return this.BseClientCode;
@@ -810,208 +810,208 @@ goToNextTab() {
   }
 
   SaveAndContinue() {
-  console.log('call normal');
-  console.log(this.savedNominees.length, 'saved nominees');
-  console.log(this.UpdatedNomineeList.length, 'updated nominee list');
+    console.log('call normal');
+    console.log(this.savedNominees.length, 'saved nominees');
+    console.log(this.UpdatedNomineeList.length, 'updated nominee list');
 
-  // ✅ If user has at least one saved nominee, skip validation and proceed
-  if (this.savedNominees.length > 0 || this.UpdatedNomineeList.length > 0) {
-    console.log('User has saved nominees, skipping validation');
-    this.router.navigate(['/app/nomineeList']);
-    return;
-  }
-
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
-
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
-
-  const clientCode = this.BseClientCode;
-  formValue.clieCode = clientCode;
-  formValue.membID = this.MemberDetailID;
-
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
-
-  console.log('Form value of Nominee', formValue);
-
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
-
-  console.log(storedData, 'storedData before update');
-  console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
-
-  // 🔹 Get only this client's nominees
-  const clientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
-
-  if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
-    const selectedNominee = clientNominees[this.nomiIndexinNormalMode];
-    console.log(selectedNominee, 'selected nominee for edit');
-
-    if (selectedNominee) {
-      const actualIndex = storedData.findIndex(
-        (        nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
-          nomi.clieCode === selectedNominee.clieCode &&
-          nomi.membID === selectedNominee.membID &&
-          String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
-          nomi.identityType === selectedNominee.identityType
-      );
-
-      if (actualIndex !== -1) {
-        storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
-        console.log("✅ Updated nominee:", storedData[actualIndex]);
-      }
-    }
-  } else {
-    storedData.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
-
-  console.log(storedData, 'stored data after update');
-
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
-
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+    // ✅ If user has at least one saved nominee, skip validation and proceed
+    if (this.savedNominees.length > 0 || this.UpdatedNomineeList.length > 0) {
+      console.log('User has saved nominees, skipping validation');
       this.router.navigate(['/app/nomineeList']);
-    });
-    return;
-  }
-
-  // 🔹 Save back
-  localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
-  console.log(updatedClientNominees, 'updated nominee list');
-
-  // 🔹 Map for API
-   const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
-  // const listToMap = updatedClientNominees;
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
-
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/nomineeList']);
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
-      }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+      return;
     }
-  });
-}
+
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
+
+    const clientCode = this.BseClientCode;
+    formValue.clieCode = clientCode;
+    formValue.membID = this.MemberDetailID;
+
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
+
+    console.log('Form value of Nominee', formValue);
+
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
+
+    console.log(storedData, 'storedData before update');
+    console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
+
+    // 🔹 Get only this client's nominees
+    const clientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
+
+    if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
+      const selectedNominee = clientNominees[this.nomiIndexinNormalMode];
+      console.log(selectedNominee, 'selected nominee for edit');
+
+      if (selectedNominee) {
+        const actualIndex = storedData.findIndex(
+          (nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
+            nomi.clieCode === selectedNominee.clieCode &&
+            nomi.membID === selectedNominee.membID &&
+            String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
+            nomi.identityType === selectedNominee.identityType
+        );
+
+        if (actualIndex !== -1) {
+          storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
+          console.log("✅ Updated nominee:", storedData[actualIndex]);
+        }
+      }
+    } else {
+      storedData.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
+
+    console.log(storedData, 'stored data after update');
+
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/nomineeList']);
+      });
+      return;
+    }
+
+    // 🔹 Save back
+    localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
+    console.log(updatedClientNominees, 'updated nominee list');
+
+    // 🔹 Map for API
+    const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
+    // const listToMap = updatedClientNominees;
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/nomineeList']);
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
+        }
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+      }
+    });
+  }
 
 
   SaveAndExit() {
-  console.log('call normal exit');
+    console.log('call normal exit');
 
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
-
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
-
-  const clientCode = this.BseClientCode;
-  formValue.clieCode = clientCode;
-  formValue.membID = this.MemberDetailID;
-
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
-
-  console.log('Form value of Nominee', formValue);
-
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
-
-  console.log(storedData, 'storedData before update');
-  console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
-
-  // 🔹 Get only this client's nominees
-  const clientNominees = storedData.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
-
-  if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
-    const selectedNominee = clientNominees[this.nomiIndexinNormalMode];
-    console.log(selectedNominee, 'selected nominee for edit');
-
-    if (selectedNominee) {
-      const actualIndex = storedData.findIndex(
-        (        nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
-          nomi.clieCode === selectedNominee.clieCode &&
-          nomi.membID === selectedNominee.membID &&
-          String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
-          nomi.identityType === selectedNominee.identityType
-      );
-
-      if (actualIndex !== -1) {
-        storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
-        console.log("✅ Updated nominee:", storedData[actualIndex]);
-      }
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
     }
-  } else {
-    storedData.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
 
-  console.log(storedData, 'stored data after update');
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
 
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = storedData.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
+    const clientCode = this.BseClientCode;
+    formValue.clieCode = clientCode;
+    formValue.membID = this.MemberDetailID;
 
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
-      this.router.navigate(['/app/uccList']);
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
+
+    console.log('Form value of Nominee', formValue);
+
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
+
+    console.log(storedData, 'storedData before update');
+    console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
+
+    // 🔹 Get only this client's nominees
+    const clientNominees = storedData.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
+
+    if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
+      const selectedNominee = clientNominees[this.nomiIndexinNormalMode];
+      console.log(selectedNominee, 'selected nominee for edit');
+
+      if (selectedNominee) {
+        const actualIndex = storedData.findIndex(
+          (nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
+            nomi.clieCode === selectedNominee.clieCode &&
+            nomi.membID === selectedNominee.membID &&
+            String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
+            nomi.identityType === selectedNominee.identityType
+        );
+
+        if (actualIndex !== -1) {
+          storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
+          console.log("✅ Updated nominee:", storedData[actualIndex]);
+        }
+      }
+    } else {
+      storedData.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
+
+    console.log(storedData, 'stored data after update');
+
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = storedData.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
+
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/uccList']);
+      });
+      return;
+    }
+
+    // 🔹 Save back
+    localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
+    console.log(updatedClientNominees, 'updated nominee list');
+
+    // 🔹 Map for API
+    // const listToMap = updatedClientNominees;
+    const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/uccList']);
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
+        }
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+      }
     });
-    return;
   }
 
-  // 🔹 Save back
-  localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
-  console.log(updatedClientNominees, 'updated nominee list');
-
-  // 🔹 Map for API
-  // const listToMap = updatedClientNominees;
-  const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
-
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/uccList']);
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
-      }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
-    }
-  });
-}
-
-///as of now remain
+  ///as of now remain
   patchDataForEditinNormalMode(nav: { isEditNomiNormalMode: any; nomiInNormal: { name: any; relation: any; isMinor: any; percentage: any; idType: any; idNumber: any; email: any; mobileNumber: any; address1: any; address2: any; address3: any; city: any; pin: any; country: any; dob: any; guardian: any; guardPAN: any; }; nomiKeyinNormalMode: any; nomiIndexinNormalMode: any; }) {
     console.log(nav.isEditNomiNormalMode, 'isEditNomiNormalMode');
 
@@ -1057,7 +1057,7 @@ goToNextTab() {
 
 
 
-// by key exchanging
+  // by key exchanging
   // Add Nominee - Save current form and add new
   addNominee() {
     // Validate current form
@@ -1110,29 +1110,29 @@ goToNextTab() {
     this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
       next: (response: { success: boolean; message: string }) => {
         console.log('Nominee API Response:', response);
-         this.isLoading = false;
+        this.isLoading = false;
         if (response.success) {
-              this.sharedService.successDia(response.message).subscribe(result => {
-          this.nomineeForm.reset();
+          this.sharedService.successDia(response.message).subscribe(result => {
+            this.nomineeForm.reset();
             this.nomineeForm.patchValue({
               relation: '0',
               isMinor: '',
               identityType: '',
               country: ''
             });
-            
+
             this.currentNomineeIndex++;
             console.log(`Nominee ${this.currentNomineeIndex} of ${this.maxNominees} added successfully`);
-            
+
             // Refresh from API to get updated list
             this.getNomineeList(clientCode!);
             // this.isLoading = false;
-            
-      }
-      )
-    }
-        
-        
+
+          }
+          )
+        }
+
+
         else {
           this.isLoading = false;
           this.sharedService.OpenAlert('Failed to save nominee details.');
@@ -1147,7 +1147,7 @@ goToNextTab() {
   }
 
 
-   addNomineeandExit() {
+  addNomineeandExit() {
     console.log(this.savedNominees.length, 'saved nominees');
     console.log(this.UpdatedNomineeList.length, 'updated nominee list');
 
@@ -1213,29 +1213,29 @@ goToNextTab() {
     this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
       next: (response: { success: boolean; message: string }) => {
         console.log('Nominee API Response:', response);
-    
+
         if (response.success) {
-              this.sharedService.successDia(response.message).subscribe(result => {
-          this.nomineeForm.reset();
+          this.sharedService.successDia(response.message).subscribe(result => {
+            this.nomineeForm.reset();
             this.nomineeForm.patchValue({
               relation: '0',
               isMinor: '',
               identityType: '',
               country: ''
             });
-            
+
             this.currentNomineeIndex++;
             console.log(`Nominee ${this.currentNomineeIndex} of ${this.maxNominees} added successfully`);
-            
+
             // Refresh from API to get updated list
             this.getNomineeListandExit(clientCode!);
             this.isLoading = false;
-            
-      }
-      )
-    }
-        
-        
+
+          }
+          )
+        }
+
+
         else {
           this.isLoading = false;
           this.sharedService.OpenAlert('Failed to save nominee details.');
@@ -1257,7 +1257,7 @@ goToNextTab() {
     // Load from localStorage or API
     let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
     storedData = Array.isArray(storedData) ? storedData : [];
-    
+
     const clientNominees = storedData.filter((n: any) => n.clieCode === clientCode);
     this.savedNominees = clientNominees;
     console.log('Nominees from API:', this.savedNominees);
@@ -1276,13 +1276,13 @@ goToNextTab() {
 
   deleteNomineeFromDB(nominee: any, index: number) {
     const clientCode = this.resolveClientID();
-    
+
     // Remove nominee from savedNominees array
     const updatedNominees = this.savedNominees.filter((_, i) => i !== index);
-    
+
     // Call API to update the nominee list (send remaining nominees)
     const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(updatedNominees, clientCode);
-    
+
     console.log('Deleting nominee, sending updated list:', nomineeInput);
 
     this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
@@ -1306,168 +1306,168 @@ goToNextTab() {
     });
   }
 
-  getNomineeList(clieCode: string){
-      if (!clieCode) {
-        console.warn('Client code is missing. Cannot fetch nominee list.');
-        return;
-      }
-  
-      const input: bseNomineeListApiInput = {
-        clientCode: clieCode
-      }
-      console.log('nominee list input', input);
-  
-      this.bseUccSer.getBseNomineeList(input).subscribe({
-        next: (res: any) => {
-          console.log('res of nominee list', res);
-          const clieCode = res.clieCode?.trim() || '';
-          const membID = res.membID?.trim() || '';
-          console.log(clieCode, membID, 'clie code and memb id');
-  
-          this.isAddNomiClieCode = clieCode;
-          this.isAddNomiMembID = membID;
-  
-          this.isEditNomiClieCode = clieCode;
-          this.isEditNomiMembID = membID;
-  
-           this.isEditClieCodeinNormalMode = clieCode;
-        this.isEditMembIDinNormalMode = membID;
-
-  
-          this.UpdatedNomineeList = this.mapNomineeDetailsToArray(res);
-          console.log('updaed nominee list', this.UpdatedNomineeList);
-  
-          localStorage.setItem('getNomineekList', JSON.stringify(this.UpdatedNomineeList));
-          
-          // Update savedNominees for table display
-          this.savedNominees = this.UpdatedNomineeList;
-          this.currentNomineeIndex = this.UpdatedNomineeList.length;
-          console.log('Saved nominees updated from API:', this.savedNominees);
-       
-       
-        },
-  
-        error: (err: any) => {
-          console.error('Error fetching nominee list', err);
-        }
-      })
-}
-
-  getNomineeListandExit(clieCode: string){
-      if (!clieCode) {
-        console.warn('Client code is missing. Cannot fetch nominee list.');
-        return;
-      }
-  
-      const input: bseNomineeListApiInput = {
-        clientCode: clieCode
-      }
-      console.log('nominee list input', input);
-  
-      this.bseUccSer.getBseNomineeList(input).subscribe({
-        next: (res: any) => {
-          console.log('res of nominee list', res);
-          const clieCode = res.clieCode?.trim() || '';
-          const membID = res.membID?.trim() || '';
-          console.log(clieCode, membID, 'clie code and memb id');
-  
-          this.isAddNomiClieCode = clieCode;
-          this.isAddNomiMembID = membID;
-  
-          this.isEditNomiClieCode = clieCode;
-          this.isEditNomiMembID = membID;
-  
-           this.isEditClieCodeinNormalMode = clieCode;
-        this.isEditMembIDinNormalMode = membID;
-
-  
-          this.UpdatedNomineeList = this.mapNomineeDetailsToArray(res);
-          console.log('updaed nominee list', this.UpdatedNomineeList);
-  
-          localStorage.setItem('getNomineekList', JSON.stringify(this.UpdatedNomineeList));
-          
-          // Update savedNominees for table display
-          this.savedNominees = this.UpdatedNomineeList;
-          this.currentNomineeIndex = this.UpdatedNomineeList.length;
-          console.log('Saved nominees updated from API:', this.savedNominees);
-       
-          // Wait 2 seconds before navigating to allow user to see the updated list
-          // setTimeout(() => {
-          //   this.nextTab.emit(5);
-          //   this.router.navigate(['/app/registerdList']);
-          // }, 2000);
-            
-       
-        },
-  
-        error: (err: any) => {
-          console.error('Error fetching nominee list', err);
-        }
-      })
-}
-
-  private mapNomineeDetailsToArray(response: any): any[] {
-  const nominees = [];
-
-  const commonFields = {
-    clieCode: response.clieCode?.trim() || '',
-    membID: response.membID?.trim() || ''
-  };
-
-  for (let i = 1; i <= 3; i++) {
-    const key = `nominee${i}detail`;
-    const nominee = response[key];
-
-    if (!nominee) continue;
-
-    const cleanedNominee = {
-      nomineeKey: key,
-      index: i,
-      name: nominee.name?.trim() || null,
-      relation: nominee.relation?.trim() || null,
-      percentage: nominee.percentage?.trim() || null,
-      isMinor: nominee.isMinor?.trim() || null,
-      dob: nominee.dob?.trim() || null,
-      guardian: nominee.guardian?.trim() || null,
-      guardPAN: nominee.guardPAN?.trim() || null,
-      idType: nominee.idType?.trim() || null,
-      idNumber: nominee.idNumber?.trim() || null,
-      email: nominee.email?.trim() || null,
-      mobileNumber: nominee.mobileNumber?.trim() || null,
-      country_code: nominee.country_code?.trim() || nominee.countryCode?.trim() || null,
-      // contact_number: nominee.contact_number?.trim() || nominee.contactNumber?.trim() || null,
-      whose_contact_number: nominee.whose_contact_number?.trim() || nominee.whoseContactNumber?.trim() || null,
-      contact_type: nominee.contact_type?.trim() || nominee.contactType?.trim() || null,
-      extension: nominee.extension?.trim() || null,
-      fax_no: nominee.fax_no?.trim() || nominee.faxNo?.trim() || null,
-      // email_address: nominee.email_address?.trim() || nominee.emailAddress?.trim() || null,
-      whose_email_address: nominee.whose_email_address?.trim() || nominee.whoseEmailAddress?.trim() || null,
-      address1: nominee.address1?.trim() || null,
-      address2: nominee.address2?.trim() || null,
-      address3: nominee.address3?.trim() || null,
-      city: nominee.city?.trim() || null,
-      pin: nominee.pin?.trim() || null,
-      country: nominee.country?.trim() || null,
-      ...commonFields
-    };
-
-    // Only validate key nominee-specific fields (not just commonFields)
-    const isNomineeDataValid = [
-      cleanedNominee.name,
-      cleanedNominee.relation,
-      cleanedNominee.percentage,
-      cleanedNominee.idType,
-      cleanedNominee.idNumber,
-      cleanedNominee.mobileNumber
-    ].some(val => val && val !== 'null' && val !== '');
-
-    if (isNomineeDataValid) {
-      nominees.push(cleanedNominee);
+  getNomineeList(clieCode: string) {
+    if (!clieCode) {
+      console.warn('Client code is missing. Cannot fetch nominee list.');
+      return;
     }
+
+    const input: bseNomineeListApiInput = {
+      clientCode: clieCode
+    }
+    console.log('nominee list input', input);
+
+    this.bseUccSer.getBseNomineeList(input).subscribe({
+      next: (res: any) => {
+        console.log('res of nominee list', res);
+        const clieCode = res.clieCode?.trim() || '';
+        const membID = res.membID?.trim() || '';
+        console.log(clieCode, membID, 'clie code and memb id');
+
+        this.isAddNomiClieCode = clieCode;
+        this.isAddNomiMembID = membID;
+
+        this.isEditNomiClieCode = clieCode;
+        this.isEditNomiMembID = membID;
+
+        this.isEditClieCodeinNormalMode = clieCode;
+        this.isEditMembIDinNormalMode = membID;
+
+
+        this.UpdatedNomineeList = this.mapNomineeDetailsToArray(res);
+        console.log('updaed nominee list', this.UpdatedNomineeList);
+
+        localStorage.setItem('getNomineekList', JSON.stringify(this.UpdatedNomineeList));
+
+        // Update savedNominees for table display
+        this.savedNominees = this.UpdatedNomineeList;
+        this.currentNomineeIndex = this.UpdatedNomineeList.length;
+        console.log('Saved nominees updated from API:', this.savedNominees);
+
+
+      },
+
+      error: (err: any) => {
+        console.error('Error fetching nominee list', err);
+      }
+    })
   }
 
-  return nominees;
-}
+  getNomineeListandExit(clieCode: string) {
+    if (!clieCode) {
+      console.warn('Client code is missing. Cannot fetch nominee list.');
+      return;
+    }
+
+    const input: bseNomineeListApiInput = {
+      clientCode: clieCode
+    }
+    console.log('nominee list input', input);
+
+    this.bseUccSer.getBseNomineeList(input).subscribe({
+      next: (res: any) => {
+        console.log('res of nominee list', res);
+        const clieCode = res.clieCode?.trim() || '';
+        const membID = res.membID?.trim() || '';
+        console.log(clieCode, membID, 'clie code and memb id');
+
+        this.isAddNomiClieCode = clieCode;
+        this.isAddNomiMembID = membID;
+
+        this.isEditNomiClieCode = clieCode;
+        this.isEditNomiMembID = membID;
+
+        this.isEditClieCodeinNormalMode = clieCode;
+        this.isEditMembIDinNormalMode = membID;
+
+
+        this.UpdatedNomineeList = this.mapNomineeDetailsToArray(res);
+        console.log('updaed nominee list', this.UpdatedNomineeList);
+
+        localStorage.setItem('getNomineekList', JSON.stringify(this.UpdatedNomineeList));
+
+        // Update savedNominees for table display
+        this.savedNominees = this.UpdatedNomineeList;
+        this.currentNomineeIndex = this.UpdatedNomineeList.length;
+        console.log('Saved nominees updated from API:', this.savedNominees);
+
+        // Wait 2 seconds before navigating to allow user to see the updated list
+        // setTimeout(() => {
+        //   this.nextTab.emit(5);
+        //   this.router.navigate(['/app/registerdList']);
+        // }, 2000);
+
+
+      },
+
+      error: (err: any) => {
+        console.error('Error fetching nominee list', err);
+      }
+    })
+  }
+
+  private mapNomineeDetailsToArray(response: any): any[] {
+    const nominees = [];
+
+    const commonFields = {
+      clieCode: response.clieCode?.trim() || '',
+      membID: response.membID?.trim() || ''
+    };
+
+    for (let i = 1; i <= 3; i++) {
+      const key = `nominee${i}detail`;
+      const nominee = response[key];
+
+      if (!nominee) continue;
+
+      const cleanedNominee = {
+        nomineeKey: key,
+        index: i,
+        name: nominee.name?.trim() || null,
+        relation: nominee.relation?.trim() || null,
+        percentage: nominee.percentage?.trim() || null,
+        isMinor: nominee.isMinor?.trim() || null,
+        dob: nominee.dob?.trim() || null,
+        guardian: nominee.guardian?.trim() || null,
+        guardPAN: nominee.guardPAN?.trim() || null,
+        idType: nominee.idType?.trim() || null,
+        idNumber: nominee.idNumber?.trim() || null,
+        email: nominee.email?.trim() || null,
+        mobileNumber: nominee.mobileNumber?.trim() || null,
+        country_code: nominee.country_code?.trim() || nominee.countryCode?.trim() || null,
+        // contact_number: nominee.contact_number?.trim() || nominee.contactNumber?.trim() || null,
+        whose_contact_number: nominee.whose_contact_number?.trim() || nominee.whoseContactNumber?.trim() || null,
+        contact_type: nominee.contact_type?.trim() || nominee.contactType?.trim() || null,
+        extension: nominee.extension?.trim() || null,
+        fax_no: nominee.fax_no?.trim() || nominee.faxNo?.trim() || null,
+        // email_address: nominee.email_address?.trim() || nominee.emailAddress?.trim() || null,
+        whose_email_address: nominee.whose_email_address?.trim() || nominee.whoseEmailAddress?.trim() || null,
+        address1: nominee.address1?.trim() || null,
+        address2: nominee.address2?.trim() || null,
+        address3: nominee.address3?.trim() || null,
+        city: nominee.city?.trim() || null,
+        pin: nominee.pin?.trim() || null,
+        country: nominee.country?.trim() || null,
+        ...commonFields
+      };
+
+      // Only validate key nominee-specific fields (not just commonFields)
+      const isNomineeDataValid = [
+        cleanedNominee.name,
+        cleanedNominee.relation,
+        cleanedNominee.percentage,
+        cleanedNominee.idType,
+        cleanedNominee.idNumber,
+        cleanedNominee.mobileNumber
+      ].some(val => val && val !== 'null' && val !== '');
+
+      if (isNomineeDataValid) {
+        nominees.push(cleanedNominee);
+      }
+    }
+
+    return nominees;
+  }
 
   // Get relation label from value
   getRelationLabel(value: string): string {
@@ -1485,7 +1485,7 @@ goToNextTab() {
       // Fallback to localStorage if no client code
       let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
       storedData = Array.isArray(storedData) ? storedData : [];
-      
+
       const clientNominees = storedData.filter((n: any) => n.clieCode === clientCode);
       this.savedNominees = clientNominees;
       this.currentNomineeIndex = clientNominees.length;
@@ -1518,7 +1518,7 @@ goToNextTab() {
 
 
   //     if (selectedNominee) {
-     
+
   //       const actualIndex = this.storedData.findIndex(
   //         nomi =>
   //           nomi.clieCode === nomiDatFromPatch?.clieCode &&
@@ -1541,7 +1541,7 @@ goToNextTab() {
   //           nomi?.idNumber === nomiDatFromPatch?.IDNumber &&
   //           nomi?.idType === nomiDatFromPatch?.identityType &&
   //           nomi?.pin === nomiDatFromPatch?.pin 
-            
+
   //       );
 
   //       if (actualIndex !== -1) {
@@ -1552,11 +1552,11 @@ goToNextTab() {
   //       console.warn("Nominee not found for update");
   //     }
 
-       
+
   //       console.log(actualIndex,'actual index');
   //       console.log(this.storedData[actualIndex],' stored data post editing');
-        
-        
+
+
   //     }
   //   }
 
@@ -1566,7 +1566,7 @@ goToNextTab() {
   // }
   // end here
 
-   get MemberDetailID(): string | null {
+  get MemberDetailID(): string | null {
     const data = localStorage.getItem('uccRegistrationData');
     if (data) {
       try {
@@ -1592,9 +1592,9 @@ goToNextTab() {
     return null;
   }
 
-/// fro update-edit mode- add-edit
-patchDataForEdit(nav: { isEditNomiDetail: any; nomiInEdit: { name: any; relation: any; isMinor: any; percentage: any; idType: any; idNumber: any; email: any; mobileNumber: any; address1: any; address2: any; address3: any; city: any; pin: any; country: any; dob: any; guardian: any; guardPAN: any; }; nomiKeyInEdit: any; nomiIndexInEdit: any; }){
-      console.log(nav.isEditNomiDetail, 'isEditNomiDetail');
+  /// fro update-edit mode- add-edit
+  patchDataForEdit(nav: { isEditNomiDetail: any; nomiInEdit: { name: any; relation: any; isMinor: any; percentage: any; idType: any; idNumber: any; email: any; mobileNumber: any; address1: any; address2: any; address3: any; city: any; pin: any; country: any; dob: any; guardian: any; guardPAN: any; }; nomiKeyInEdit: any; nomiIndexInEdit: any; }) {
+    console.log(nav.isEditNomiDetail, 'isEditNomiDetail');
 
     if (nav.isEditNomiDetail && nav.nomiInEdit) {
       this.nomineeForm.patchValue({
@@ -1634,753 +1634,753 @@ patchDataForEdit(nav: { isEditNomiDetail: any; nomiInEdit: { name: any; relation
       this.nomiDataFromPatch = this.nomineeForm.value;
 
     }
-}
+  }
 
 
   UpdateAndContinue() {
-  console.log('call update');
+    console.log('call update');
 
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
-
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
-
-  const clientCode = this.resolveClientID();
-  const membID = this.resolveMembID();
-  formValue.clieCode = clientCode;
-  formValue.membID = membID;
-
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
-
-  console.log('Form value of Nominee', formValue);
-
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
-
-  console.log(storedData, 'storedData before update');
-  console.log(this.nomiIndexInEdit, 'nominee index from other comp');
-
-  // 🔹 Get only this client's nominees
-  const clientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
-
-  if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
-    const selectedNominee = clientNominees[this.nomiIndexInEdit];
-    console.log(selectedNominee, 'selected nominee for edit');
-
-    if (selectedNominee) {
-      const actualIndex = storedData.findIndex(
-        (        nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
-          nomi.clieCode === selectedNominee.clieCode &&
-          nomi.membID === selectedNominee.membID &&
-          String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
-          nomi.identityType === selectedNominee.identityType
-      );
-
-      if (actualIndex !== -1) {
-        storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
-        console.log("✅ Updated nominee:", storedData[actualIndex]);
-      }
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
     }
-  } else {
-    storedData.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
 
-  console.log(storedData, 'stored data after update');
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
 
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    const clientCode = this.resolveClientID();
+    const membID = this.resolveMembID();
+    formValue.clieCode = clientCode;
+    formValue.membID = membID;
 
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
-      this.router.navigate(['/app/nomineeList']
-        , {
-        state: {
-          isAddNewNomiInNomiList: true,
-          clieCodeFromAddNomi: clientCode
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
+
+    console.log('Form value of Nominee', formValue);
+
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
+
+    console.log(storedData, 'storedData before update');
+    console.log(this.nomiIndexInEdit, 'nominee index from other comp');
+
+    // 🔹 Get only this client's nominees
+    const clientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
+
+    if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
+      const selectedNominee = clientNominees[this.nomiIndexInEdit];
+      console.log(selectedNominee, 'selected nominee for edit');
+
+      if (selectedNominee) {
+        const actualIndex = storedData.findIndex(
+          (nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
+            nomi.clieCode === selectedNominee.clieCode &&
+            nomi.membID === selectedNominee.membID &&
+            String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
+            nomi.identityType === selectedNominee.identityType
+        );
+
+        if (actualIndex !== -1) {
+          storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
+          console.log("✅ Updated nominee:", storedData[actualIndex]);
         }
       }
-      );
-    });
-    return;
-  }
+    } else {
+      storedData.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
 
-  // 🔹 Save back
-  localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
-  console.log(updatedClientNominees, 'updated nominee list');
+    console.log(storedData, 'stored data after update');
 
-  // 🔹 Map for API
-  // const listToMap = updatedClientNominees;
-  const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
 
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/nomineeList']
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/nomineeList']
+          , {
+            state: {
+              isAddNewNomiInNomiList: true,
+              clieCodeFromAddNomi: clientCode
+            }
+          }
+        );
+      });
+      return;
+    }
+
+    // 🔹 Save back
+    localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
+    console.log(updatedClientNominees, 'updated nominee list');
+
+    // 🔹 Map for API
+    // const listToMap = updatedClientNominees;
+    const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/nomineeList']
               , {
-        state: {
-          isAddNewNomiInNomiList: true,
-          clieCodeFromAddNomi: clientCode
+                state: {
+                  isAddNewNomiInNomiList: true,
+                  clieCodeFromAddNomi: clientCode
+                }
+              }
+            );
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
         }
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
       }
-          );
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
-      }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
-    }
-  });
-}
+    });
+  }
 
   UpdateAndExit() {
-  console.log('call update exit');
+    console.log('call update exit');
 
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
-
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
-
-  const clientCode = this.resolveClientID();
-  const membID = this.resolveMembID();
-  formValue.clieCode = clientCode;
-  formValue.membID = membID;
-
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
-
-  console.log('Form value of Nominee', formValue);
-
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
-
-  console.log(storedData, 'storedData before update');
-  console.log(this.nomiIndexInEdit, 'nominee index from other comp');
-
-  // 🔹 Get only this client's nominees
-  const clientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
-
-  if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
-    const selectedNominee = clientNominees[this.nomiIndexInEdit];
-    console.log(selectedNominee, 'selected nominee for edit');
-
-    if (selectedNominee) {
-      const actualIndex = storedData.findIndex(
-        (        nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
-          nomi.clieCode === selectedNominee.clieCode &&
-          nomi.membID === selectedNominee.membID &&
-          String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
-          nomi.identityType === selectedNominee.identityType
-      );
-
-      if (actualIndex !== -1) {
-        storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
-        console.log("✅ Updated nominee:", storedData[actualIndex]);
-      }
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
     }
-  } else {
-    storedData.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
 
-  console.log(storedData, 'stored data after update');
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
 
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    const clientCode = this.resolveClientID();
+    const membID = this.resolveMembID();
+    formValue.clieCode = clientCode;
+    formValue.membID = membID;
 
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
-      this.router.navigate(['/app/uccList']
-      //   , {
-      //   state: {
-      //     isAddNewNomiInNomiList: true,
-      //     clieCodeFromAddNomi: clientCode
-      //   }
-      // }
-      );
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
+
+    console.log('Form value of Nominee', formValue);
+
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('nomineeAddListInNormalMode') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
+
+    console.log(storedData, 'storedData before update');
+    console.log(this.nomiIndexInEdit, 'nominee index from other comp');
+
+    // 🔹 Get only this client's nominees
+    const clientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
+
+    if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
+      const selectedNominee = clientNominees[this.nomiIndexInEdit];
+      console.log(selectedNominee, 'selected nominee for edit');
+
+      if (selectedNominee) {
+        const actualIndex = storedData.findIndex(
+          (nomi: { clieCode: any; membID: any; IDNumber: any; identityType: any; }) =>
+            nomi.clieCode === selectedNominee.clieCode &&
+            nomi.membID === selectedNominee.membID &&
+            String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
+            nomi.identityType === selectedNominee.identityType
+        );
+
+        if (actualIndex !== -1) {
+          storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
+          console.log("✅ Updated nominee:", storedData[actualIndex]);
+        }
+      }
+    } else {
+      storedData.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
+
+    console.log(storedData, 'stored data after update');
+
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = storedData.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/uccList']
+          //   , {
+          //   state: {
+          //     isAddNewNomiInNomiList: true,
+          //     clieCodeFromAddNomi: clientCode
+          //   }
+          // }
+        );
+      });
+      return;
+    }
+
+    // 🔹 Save back
+    localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
+    console.log(updatedClientNominees, 'updated nominee list');
+
+    // 🔹 Map for API
+    // const listToMap = updatedClientNominees;
+    const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/uccList']
+              //         , {
+              //   state: {
+              //     isAddNewNomiInNomiList: true,
+              //     clieCodeFromAddNomi: clientCode
+              //   }
+              // }
+            );
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
+        }
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+      }
     });
-    return;
   }
 
-  // 🔹 Save back
-  localStorage.setItem('nomineeAddListInNormalMode', JSON.stringify(storedData));
-  console.log(updatedClientNominees, 'updated nominee list');
-
-  // 🔹 Map for API
-  // const listToMap = updatedClientNominees;
-  const listToMap = storedData.length === 0 ? storedData : updatedClientNominees;
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
-
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/uccList']
-      //         , {
-      //   state: {
-      //     isAddNewNomiInNomiList: true,
-      //     clieCodeFromAddNomi: clientCode
-      //   }
-      // }
-          );
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
-      }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
-    }
-  });
-}
 
 
 
 
-
-// from key replacing- for normal mode
+  // from key replacing- for normal mode
   patchDataForEditinNormal(nav: { isEditNomiNormalMode: any; nomiInNormal: any; nomiKeyinNormalMode: any; nomiIndexinNormalMode: any; }) {
-  console.log(nav.isEditNomiNormalMode, 'isEditNomiNormalMode');
+    console.log(nav.isEditNomiNormalMode, 'isEditNomiNormalMode');
 
-  if (nav.isEditNomiNormalMode && nav.nomiInNormal) {
-    // 🔹 Use mapStoredToPatched here so the form always has NEW keys
-    const patchedNomi = this.mapStoredToPatched(nav.nomiInNormal);
+    if (nav.isEditNomiNormalMode && nav.nomiInNormal) {
+      // 🔹 Use mapStoredToPatched here so the form always has NEW keys
+      const patchedNomi = this.mapStoredToPatched(nav.nomiInNormal);
 
-    this.nomineeForm.patchValue(patchedNomi);
-    console.log(this.nomineeForm.value, 'nominee form value in normal edit');
+      this.nomineeForm.patchValue(patchedNomi);
+      console.log(this.nomineeForm.value, 'nominee form value in normal edit');
 
-    this.nomiKeyinNormalMode = nav.nomiKeyinNormalMode;
-    this.nomiIndexinNormalMode = nav.nomiIndexinNormalMode;
+      this.nomiKeyinNormalMode = nav.nomiKeyinNormalMode;
+      this.nomiIndexinNormalMode = nav.nomiIndexinNormalMode;
 
-    // ✅ form value already in patched structure
-    this.nomiDataFromPatch = this.nomineeForm.value;
+      // ✅ form value already in patched structure
+      this.nomiDataFromPatch = this.nomineeForm.value;
 
-    // 🔹 Load stored data from localStorage
-    // this.storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
-    // this.storedData = Array.isArray(this.storedData) ? this.storedData : [];
-    // console.log(this.storedData, 'stored data post editing in normal mode');
+      // 🔹 Load stored data from localStorage
+      // this.storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
+      // this.storedData = Array.isArray(this.storedData) ? this.storedData : [];
+      // console.log(this.storedData, 'stored data post editing in normal mode');
+    }
   }
-}
-// imp for converting stored-> patched format( formvalue)
-private mapStoredToPatched(stored: any): any {
-  return {
-    nomineeName: stored.name,
-    relation: stored.relation,
-    isMinor: stored.isMinor,
-    applicablePercentage: stored.percentage,
-    identityType: stored.idType,
-    nomineePan: stored.nomineePan || "",
-    IDNumber: stored.idNumber,
-    email: stored.email,
-    mobile: stored.mobileNumber,
-    country_code: stored.country_code ?? stored.countryCode ?? '',
-    // contact_number: stored.contact_number ?? stored.contactNumber ?? '',
-    whose_contact_number: stored.whose_contact_number ?? stored.whoseContactNumber ?? '',
-    contact_type: stored.contact_type ?? stored.contactType ?? '',
-    extension: stored.extension ?? '',
-    fax_no: stored.fax_no ?? stored.faxNo ?? '',
-    // email_address: stored.email_address ?? stored.emailAddress ?? '',
-    whose_email_address: stored.whose_email_address ?? stored.whoseEmailAddress ?? '',
-    address1: stored.address1,
-    address2: stored.address2,
-    address3: stored.address3,
-    city: stored.city,
-    pin: stored.pin,
-    country: stored.country,
-    nomineeDob: stored.dob,
-    guardianName: stored.guardian,
-    pan: stored.guardPAN,
-    clieCode: stored.clieCode,
-    membID: stored.membID
-  };
-}
+  // imp for converting stored-> patched format( formvalue)
+  private mapStoredToPatched(stored: any): any {
+    return {
+      nomineeName: stored.name,
+      relation: stored.relation,
+      isMinor: stored.isMinor,
+      applicablePercentage: stored.percentage,
+      identityType: stored.idType,
+      nomineePan: stored.nomineePan || "",
+      IDNumber: stored.idNumber,
+      email: stored.email,
+      mobile: stored.mobileNumber,
+      country_code: stored.country_code ?? stored.countryCode ?? '',
+      // contact_number: stored.contact_number ?? stored.contactNumber ?? '',
+      whose_contact_number: stored.whose_contact_number ?? stored.whoseContactNumber ?? '',
+      contact_type: stored.contact_type ?? stored.contactType ?? '',
+      extension: stored.extension ?? '',
+      fax_no: stored.fax_no ?? stored.faxNo ?? '',
+      // email_address: stored.email_address ?? stored.emailAddress ?? '',
+      whose_email_address: stored.whose_email_address ?? stored.whoseEmailAddress ?? '',
+      address1: stored.address1,
+      address2: stored.address2,
+      address3: stored.address3,
+      city: stored.city,
+      pin: stored.pin,
+      country: stored.country,
+      nomineeDob: stored.dob,
+      guardianName: stored.guardian,
+      pan: stored.guardPAN,
+      clieCode: stored.clieCode,
+      membID: stored.membID
+    };
+  }
 
   saveAndEditinNormal() {
-  console.log('call normal');
+    console.log('call normal');
 
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
+    }
 
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
 
-  const clientCode = this.BseClientCode;
-  formValue.clieCode = clientCode;
-  formValue.membID = this.MemberDetailID;
+    const clientCode = this.BseClientCode;
+    formValue.clieCode = clientCode;
+    formValue.membID = this.MemberDetailID;
 
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
 
-  console.log('Form value of Nominee', formValue);
+    console.log('Form value of Nominee', formValue);
 
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
 
     console.log(storedData, 'storedData before update');
- let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
+    let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
 
- console.log(patchedList,'patched list');
-//  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(patchedList, 'patched list');
+    //  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
 
-  console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
+    console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
 
-  // 🔹 Get only this client's nominees
-  const clientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
+    // 🔹 Get only this client's nominees
+    const clientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
 
-  // if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
-  //   const selectedNominee = clientNominees[this.nomiIndexinNormalMode];
-  //   console.log(selectedNominee, 'selected nominee for edit');
+    // if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
+    //   const selectedNominee = clientNominees[this.nomiIndexinNormalMode];
+    //   console.log(selectedNominee, 'selected nominee for edit');
 
-  //   if (selectedNominee) {
-  //     const actualIndex = patchedList.findIndex(
-  //       nomi =>
-  //         nomi.clieCode === selectedNominee.clieCode &&
-  //         nomi.membID === selectedNominee.membID &&
-  //         String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
-  //         nomi.identityType === selectedNominee.identityType
-  //     );
+    //   if (selectedNominee) {
+    //     const actualIndex = patchedList.findIndex(
+    //       nomi =>
+    //         nomi.clieCode === selectedNominee.clieCode &&
+    //         nomi.membID === selectedNominee.membID &&
+    //         String(nomi.IDNumber) === String(selectedNominee.IDNumber) &&  // ✅ unique per nominee
+    //         nomi.identityType === selectedNominee.identityType
+    //     );
 
-  //     if (actualIndex !== -1) {
-  //       patchedList[actualIndex] = { ...patchedList[actualIndex], ...formValue };
-  //       console.log("✅ Updated nominee:", patchedList[actualIndex]);
-  //     }
-  //   }
-  // } 
+    //     if (actualIndex !== -1) {
+    //       patchedList[actualIndex] = { ...patchedList[actualIndex], ...formValue };
+    //       console.log("✅ Updated nominee:", patchedList[actualIndex]);
+    //     }
+    //   }
+    // } 
 
 
-  if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
-  // Directly update by index
-  patchedList[this.nomiIndexinNormalMode] = { 
-    ...patchedList[this.nomiIndexinNormalMode], 
-    ...formValue 
-  };
-  console.log("✅ Updated nominee:", patchedList[this.nomiIndexinNormalMode]);
-} 
-  else {
-    patchedList.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
-
-  console.log(patchedList, 'stored data after update');
-
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
-
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
-      this.router.navigate(['/app/nomineeList']);
-    });
-    return;
-  }
-
-  // 🔹 Save back
-  // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
-  console.log(updatedClientNominees, 'updated nominee list');
-
-  // 🔹 Map for API
-  // const listToMap = updatedClientNominees;
-  const listToMap = patchedList.length === 0 ? patchedList : updatedClientNominees;
-
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
-
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/nomineeList']);
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
-      }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+    if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
+      // Directly update by index
+      patchedList[this.nomiIndexinNormalMode] = {
+        ...patchedList[this.nomiIndexinNormalMode],
+        ...formValue
+      };
+      console.log("✅ Updated nominee:", patchedList[this.nomiIndexinNormalMode]);
     }
-  });
-}
+    else {
+      patchedList.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
+
+    console.log(patchedList, 'stored data after update');
+
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
+
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/nomineeList']);
+      });
+      return;
+    }
+
+    // 🔹 Save back
+    // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(updatedClientNominees, 'updated nominee list');
+
+    // 🔹 Map for API
+    // const listToMap = updatedClientNominees;
+    const listToMap = patchedList.length === 0 ? patchedList : updatedClientNominees;
+
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/nomineeList']);
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
+        }
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+      }
+    });
+  }
 
   saveAndExitinNormal() {
-  console.log('call normal');
+    console.log('call normal');
 
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
+    }
 
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
 
-  const clientCode = this.BseClientCode;
-  formValue.clieCode = clientCode;
-  formValue.membID = this.MemberDetailID;
+    const clientCode = this.BseClientCode;
+    formValue.clieCode = clientCode;
+    formValue.membID = this.MemberDetailID;
 
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
 
-  console.log('Form value of Nominee', formValue);
+    console.log('Form value of Nominee', formValue);
 
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
 
     console.log(storedData, 'storedData before update');
- let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
+    let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
 
- console.log(patchedList,'patched list');
-//  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(patchedList, 'patched list');
+    //  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
 
-  console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
+    console.log(this.nomiIndexinNormalMode, 'nominee index from other comp');
 
-  // 🔹 Get only this client's nominees
-  const clientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
-
-
+    // 🔹 Get only this client's nominees
+    const clientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
 
 
-  if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
-  // Directly update by index
-  patchedList[this.nomiIndexinNormalMode] = { 
-    ...patchedList[this.nomiIndexinNormalMode], 
-    ...formValue 
-  };
-  console.log("✅ Updated nominee:", patchedList[this.nomiIndexinNormalMode]);
-} 
-  else {
-    patchedList.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
 
-  console.log(patchedList, 'stored data after update');
 
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
-
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
-      this.router.navigate(['/app/uccList']);
-    });
-    return;
-  }
-
-  // 🔹 Save back
-  // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
-  console.log(updatedClientNominees, 'updated nominee list');
-
-  // 🔹 Map for API
-  // const listToMap = updatedClientNominees;
-  const listToMap = patchedList.length === 0 ? patchedList : updatedClientNominees;
-
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
-
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/uccList']);
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
-      }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+    if (this.nomiIndexinNormalMode !== null && this.nomiIndexinNormalMode >= 0) {
+      // Directly update by index
+      patchedList[this.nomiIndexinNormalMode] = {
+        ...patchedList[this.nomiIndexinNormalMode],
+        ...formValue
+      };
+      console.log("✅ Updated nominee:", patchedList[this.nomiIndexinNormalMode]);
     }
-  });
-}
+    else {
+      patchedList.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
 
-//from key replacing- for update-edit mode
-  patchDataForEditinEdit(nav: { isEditNomiDetail: any; nomiInEdit: any; nomiKeyInEdit: any; nomiIndexInEdit: any; }) {
-  console.log(nav.isEditNomiDetail, 'isEditNomiDetail');
+    console.log(patchedList, 'stored data after update');
 
-  if (nav.isEditNomiDetail && nav.nomiInEdit) {
-    // 🔹 Use mapStoredToPatched here so the form always has NEW keys
-    const patchedNomi = this.mapStoredToPatched(nav.nomiInEdit);
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = patchedList.filter((n: { clieCode: string; }) => n.clieCode === clientCode);
 
-    this.nomineeForm.patchValue(patchedNomi);
-    console.log(this.nomineeForm.value, 'nominee form value in update edit');
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/uccList']);
+      });
+      return;
+    }
 
-    this.nomiKeyInEdit = nav.nomiKeyInEdit;
-    this.nomiIndexInEdit = nav.nomiIndexInEdit;
+    // 🔹 Save back
+    // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(updatedClientNominees, 'updated nominee list');
 
-    // ✅ form value already in patched structure
-    this.nomiDataFromPatch = this.nomineeForm.value;
+    // 🔹 Map for API
+    // const listToMap = updatedClientNominees;
+    const listToMap = patchedList.length === 0 ? patchedList : updatedClientNominees;
 
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/uccList']);
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
+        }
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
+      }
+    });
   }
-}
+
+  //from key replacing- for update-edit mode
+  patchDataForEditinEdit(nav: { isEditNomiDetail: any; nomiInEdit: any; nomiKeyInEdit: any; nomiIndexInEdit: any; }) {
+    console.log(nav.isEditNomiDetail, 'isEditNomiDetail');
+
+    if (nav.isEditNomiDetail && nav.nomiInEdit) {
+      // 🔹 Use mapStoredToPatched here so the form always has NEW keys
+      const patchedNomi = this.mapStoredToPatched(nav.nomiInEdit);
+
+      this.nomineeForm.patchValue(patchedNomi);
+      console.log(this.nomineeForm.value, 'nominee form value in update edit');
+
+      this.nomiKeyInEdit = nav.nomiKeyInEdit;
+      this.nomiIndexInEdit = nav.nomiIndexInEdit;
+
+      // ✅ form value already in patched structure
+      this.nomiDataFromPatch = this.nomineeForm.value;
+
+    }
+  }
 
   saveAndEditinUpdate() {
-  console.log('call normal');
+    console.log('call normal');
 
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
+    }
 
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
 
-  // const clientCode: string = this.BseClientCode;
-  // formValue.clieCode = clientCode;
-  // formValue.membID = this.MemberDetailID;
+    // const clientCode: string = this.BseClientCode;
+    // formValue.clieCode = clientCode;
+    // formValue.membID = this.MemberDetailID;
     const clientCode = this.resolveClientID();
-  const membID = this.resolveMembID();
-  formValue.clieCode = clientCode;
-  formValue.membID = membID;
+    const membID = this.resolveMembID();
+    formValue.clieCode = clientCode;
+    formValue.membID = membID;
 
 
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
 
-  console.log('Form value of Nominee', formValue);
+    console.log('Form value of Nominee', formValue);
 
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
 
     console.log(storedData, 'storedData before update');
- let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
+    let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
 
- console.log(patchedList,'patched list');
-//  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(patchedList, 'patched list');
+    //  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
 
-  console.log(this.nomiIndexInEdit, 'nominee index from other comp');
+    console.log(this.nomiIndexInEdit, 'nominee index from other comp');
 
-  // 🔹 Get only this client's nominees
-  const clientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
+    // 🔹 Get only this client's nominees
+    const clientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
 
 
-  if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
-  // Directly update by index
-  patchedList[this.nomiIndexInEdit] = { 
-    ...patchedList[this.nomiIndexInEdit], 
-    ...formValue 
-  };
-  console.log("✅ Updated nominee:", patchedList[this.nomiIndexInEdit]);
-} 
-  else {
-    patchedList.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
+    if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
+      // Directly update by index
+      patchedList[this.nomiIndexInEdit] = {
+        ...patchedList[this.nomiIndexInEdit],
+        ...formValue
+      };
+      console.log("✅ Updated nominee:", patchedList[this.nomiIndexInEdit]);
+    }
+    else {
+      patchedList.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
 
-  console.log(patchedList, 'stored data after update');
+    console.log(patchedList, 'stored data after update');
 
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
 
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
-      this.router.navigate(['/app/nomineeList']
-        ,{
-           state: {
-          isAddNewNomiInNomiList: true,
-          clieCodeFromAddNomi: clientCode
-        }
-        }
-      );
-    });
-    return;
-  }
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/nomineeList']
+          , {
+            state: {
+              isAddNewNomiInNomiList: true,
+              clieCodeFromAddNomi: clientCode
+            }
+          }
+        );
+      });
+      return;
+    }
 
-  // 🔹 Save back
-  // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
-  console.log(updatedClientNominees, 'updated nominee list');
+    // 🔹 Save back
+    // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(updatedClientNominees, 'updated nominee list');
 
-  // 🔹 Map for API
-  // const listToMap = updatedClientNominees;
+    // 🔹 Map for API
+    // const listToMap = updatedClientNominees;
     const listToMap = patchedList.length === 0 ? patchedList : updatedClientNominees;
 
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
 
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/nomineeList']
-            ,{
-               state: {
-          isAddNewNomiInNomiList: true,
-          clieCodeFromAddNomi: clientCode
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/nomineeList']
+              , {
+                state: {
+                  isAddNewNomiInNomiList: true,
+                  clieCodeFromAddNomi: clientCode
+                }
+              }
+            );
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
         }
-            }
-          );
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
       }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
-    }
-  });
-}
+    });
+  }
 
   saveAndExitinUpdate() {
-  console.log('call normal');
+    console.log('call normal');
 
-  if (this.nomineeForm.invalid) {
-    this.nomineeForm.markAllAsTouched();
-    return;
-  }
+    if (this.nomineeForm.invalid) {
+      this.nomineeForm.markAllAsTouched();
+      return;
+    }
 
-  const formValue = this.nomineeForm.getRawValue();
-  console.log(formValue, 'Nominee formValue');
+    const formValue = this.nomineeForm.getRawValue();
+    console.log(formValue, 'Nominee formValue');
 
-  // const clientCode: string = this.BseClientCode;
-  // formValue.clieCode = clientCode;
-  // formValue.membID = this.MemberDetailID;
+    // const clientCode: string = this.BseClientCode;
+    // formValue.clieCode = clientCode;
+    // formValue.membID = this.MemberDetailID;
     const clientCode = this.resolveClientID();
-  const membID = this.resolveMembID();
-  formValue.clieCode = clientCode;
-  formValue.membID = membID;
+    const membID = this.resolveMembID();
+    formValue.clieCode = clientCode;
+    formValue.membID = membID;
 
 
-  if (formValue.nomineeDob) {
-    formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
-  } else {
-    formValue.nomineeDob = '';
-  }
+    if (formValue.nomineeDob) {
+      formValue.nomineeDob = this.formatDateToDDMMYYYY(formValue.nomineeDob);
+    } else {
+      formValue.nomineeDob = '';
+    }
 
-  console.log('Form value of Nominee', formValue);
+    console.log('Form value of Nominee', formValue);
 
-  // 🔹 Load from localStorage
-  let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
-  storedData = Array.isArray(storedData) ? storedData : [];
+    // 🔹 Load from localStorage
+    let storedData = JSON.parse(localStorage.getItem('getNomineekList') || '[]');
+    storedData = Array.isArray(storedData) ? storedData : [];
 
     console.log(storedData, 'storedData before update');
- let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
+    let patchedList = storedData.map((nomi: any) => this.mapStoredToPatched(nomi));
 
- console.log(patchedList,'patched list');
-//  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(patchedList, 'patched list');
+    //  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
 
-  console.log(this.nomiIndexInEdit, 'nominee index from other comp');
+    console.log(this.nomiIndexInEdit, 'nominee index from other comp');
 
-  // 🔹 Get only this client's nominees
-  const clientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
-  console.log(clientNominees, 'client nominees');
+    // 🔹 Get only this client's nominees
+    const clientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    console.log(clientNominees, 'client nominees');
 
 
-  if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
-  // Directly update by index
-  patchedList[this.nomiIndexInEdit] = { 
-    ...patchedList[this.nomiIndexInEdit], 
-    ...formValue 
-  };
-  console.log("✅ Updated nominee:", patchedList[this.nomiIndexInEdit]);
-} 
-  else {
-    patchedList.push(formValue);
-    console.log("➕ Added new nominee:", formValue);
-  }
+    if (this.nomiIndexInEdit !== null && this.nomiIndexInEdit >= 0) {
+      // Directly update by index
+      patchedList[this.nomiIndexInEdit] = {
+        ...patchedList[this.nomiIndexInEdit],
+        ...formValue
+      };
+      console.log("✅ Updated nominee:", patchedList[this.nomiIndexInEdit]);
+    }
+    else {
+      patchedList.push(formValue);
+      console.log("➕ Added new nominee:", formValue);
+    }
 
-  console.log(patchedList, 'stored data after update');
+    console.log(patchedList, 'stored data after update');
 
-  // 🔹 Only keep nominees of this client
-  const updatedClientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
+    // 🔹 Only keep nominees of this client
+    const updatedClientNominees = patchedList.filter((n: { clieCode: string | null; }) => n.clieCode === clientCode);
 
-  if (updatedClientNominees.length > 3) {
-    this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
-      this.router.navigate(['/app/uccList']
-        ,{
-           state: {
-          isAddNewNomiInNomiList: true,
-          clieCodeFromAddNomi: clientCode
-        }
-        }
-      );
-    });
-    return;
-  }
+    if (updatedClientNominees.length > 3) {
+      this.sharedService.OpenAlert('You can only add up to 3 nominee details!', () => {
+        this.router.navigate(['/app/uccList']
+          , {
+            state: {
+              isAddNewNomiInNomiList: true,
+              clieCodeFromAddNomi: clientCode
+            }
+          }
+        );
+      });
+      return;
+    }
 
-  // 🔹 Save back
-  // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
-  console.log(updatedClientNominees, 'updated nominee list');
+    // 🔹 Save back
+    // localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
+    console.log(updatedClientNominees, 'updated nominee list');
 
-  // 🔹 Map for API
-  // const listToMap = updatedClientNominees;
+    // 🔹 Map for API
+    // const listToMap = updatedClientNominees;
     const listToMap = patchedList.length === 0 ? patchedList : updatedClientNominees;
 
-  const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
+    const nomineeInput: uccNomineeDetails = this.mapFormToNomineeDetails(listToMap, clientCode);
 
-  this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
-    next: (response: { success: boolean; message: string }) => {
-      console.log('Nominee API Response:', response);
-      if (response.success) {
-        this.sharedService.OpenAlert(response.message, () => {
-          this.router.navigate(['/app/uccList']
-            ,{
-               state: {
-          isAddNewNomiInNomiList: true,
-          clieCodeFromAddNomi: clientCode
+    this.bseUccSer.getUccNomineeData(nomineeInput).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Nominee API Response:', response);
+        if (response.success) {
+          this.sharedService.OpenAlert(response.message, () => {
+            this.router.navigate(['/app/uccList']
+              , {
+                state: {
+                  isAddNewNomiInNomiList: true,
+                  clieCodeFromAddNomi: clientCode
+                }
+              }
+            );
+          });
+        } else {
+          this.sharedService.OpenAlert('Failed to save nominee details.');
         }
-            }
-          );
-        });
-      } else {
-        this.sharedService.OpenAlert('Failed to save nominee details.');
+      },
+      error: (err: any) => {
+        console.error('Nominee API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
       }
-    },
-    error: (err: any) => {
-      console.error('Nominee API Error:', err);
-      this.sharedService.OpenAlert('Something went wrong while saving nominee details.');
-    }
-  });
-}
+    });
+  }
 
 
   allowOnlyChars(event: any, controlName: string) {
-  const input = event.target as HTMLInputElement;
+    const input = event.target as HTMLInputElement;
 
-  // Allow only alphabets and spaces
-  input.value = input.value.replace(/[^A-Za-z ]/g, '');
+    // Allow only alphabets and spaces
+    input.value = input.value.replace(/[^A-Za-z ]/g, '');
 
-  this.nomineeForm.get(controlName)?.setValue(input.value, { emitEvent: false });
-}
+    this.nomineeForm.get(controlName)?.setValue(input.value, { emitEvent: false });
+  }
 
   allowOnlyNumbers(event: any, controlName: string) {
     const input = event.target as HTMLInputElement;
@@ -2389,18 +2389,16 @@ private mapStoredToPatched(stored: any): any {
   }
 
   allowAlphaNumeric(event: any, controlName: string) {
-  const input = event.target as HTMLInputElement;
+    const input = event.target as HTMLInputElement;
 
-  // Allow only alphabets and numbers
-  input.value = input.value.replace(/[^A-Za-z0-9]/g, '');
+    // Allow only alphabets and numbers
+    input.value = input.value.replace(/[^A-Za-z0-9]/g, '');
 
-  this.nomineeForm.get(controlName)?.setValue(input.value, { emitEvent: false });
-}
+    this.nomineeForm.get(controlName)?.setValue(input.value, { emitEvent: false });
+  }
 
-goBack(){
-  this.location.back();
-}
-
-
+  goBack() {
+    this.nextTab.emit(3)
+  }
 
 }

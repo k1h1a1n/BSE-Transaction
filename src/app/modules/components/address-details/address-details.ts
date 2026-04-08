@@ -249,8 +249,9 @@ export class AddressDetails implements OnChanges {
   }
 
   goBack() {
-    this.location.back();
-    const saved = localStorage.getItem('uccRegistrationData');
+    this.nextTab.emit(0)
+    // this.location.back();
+    // const saved = localStorage.getItem('uccRegistrationData');
   }
 
   navToDepoBankDetail() {
@@ -517,6 +518,7 @@ export class AddressDetails implements OnChanges {
   }
 
   submitData() {
+    this.nextTab.emit(2); 
     // if (this.addressForm.invalid) {
     //   this.addressForm.markAllAsTouched();
     //   const invalidControls = Object.keys(this.addressForm.controls)
@@ -525,50 +527,49 @@ export class AddressDetails implements OnChanges {
     //   return;
     // }
 
-    console.log('Address Form Submitted', this.addressForm.value);
+    // console.log('Address Form Submitted', this.addressForm.value);
 
-    const rawFormValue = this.addressForm.getRawValue();
-    console.log('Address Form Submitted', rawFormValue);
+    // const rawFormValue = this.addressForm.getRawValue();
+    // console.log('Address Form Submitted', rawFormValue);
 
-    const bseClientCode = this.BseClientCode || '';
-    rawFormValue.bseClientCode = bseClientCode;
+    // const bseClientCode = this.BseClientCode || '';
+    // rawFormValue.bseClientCode = bseClientCode;
 
-    console.log('address raw form value', rawFormValue);
+    // console.log('address raw form value', rawFormValue);
 
-    localStorage.setItem('uccAddressData', JSON.stringify(rawFormValue));
+    // localStorage.setItem('uccAddressData', JSON.stringify(rawFormValue));
 
-    const input: UccAddressDetails = this.mapFormToUccAddressDetails(rawFormValue);
-    input.clieCode = rawFormValue.bseClientCode;
+    // const input: UccAddressDetails = this.mapFormToUccAddressDetails(rawFormValue);
+    // input.clieCode = rawFormValue.bseClientCode;
 
-    console.log('clie code', input.clieCode);
+    // console.log('clie code', input.clieCode);
 
-    this.isLoading = true;
+    // this.isLoading = true;
 
-    this.bseUccReg.getUccAddressContData(input).subscribe({
-      next: (response: { success: boolean; message: string }) => {
-        console.log('API Response:', response);
-        this.isLoading = false;
+    // this.bseUccReg.getUccAddressContData(input).subscribe({
+    //   next: (response: { success: boolean; message: string }) => {
+    //     console.log('API Response:', response);
+    //     this.isLoading = false;
 
-        if (response?.success === true) {
-          this.sharedSer.successDia(response?.message).subscribe(result => {
-            if (result === true) {
-              this.nextTab.emit(2);  // Emit to parent to switch to KYC Details tab
-            }
-            // this.isLoading = false;
-          }
-          )
-        }
-        else {
-          this.isLoading = false;
-          this.sharedSer.OpenAlert('Failed to save address details.');
-        }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Registration Edit Error:', err);
-        this.sharedSer.OpenAlert('Something went wrong while saving address details.');
-      }
-    });
+    //     if (response?.success === true) {
+    //       this.sharedSer.successDia(response?.message).subscribe(result => {
+    //         if (result === true) {
+    //           this.nextTab.emit(2); 
+    //         }
+    //       }
+    //       )
+    //     }
+    //     else {
+    //       this.isLoading = false;
+    //       this.sharedSer.OpenAlert('Failed to save address details.');
+    //     }
+    //   },
+    //   error: (err) => {
+    //     this.isLoading = false;
+    //     console.error('Registration Edit Error:', err);
+    //     this.sharedSer.OpenAlert('Something went wrong while saving address details.');
+    //   }
+    // });
 
   }
 

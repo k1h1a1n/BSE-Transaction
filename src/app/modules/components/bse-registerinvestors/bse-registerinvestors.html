@@ -85,7 +85,6 @@
                 <div class="col-4">
                     <div class="InputControl">
                         <label>Registration Type</label>
-
                         <p-selectbutton [options]="registrationTypeOptions" formControlName="registrationType"
                             optionLabel="label" optionValue="value" aria-labelledby="basic"
                             class="Width100perc registration-type" />
@@ -335,12 +334,6 @@
                     <div class="col-4">
                         <div class="InputControl">
                             <label>Email Declaration <span class="RedTxt">*</span></label>
-                            <!-- <select id="occupation" formControlName="emailDeclaration" required>
-                            <option value="" disabled>Select Email Declaration</option>
-                            <option *ngFor="let occupation of emailDeclarationOptions" [value]="occupation.key">
-                                {{ occupation.value }}
-                            </option>
-                        </select> -->
                             <mat-form-field>
                                 <!-- <mat-label>Select</mat-label> -->
                                 <mat-select formControlName="emailDeclaration">
@@ -360,14 +353,7 @@
                     <div class="col-4">
                         <div class="InputControl">
                             <label>Mobile Declaration <span class="RedTxt">*</span></label>
-                            <!-- <select id="occupation" formControlName="mobileDeclaration" required>
-                            <option value="" disabled>Select Mobile Declaration</option>
-                            <option *ngFor="let occupation of mobileDeclarationOptions" [value]="occupation.key">
-                                {{ occupation.value }}
-                            </option>
-                        </select> -->
                             <mat-form-field>
-                                <!-- <mat-label>Select</mat-label> -->
                                 <mat-select formControlName="mobileDeclaration">
                                     <mat-option value="" disabled>Select Mobile Declaration</mat-option>
                                     <mat-option *ngFor="let occupation of mobileDeclarationOptions"

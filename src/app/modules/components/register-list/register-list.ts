@@ -47,11 +47,6 @@ export interface PeriodicElement {
   createdOn: string;
 }
 
-const ELEMENT_DATA: PeriodicElement[] = [
-  { clientId: 1767003708, holdingPattern: 'Single', firstApplication: 'Nitin Jogale', secondApplication: 'Kunal Done', thirdApplication: 'Abhishek Pandit', bseStatus: false, docStatus: false, memberId: 21558, eLog: false, createdOn: '08/01/25' },
-  { clientId: 1767003710, holdingPattern: 'Joint', firstApplication: 'Asha Sharma', secondApplication: 'Ravi Kumar', thirdApplication: '', bseStatus: true, docStatus: true, memberId: 21559, eLog: true, createdOn: '09/02/25' },
-  { clientId: 1767003722, holdingPattern: 'Single', firstApplication: 'Priya Singh', secondApplication: '', thirdApplication: '', bseStatus: false, docStatus: true, memberId: 21560, eLog: false, createdOn: '10/03/25' },
-];
 @Component({
   selector: 'app-register-list',
   imports: [BreadcrumbModule, MatFormFieldModule, MatDatepickerModule, MatCheckboxModule,

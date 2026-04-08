@@ -424,102 +424,91 @@ export class KycDetailsComponent implements OnInit, OnChanges {
 
 
   kycVerification() {
-    // Validate form before proceeding
-    if (this.kycForm.invalid) {
-      this.kycForm.markAllAsTouched();
-      this.sharedService.OpenAlert('Please fill all required fields correctly.');
-      return;
-    }
 
-    this.loadHoldingPatternAndSetFieldStates();
-    console.log('KYC Verification form data:', this.kycForm.value);
-
-    // Get raw value to include disabled fields
-    let kycFormValue = this.mapFormToUccAddressDetails(this.kycForm.getRawValue());
-
-    console.log(kycFormValue, 'kyc form value');
-
-    // Implement KYC verification logic here
-    //   this.sharedService.successDia('KYC Verification Successful!').subscribe(result => {
+    this.nextTab.emit({
+      index: 3,
+      state: {
+        isUpdateBank: true,
+        MembID: this.MemberDetailID || null,
+        clieCode: '',
+        h_p: ''
+      }
+    });
+    // if (this.kycForm.invalid) {
+    //   this.kycForm.markAllAsTouched();
+    //   this.sharedService.OpenAlert('Please fill all required fields correctly.');
+    //   return;
     // }
 
-    this.isLoading = true;
+    // this.loadHoldingPatternAndSetFieldStates();
+    // console.log('KYC Verification form data:', this.kycForm.value);
 
-    this.bseUccReg.getKycVerification(kycFormValue).subscribe(response => {
-      console.log('KYC Verification response:', response);
-      this.isLoading = false;
-      if (response && response.success === true) {
-        this.sharedService.successDia('KYC Saved Successfully!').subscribe(result => {
-          if (result) {   // result === true when OK clicked
-            this.nextTab.emit(3);
-            //  this.router.navigate(['/app/depoBankDetails']);
-          }
-          // this.isLoading = false;
-        });
-      } else {
-        this.isLoading = false;
-        this.sharedService.OpenAlert('KYC Saving Failed: ' + (response.message || 'Unknown error'));
-      }
-    }, error => {
-      this.isLoading = false;
-      this.sharedService.OpenAlert('KYC Saving Error: ' + (error.message || 'Unknown error'));
-    });
+    // let kycFormValue = this.mapFormToUccAddressDetails(this.kycForm.getRawValue());
+    // console.log(kycFormValue, 'kyc form value');
+    // this.isLoading = true;
+
+    // this.bseUccReg.getKycVerification(kycFormValue).subscribe(response => {
+    //   console.log('KYC Verification response:', response);
+    //   this.isLoading = false;
+    //   if (response && response.success === true) {
+    //     this.sharedService.successDia('KYC Saved Successfully!').subscribe(result => {
+    //       if (result) {  
+    //         this.nextTab.emit(3);
+    //       }
+    //     });
+    //   } else {
+    //     this.isLoading = false;
+    //     this.sharedService.OpenAlert('KYC Saving Failed: ' + (response.message || 'Unknown error'));
+    //   }
+    // }, error => {
+    //   this.isLoading = false;
+    //   this.sharedService.OpenAlert('KYC Saving Error: ' + (error.message || 'Unknown error'));
+    // });
   }
 
   kycUpdateVerification() {
     console.log("cupdate method called");
-    // Validate form before proceeding
-    if (this.kycForm.invalid) {
-      this.kycForm.markAllAsTouched();
-      this.sharedService.OpenAlert('Please fill all required fields correctly.');
-      return;
-    }
+    // if (this.kycForm.invalid) {
+    //   this.kycForm.markAllAsTouched();
+    //   this.sharedService.OpenAlert('Please fill all required fields correctly.');
+    //   return;
+    // }
 
-    this.loadHoldingPatternAndSetFieldStates();
-    console.log('KYC Verification form data:', this.kycForm.value);
+    // this.loadHoldingPatternAndSetFieldStates();
+    // console.log('KYC Verification form data:', this.kycForm.value);
 
-    // Get raw value to include disabled fields
-    // let kycFormValue: KYCRequest = this.mapFormToUccAddressDetails(this.kycForm.getRawValue());
+    // const editedBseClientCode = localStorage.getItem('editedBseClientCode');
+    // console.log(editedBseClientCode, 'edited BSE Client Code');
 
-    // console.log(kycFormValue,'kyc form value');
+    // const input: KYCRequest = this.mapFormToUccAddressDetails(this.kycForm.getRawValue());
+    // input.clientCode = this.BseClientCode || '';
+    // console.log(input, 'kyc form value');
 
-
-    const editedBseClientCode = localStorage.getItem('editedBseClientCode');
-    console.log(editedBseClientCode, 'edited BSE Client Code');
-
-    const input: KYCRequest = this.mapFormToUccAddressDetails(this.kycForm.getRawValue());
-    input.clientCode = this.BseClientCode || '';
-    console.log(input, 'kyc form value');
-
-    this.isLoading = true;
-
-
-
-    this.bseUccReg.getKycVerification(input).subscribe(response => {
-      console.log('KYC Verification response:', response);
-      this.isLoading = false;
-      if (response && response.success === true) {
-        this.sharedService.successDia('KYC Saved Successfully!').subscribe(result => {
-          if (result) {   // result === true when OK clicked
-            this.nextTab.emit({
-              index: 3,
-              state: {
-                isUpdateBank: true,
-                MembID: this.MemberDetailID || null,
-                clieCode: editedBseClientCode || input.clientCode || '',
-                h_p: ''
-              }
-            });
-          }
-          // this.isLoading = false;
-        });
-      } else {
-        this.isLoading = false;
-        this.sharedService.OpenAlert('KYC Saving Failed: ' + (response.message || 'Unknown error'));
-      }
-    }, error => {
-      this.isLoading = false;
-      this.sharedService.OpenAlert('KYC Saving Error: ' + (error.message || 'Unknown error'));
-    });
+    // this.isLoading = true;
+    // this.bseUccReg.getKycVerification(input).subscribe(response => {
+    //   console.log('KYC Verification response:', response);
+    //   this.isLoading = false;
+    //   if (response && response.success === true) {
+    //     this.sharedService.successDia('KYC Saved Successfully!').subscribe(result => {
+    //       if (result) {
+    //         this.nextTab.emit({
+    //           index: 3,
+    //           state: {
+    //             isUpdateBank: true,
+    //             MembID: this.MemberDetailID || null,
+    //             clieCode: editedBseClientCode || input.clientCode || '',
+    //             h_p: ''
+    //           }
+    //         });
+    //       }
+    //     });
+    //   } else {
+    //     this.isLoading = false;
+    //     this.sharedService.OpenAlert('KYC Saving Failed: ' + (response.message || 'Unknown error'));
+    //   }
+    // }, error => {
+    //   this.isLoading = false;
+    //   this.sharedService.OpenAlert('KYC Saving Error: ' + (error.message || 'Unknown error'));
+    // });
   }
 }

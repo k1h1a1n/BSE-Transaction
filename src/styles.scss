@@ -362,7 +362,6 @@ div.mat-mdc-menu-panel
     display: flex;
     align-items: start;
     width: 100%;
-    height: 100%;
     float: left;
     position: absolute;
     top: 60px;
@@ -655,8 +654,9 @@ div.mat-mdc-menu-panel
   .PageHeading
   {
     font-family: poppinsSB;
-    font-size: 18px;
-    margin: 10px 0px;
+    font-size: 16px;
+    margin: 6px 0px;
+    height: 16px;
   }
 
   /* MainPageCntnr */
@@ -666,7 +666,7 @@ div.mat-mdc-menu-panel
     background-color: #fff;
     border: 1px solid #EEEEEE;
     border-radius: 10px;
-    padding: 10px 10px;
+    padding: 6px 6px;
     
     .MaingPage_InnerNavHead
     {
@@ -779,7 +779,6 @@ div.mat-mdc-menu-panel
     input
     {
       @include mix.Width100perc;
-      padding: var.$input-padding;
       font-size: var.$input-text-fontsize;
     }
   }
@@ -1390,7 +1389,7 @@ padding: 6px 5px;
         td
         {
           font-size: var.$table-data-fontsize;
-          padding: 5px 8px;
+          padding: 2px 2px;
           border-top: 1px solid #CCCCCC;
           overflow: visible;
 

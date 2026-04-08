@@ -883,7 +883,8 @@ console.log(bseClieCode,'bseclie code');
   }
 
   goBack() {
-    this.location.back();
+    // this.location.back();
+    this.nextTab.emit(2);
   }
 
   get clientType() {
@@ -1099,9 +1100,12 @@ console.log(bseClieCode,'bseclie code');
   }
 
 
+  submit(){
+    this.nextTab.emit(4)
+  }
 
 
-  submit() {
+  submit_() {
     // Mark all form controls as touched to show validation errors
     this.bankForm.markAllAsTouched();
     this.bankFormArray.controls.forEach((control: any) => control.markAllAsTouched());
@@ -1226,17 +1230,10 @@ console.log(bseClieCode,'bseclie code');
               this.getBankList(payload.clieCode);
               // Clear all rows and reset to 1 empty row after successful save
               this.resetBankFormArray();
-              //  this.nextTab.emit(3);  
-              // this.router.navigate(['/app/nomineeDetails']);
             }
           }
           )
         }
-
-        //      if (response.success) {
-        //         this.getBankList(payload.clieCode);
-
-        // } 
         else {
           this.sharedServ.OpenAlert('Failed to save bank details.');
         }
