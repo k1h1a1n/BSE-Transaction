@@ -44,7 +44,7 @@ export interface TabNavigationEvent {
   templateUrl: './depo-bank-detail.html',
   styleUrl: './depo-bank-detail.scss',
 })
-export class DepoBankDetail implements OnInit, OnChanges {
+export class DepoBankDetail {
   isLoading: boolean = false;
 
   bankForm!: FormGroup;
@@ -139,10 +139,7 @@ export class DepoBankDetail implements OnInit, OnChanges {
   breadcrumb_items: MenuItem[] = [];
   maxRows = 5;
 
-  // @Output() nextTab =  new EventEmitter<number>();
-  @Output() nextTab = new EventEmitter<number | TabNavigationEvent>();
-
-  @Input() tabState: any;
+  @Output() nextTab = new EventEmitter<any>();
   //BANK LIST
   bankDataList: any[] = [];
   MAX_BANKS = 5;
@@ -190,46 +187,6 @@ export class DepoBankDetail implements OnInit, OnChanges {
   //   }
   // }
 
-
-
-  ngOnChanges(changes: SimpleChanges): void {
-
-    if (!changes['tabState']) {
-      return;
-    }
-
-    const state = changes['tabState'].currentValue;
-
-    if (state) {
-      console.log('bank Details received state:', state);
-
-      // ✅ match emitted property name
-      this.isUpdate = state.isUpdateBank === true;
-
-      this.memberIdFromUpdate = state.MembID ?? null;
-      this.clieCodeFromUpdate = state.clieCode ?? '';
-
-      console.log('isUpdate in ngOnChanges: ISUPDATE, membid,cliecode', this.isUpdate, this.memberIdFromUpdate, this.clieCodeFromUpdate);
-
-      if (this.isUpdate && this.clieCodeFromUpdate) {
-        this.navigateToNextTab(this.clieCodeFromUpdate);
-      }
-
-      // ✅ Get member ID from localStorage after KYC popup closes
-      const storedMembData = localStorage.getItem('uccRegistrationData');
-      const parsedMemData = storedMembData ? JSON.parse(storedMembData) : null;
-      const membid = parsedMemData?.memberName || parsedMemData?.memberDetails?.id || '';
-      console.log(membid, 'membID from address details');
-
-    } else {
-      // ✅ RESET for normal mode
-      this.isUpdate = false;
-      this.memberIdFromUpdate = null;
-      this.clieCodeFromUpdate = '';
-
-      console.log('Normal mode → update cleared');
-    }
-  }
   ngOnInit() {
 
     this.breadcrumb_items = [
@@ -299,8 +256,8 @@ export class DepoBankDetail implements OnInit, OnChanges {
     this.updateBankRows('');
     this.togglePmsByClientType(this.bankForm.get('clientType')?.value);
 
-       
-   // this.getDefaultBanksFromCustmerMaster();
+
+    // this.getDefaultBanksFromCustmerMaster();
 
 
     // this.addNewRow();
@@ -379,13 +336,13 @@ export class DepoBankDetail implements OnInit, OnChanges {
     const storedData = localStorage.getItem('uccRegistrationData');
     const parsedData = storedData ? JSON.parse(storedData) : null;
     const bseClieCode = parsedData?.bseClientCode || '';
-console.log(bseClieCode,'bseclie code');
+    console.log(bseClieCode, 'bseclie code');
 
     if (bseClieCode) {
       this.getBankList(bseClieCode);
     }
 
-   
+
 
   }
 
@@ -405,8 +362,8 @@ console.log(bseClieCode,'bseclie code');
   goToNextTab() {
     const storedData = localStorage.getItem('uccRegistrationData');
     const parsedData = storedData ? JSON.parse(storedData) : null;
-    console.log(parsedData ,' parsed data');
-    
+    console.log(parsedData, ' parsed data');
+
     const nomineeOpted = parsedData?.nominationOpted === 'Y';
 
     const hasAnyBank = (this.savedBankEntries?.length || 0) > 0 || (this.UpdatedbankList?.length || 0) > 0;
@@ -423,7 +380,7 @@ console.log(bseClieCode,'bseclie code');
     }
 
     this.nextTab.emit(4);
-    
+
   }
 
 
@@ -883,8 +840,12 @@ console.log(bseClieCode,'bseclie code');
   }
 
   goBack() {
-    // this.location.back();
-    this.nextTab.emit(2);
+    this.nextTab.emit({
+      index: 2,
+      state: {
+
+      }
+    });
   }
 
   get clientType() {
@@ -1100,8 +1061,13 @@ console.log(bseClieCode,'bseclie code');
   }
 
 
-  submit(){
-    this.nextTab.emit(4)
+  submit() {
+    this.nextTab.emit({
+      index: 4,
+      state: {
+
+      }
+    });
   }
 
 
@@ -1746,24 +1712,24 @@ console.log(bseClieCode,'bseclie code');
   // }
 
   patchValueFromBankDetails(data: any) {
-  const rawAccType = (data.bankAccoType || '').trim().toUpperCase();
-  const isValidAccType = this.accountTypes.some(type => type.value === rawAccType);
+    const rawAccType = (data.bankAccoType || '').trim().toUpperCase();
+    const isValidAccType = this.accountTypes.some(type => type.value === rawAccType);
 
-  const model = new BankDetailsModel({
-    ifsc: (data.ifscCode || '').trim(),
-    MICR: (data.micrNumb || '').trim(),
-    branchName: (data.bankBran || '').trim(),
-    bankName: (data.bankName || '').trim(),
-    accountNumber: (data.bankAccoNumb || '').trim(),
-    accountType: isValidAccType ? rawAccType : this.bankForm.value.accountType
-  });
+    const model = new BankDetailsModel({
+      ifsc: (data.ifscCode || '').trim(),
+      MICR: (data.micrNumb || '').trim(),
+      branchName: (data.bankBran || '').trim(),
+      bankName: (data.bankName || '').trim(),
+      accountNumber: (data.bankAccoNumb || '').trim(),
+      accountType: isValidAccType ? rawAccType : this.bankForm.value.accountType
+    });
 
-  // this.bankForm.patchValue(model);
-  console.log(model, 'model');
-  
+    // this.bankForm.patchValue(model);
+    console.log(model, 'model');
 
-  console.log('Mapped BankDetailsModel → Form:', model);
-}
+
+    console.log('Mapped BankDetailsModel → Form:', model);
+  }
 
 
   // checkIfscLength() {
@@ -2889,28 +2855,6 @@ console.log(bseClieCode,'bseclie code');
     })
   }
 
-  navToUpdateNom() {
-    console.log(this.clieCodeFromUpdate, 'clie code from update');
-    
-    this.navigateToNextTab(this.clieCodeFromUpdate);
-  }
-
-  navigateToNextTab(clieCodeFromUpdate: string) {
-      this.getBankList(clieCodeFromUpdate);
-    if (this.isUpdate) {
-      this.nextTab.emit({
-        index: 2,
-        state: {
-          isUpdateNominee: true,
-          // MembID: input.MembID || null,
-          // clieCode:   editedBseClientCode || input.clieCode || ''
-          MembID: this.getMembId,
-          clieCode: this.clieCodeFromUpdate || clieCodeFromUpdate || ''
-        }
-      });
-
-    }
-  }
 }
 
 

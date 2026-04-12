@@ -56,9 +56,7 @@ export class AddressDetails implements OnChanges {
   isLoading: boolean = false;
 
   //  @Output() nextTab = new EventEmitter<number>();
-  @Output() nextTab = new EventEmitter<number | TabNavigationEvent>();
-
-  @Input() tabState: any;
+  @Output() nextTab = new EventEmitter<any>();
   addressForm!: FormGroup;
   activeTab: number = 0;
   isEdit: boolean = false;
@@ -150,10 +148,6 @@ export class AddressDetails implements OnChanges {
     }
   }
 
-
-
-
-
   ngOnInit() {
 
 
@@ -235,7 +229,6 @@ export class AddressDetails implements OnChanges {
     }
   }
 
-
   navigate(index: number) {
     const pages = [
       'BseRegisterinvestors',
@@ -249,17 +242,16 @@ export class AddressDetails implements OnChanges {
   }
 
   goBack() {
-    this.nextTab.emit(0)
-    // this.location.back();
-    // const saved = localStorage.getItem('uccRegistrationData');
+    this.nextTab.emit({
+      index: 0,
+      state: {
+
+      }
+    });
   }
 
   navToDepoBankDetail() {
     this.router.navigate(['/app/depoBankDetails'])
-  }
-
-  goToNextTab() {
-    this.nextTab.emit(2);  // navigate to tab index 1
   }
 
   onNavStateEdit() {
@@ -377,7 +369,6 @@ export class AddressDetails implements OnChanges {
     }
   }
 
-
   nextTabSubmit(): void {
     // if (
     //   this.activeTab === 0 &&
@@ -429,8 +420,6 @@ export class AddressDetails implements OnChanges {
       console.warn('No mandatory registration data found to prefill address form');
     }
   }
-
-
 
   get MemberDetailID(): string | null {
     const data = localStorage.getItem('uccRegistrationData');
@@ -518,7 +507,12 @@ export class AddressDetails implements OnChanges {
   }
 
   submitData() {
-    this.nextTab.emit(2); 
+    this.nextTab.emit({
+      index: 2,
+      state: {
+
+      }
+    });
     // if (this.addressForm.invalid) {
     //   this.addressForm.markAllAsTouched();
     //   const invalidControls = Object.keys(this.addressForm.controls)
@@ -573,7 +567,6 @@ export class AddressDetails implements OnChanges {
 
   }
 
-
   get BseClientCode(): any {
     const data = localStorage.getItem('uccRegistrationData');
     if (data) {
@@ -592,10 +585,6 @@ export class AddressDetails implements OnChanges {
     input.value = input.value.replace(/\D/g, ''); // Remove non-numeric
     this.addressForm.get(controlName)?.setValue(input.value, { emitEvent: false });
   }
-
-
-
-
 
   updateDataAndContinue() {
     console.log("update called");

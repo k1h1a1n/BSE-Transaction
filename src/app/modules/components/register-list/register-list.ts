@@ -789,7 +789,7 @@ export class RegisterList {
             }),
             // ✅ Cache result properly (NO subscribe here)
             tap((res: UccDetails[]) => {
-              this.idbsvc.setNewCollectionData('UCCLIST', 'data', res, 'MM:15')
+              this.idbsvc.setNewCollectionData('UCCLIST', 'data', res, 'DD:15')
                 .subscribe({
                   error: (err) => console.error('Failed to cache UCC list', err)
                 });

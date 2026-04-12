@@ -401,7 +401,7 @@ export class NomineeDetail {
   nomiInEdit: any;
   nomiKeyInEdit: any;
   nomiIndexInEdit: any;
-  @Output() nextTab = new EventEmitter<number>();
+  @Output() nextTab = new EventEmitter<any>();
 
   constructor(private fb: FormBuilder, private location: Location, private router: Router, private bseUccSer: BseUCCRegister, private sharedService: Shared) { }
 
@@ -476,9 +476,6 @@ export class NomineeDetail {
   //   this.router.navigate([pages[index]]);
   // }
 
-  goToNextTab() {
-    this.nextTab.emit(5);  // navigate to tab index 1
-  }
 
   createNomineeForm(index: number) {
     const isRequired = index === 0;
@@ -1154,11 +1151,6 @@ export class NomineeDetail {
     // ✅ If user has at least one saved nominee, skip validation and navigate directly
     if (this.savedNominees.length > 0 || this.UpdatedNomineeList.length > 0) {
       console.log('User has saved nominees, skipping validation and navigating');
-      // Wait 2 seconds before navigating to allow user to see the list
-      // setTimeout(() => {
-      //   this.nextTab.emit(5);
-      //   this.router.navigate(['/registerdList']);
-      // }, 2000);
       this.router.navigate(['/app/registerdList']);
       return;
     }
@@ -1390,13 +1382,6 @@ export class NomineeDetail {
         this.savedNominees = this.UpdatedNomineeList;
         this.currentNomineeIndex = this.UpdatedNomineeList.length;
         console.log('Saved nominees updated from API:', this.savedNominees);
-
-        // Wait 2 seconds before navigating to allow user to see the updated list
-        // setTimeout(() => {
-        //   this.nextTab.emit(5);
-        //   this.router.navigate(['/app/registerdList']);
-        // }, 2000);
-
 
       },
 
@@ -2398,7 +2383,12 @@ export class NomineeDetail {
   }
 
   goBack() {
-    this.nextTab.emit(3)
+    this.nextTab.emit({
+      index: 3,
+      state: {
+
+      }
+    });
   }
 
 }

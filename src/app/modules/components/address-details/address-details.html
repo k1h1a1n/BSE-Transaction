@@ -4,182 +4,184 @@
         <div class="row"> -->
 <!-- <app-ucc-tabs [selectedIndex]="1" (onTabChange)="navigate($event)"></app-ucc-tabs> -->
 
-            <!-- <p>depo-bank-detail works!</p> -->
+<!-- <p>depo-bank-detail works!</p> -->
 <div class="TabMainCntnr Width100perc mt-3">
-            <!-- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [formGroup]="addressForm"> -->
-                   <!-- <mat-tab label="Address Details"> -->
-                    <div class="TabInputCntnr mt-3"  [formGroup]="addressForm">
-                        <h5 class="TabCntnrHead mb-0">Address Details</h5>
-                        <div class="TabInputSect">
-                            <div class="row">
+    <!-- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [formGroup]="addressForm"> -->
+    <!-- <mat-tab label="Address Details"> -->
+    <div class="TabInputCntnr mt-3" [formGroup]="addressForm">
+        <h5 class="TabCntnrHead mb-0">Address Details</h5>
+        <div class="TabInputSect">
+            <div class="row">
 
-            <div class="col-3">
-                <div class="InputControl">
-                    <label>State <span class="RedTxt">*</span></label>
-                    <mat-form-field>
-                        <mat-select formControlName="state">
-                            <mat-option value="" disabled>Select State </mat-option>
-                            <mat-option *ngFor="let status of stateList" [value]="status.key">{{ status.value
-                                }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <div *ngIf="addressForm.controls['state'].touched && addressForm.controls['state'].hasError('required')"
-                        class="error-message">
-                        State is required
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>State <span class="RedTxt">*</span></label>
+                        <mat-form-field>
+                            <mat-select formControlName="state">
+                                <mat-option value="" disabled>Select State </mat-option>
+                                <mat-option *ngFor="let status of stateList" [value]="status.key">{{ status.value
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="addressForm.controls['state'].touched && addressForm.controls['state'].hasError('required')"
+                            class="error-message">
+                            State is required
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Country <span class="RedTxt">*</span></label>
+                        <mat-form-field>
+                            <mat-select formControlName="country">
+                                <mat-option value="" disabled>Select Country </mat-option>
+                                <mat-option *ngFor="let country of countryList" [value]="country.key">{{ country.value
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="addressForm.controls['country'].touched && addressForm.controls['country'].hasError('required')"
+                            class="error-message">
+                            Country is required
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>City <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="city" />
+                        <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('required')"
+                            class="error-message">
+                            City is required
+                        </div>
+                        <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('pattern')"
+                            class="error-message">
+                            Only letters, spaces, dots, hyphens and apostrophes are allowed
+                        </div>
+                        <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('minLength')"
+                            class="error-message">
+                            City name must be at least 2 characters
+                        </div>
+                        <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('maxLength')"
+                            class="error-message">
+                            City name cannot exceed 20 characters
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Pincode <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="pincode" />
+                        <div *ngIf="addressForm.controls['pincode'].touched && addressForm.controls['pincode'].hasError('required')"
+                            class="error-message">
+                            Pincode is required
+                        </div>
+                        <div *ngIf="addressForm.controls['pincode'].touched && addressForm.controls['pincode'].hasError('pattern')"
+                            class="error-message">
+                            Enter a valid 6-digit Pincode (should not start with 0)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Address Line 1 <span class="RedTxt">*</span></label>
+                        <input type="text" pInputText class="Width100perc" formControlName="addLine1" />
+
+                        <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('required')"
+                            class="error-message">
+                            Address Line 1 is required
+                        </div>
+                        <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('pattern')"
+                            class="error-message">
+                            Only letters, numbers, spaces, commas, periods, hyphens, slashes, apostrophes, and hash are
+                            allowed
+                        </div>
+                        <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('minlength')"
+                            class="error-message">
+                            Address Line 1 must be at least 10 characters
+                        </div>
+                        <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('maxlength')"
+                            class="error-message">
+                            Address Line 1 cannot exceed 50 characters
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Address Line 2</label>
+                        <input type="text" pInputText class="Width100perc" formControlName="addLine2" />
+
+                        <div *ngIf="addressForm.controls['addLine2'].touched && addressForm.controls['addLine2'].hasError('pattern')"
+                            class="error-message">
+                            Only letters, numbers, spaces, commas, periods, hyphens, slashes, apostrophes, and hash are
+                            allowed
+                        </div>
+                        <div *ngIf="addressForm.controls['addLine2'].touched && addressForm.controls['addLine2'].hasError('minlength')"
+                            class="error-message">
+                            Address Line 2 must be at least 5 characters
+                        </div>
+                        <div *ngIf="addressForm.controls['addLine2'].touched && addressForm.controls['addLine2'].hasError('maxlength')"
+                            class="error-message">
+                            Address Line 2 cannot exceed 50 characters
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="InputControl">
+                        <label>Address Line 3</label>
+                        <input type="text" pInputText class="Width100perc" formControlName="addLine3" />
+
+                        <div *ngIf="addressForm.controls['addLine3'].touched && addressForm.controls['addLine3'].hasError('pattern')"
+                            class="error-message">
+                            Only letters, numbers, spaces, commas, periods, hyphens, slashes, apostrophes, and hash are
+                            allowed
+                        </div>
+                        <div *ngIf="addressForm.controls['addLine3'].touched && addressForm.controls['addLine3'].hasError('minlength')"
+                            class="error-message">
+                            Address Line 3 must be at least 5 characters
+                        </div>
+                        <div *ngIf="addressForm.controls['addLine3'].touched && addressForm.controls['addLine3'].hasError('maxlength')"
+                            class="error-message">
+                            Address Line 3 cannot exceed 50 characters
+                        </div>
                     </div>
                 </div>
 
             </div>
+        </div>
 
-
-            <div class="col-3">
-                <div class="InputControl">
-                    <label>Country <span class="RedTxt">*</span></label>
-                    <mat-form-field>
-                        <mat-select formControlName="country">
-                            <mat-option value="" disabled>Select Country </mat-option>
-                            <mat-option *ngFor="let country of countryList" [value]="country.key">{{ country.value
-                                }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <div *ngIf="addressForm.controls['country'].touched && addressForm.controls['country'].hasError('required')"
-                        class="error-message">
-                        Country is required
-                    </div>
-                </div>
-
-            </div>
-
-
-            <div class="col-3">
-                <div class="InputControl">
-                    <label>City <span class="RedTxt">*</span></label>
-                    <input type="text" pInputText class="Width100perc" formControlName="city" />
-                    <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('required')"
-                        class="error-message">
-                        City is required
-                    </div>
-                    <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('pattern')"
-                        class="error-message">
-                        Only letters, spaces, dots, hyphens and apostrophes are allowed
-                    </div>
-                    <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('minLength')"
-                        class="error-message">
-                        City name must be at least 2 characters
-                    </div>
-                    <div *ngIf="addressForm.controls['city'].touched && addressForm.controls['city'].hasError('maxLength')"
-                        class="error-message">
-                        City name cannot exceed 20 characters
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-3">
-                <div class="InputControl">
-                    <label>Pincode <span class="RedTxt">*</span></label>
-                    <input type="text" pInputText class="Width100perc" formControlName="pincode" />
-                    <div *ngIf="addressForm.controls['pincode'].touched && addressForm.controls['pincode'].hasError('required')"
-                        class="error-message">
-                        Pincode is required
-                    </div>
-                    <div *ngIf="addressForm.controls['pincode'].touched && addressForm.controls['pincode'].hasError('pattern')"
-                        class="error-message">
-                        Enter a valid 6-digit Pincode (should not start with 0)
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-3">
-                <div class="InputControl">
-                    <label>Address Line 1 <span class="RedTxt">*</span></label>
-                    <input type="text" pInputText class="Width100perc" formControlName="addLine1" />
-
-                    <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('required')"
-                        class="error-message">
-                        Address Line 1 is required
-                    </div>
-                    <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('pattern')"
-                        class="error-message">
-                        Only letters, numbers, spaces, commas, periods, hyphens, slashes, apostrophes, and hash are
-                        allowed
-                    </div>
-                    <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('minlength')"
-                        class="error-message">
-                        Address Line 1 must be at least 10 characters
-                    </div>
-                    <div *ngIf="addressForm.controls['addLine1'].touched && addressForm.controls['addLine1'].hasError('maxlength')"
-                        class="error-message">
-                        Address Line 1 cannot exceed 50 characters
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-3">
-                <div class="InputControl">
-                    <label>Address Line 2</label>
-                    <input type="text" pInputText class="Width100perc" formControlName="addLine2" />
-
-                    <div *ngIf="addressForm.controls['addLine2'].touched && addressForm.controls['addLine2'].hasError('pattern')"
-                        class="error-message">
-                        Only letters, numbers, spaces, commas, periods, hyphens, slashes, apostrophes, and hash are
-                        allowed
-                    </div>
-                    <div *ngIf="addressForm.controls['addLine2'].touched && addressForm.controls['addLine2'].hasError('minlength')"
-                        class="error-message">
-                        Address Line 2 must be at least 5 characters
-                    </div>
-                    <div *ngIf="addressForm.controls['addLine2'].touched && addressForm.controls['addLine2'].hasError('maxlength')"
-                        class="error-message">
-                        Address Line 2 cannot exceed 50 characters
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-3">
-                <div class="InputControl">
-                    <label>Address Line 3</label>
-                    <input type="text" pInputText class="Width100perc" formControlName="addLine3" />
-
-                    <div *ngIf="addressForm.controls['addLine3'].touched && addressForm.controls['addLine3'].hasError('pattern')"
-                        class="error-message">
-                        Only letters, numbers, spaces, commas, periods, hyphens, slashes, apostrophes, and hash are
-                        allowed
-                    </div>
-                    <div *ngIf="addressForm.controls['addLine3'].touched && addressForm.controls['addLine3'].hasError('minlength')"
-                        class="error-message">
-                        Address Line 3 must be at least 5 characters
-                    </div>
-                    <div *ngIf="addressForm.controls['addLine3'].touched && addressForm.controls['addLine3'].hasError('maxlength')"
-                        class="error-message">
-                        Address Line 3 cannot exceed 50 characters
-                    </div>
-                </div>
-            </div>
-
+        <!-- Progress Bar -->
+        <div class="progress-container mt-3" *ngIf="isLoading" [@slideDown]>
+            <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+            <!-- 📍 -->
+            <p class="progress-text">⏳ Saving address details...</p>
         </div>
     </div>
-    
-    <!-- Progress Bar -->
-    <div class="progress-container mt-3" *ngIf="isLoading" [@slideDown]>
-        <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
-       <!-- 📍 -->
-        <p class="progress-text">⏳ Saving address details...</p>
-    </div>
-</div>
 
-<!-- </mat-tab> -->
-  <!-- </mat-tab-group> -->
-  </div>
+    <!-- </mat-tab> -->
+    <!-- </mat-tab-group> -->
+</div>
 
 <div class="TabBtnSect Width100perc mt-3 d-flex justify-content-end ">
     <button pButton class="Grey_OutlineBtn ms-1" (click)="goBack()" [disabled]="isLoading">
         <i class="pi pi-angle-left" pButtonIcon></i>
         <span pButtonLabel>Back</span>
     </button>
-    <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="!isUpdate" (click)="nextTabSubmit()" [disabled]="isLoading">
+    <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="!isUpdate" (click)="nextTabSubmit()"
+        [disabled]="isLoading">
         <span pButtonLabel>Save & Continue</span>
     </button>
-        <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="isUpdate" (click)="updateDataAndContinue()" [disabled]="isLoading">
+    <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="isUpdate" (click)="updateDataAndContinue()"
+        [disabled]="isLoading">
         <span pButtonLabel>Update & Continue</span>
     </button>
 </div>

@@ -1374,13 +1374,13 @@ export class BseRegisterinvestors {
 
   submitDataandContinue() {
     this.nextTab.emit({
-                index: 1,
-                state: {
-                  isUpdate: false,
-                  MembID: null,
-                  clieCode: 'test',
-                }
-              });
+      index: 1,
+      state: {
+        isUpdate: false,
+        MembID: null,
+        clieCode: 'test',
+      }
+    });
     // console.log('method called');
     // console.log(this.registrationForm, 'registration form');
 

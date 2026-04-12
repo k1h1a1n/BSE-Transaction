@@ -41,7 +41,7 @@ export interface TabNavigationEvent {
   templateUrl: './kyc-details.component.html',
   styleUrls: ['./kyc-details.component.scss']
 })
-export class KycDetailsComponent implements OnInit, OnChanges {
+export class KycDetailsComponent {
   // selectedTabIndex = 1;
   isLoading: boolean = false;
 
@@ -56,81 +56,18 @@ export class KycDetailsComponent implements OnInit, OnChanges {
 
   breadcrumb_items: MenuItem[] = [];
   home: MenuItem = {};
-  // @Output() nextTab = new EventEmitter<number>();
-  @Output() nextTab = new EventEmitter<number | TabNavigationEvent>();
-  @Input() tabState: any;
+  @Output() nextTab = new EventEmitter<any>();
   isUpdate: boolean = false;
   memberIdFromUpdate: any;
   clieCodeFromUpdate: any;
   editedResp: any;
 
   constructor(private fb: FormBuilder, private bseUccReg: BseUCCRegister, private sharedService: Shared, private router: Router, private location: Location) { }
-  // ngOnChanges(changes: SimpleChanges): void {
-  //    if (changes['tabState'] && changes['tabState'].currentValue) {
-  //     console.log(
-  //       'Address Details received state:',
-  //       changes['tabState'].currentValue
-  //     );
-
-  //     const state = changes['tabState'].currentValue;
-  //     console.log(state, 'state');
-
-
-  //     this.isUpdate = state.isUpdateKYC === true;
-  //     this.memberIdFromUpdate = state.MembID;
-  //     this.clieCodeFromUpdate = state.clieCode;
-  //     console.log('isUpdate in ngOnChanges:', this.isUpdate);
-
-
-  //   }
-  // }
-
-  ngOnChanges(changes: SimpleChanges): void {
-
-    if (!changes['tabState']) {
-      return;
-    }
-
-    const state = changes['tabState'].currentValue;
-
-    if (state) {
-      console.log('kyc Details received state:', state);
-
-      // ✅ match emitted property name
-      this.isUpdate = state.isUpdateKYC === true;
-
-      this.memberIdFromUpdate = state.MembID ?? null;
-      this.clieCodeFromUpdate = state.clieCode ?? '';
-
-      console.log('isUpdate in ngOnChanges:', this.isUpdate);
-
-      if (this.isUpdate && this.clieCodeFromUpdate) {
-        this.getEditApiData(this.clieCodeFromUpdate);
-      }
-
-    } else {
-      // ✅ RESET for normal mode
-      this.isUpdate = false;
-      this.memberIdFromUpdate = null;
-      this.clieCodeFromUpdate = '';
-
-      console.log('Normal mode → update cleared');
-    }
-  }
 
 
   ngOnInit() {
-    //     this.breadcrumb_items = [
-    //   { label: 'Home', routerLink: '/' },
-    //   { label: 'CRM', routerLink: '/crm' },
-    //   { label: 'Online MF Transactions', routerLink: '/crm' },
-    //   { label: 'BSE Register Investors' },
-    // ];
-    // this.home = { icon: 'pi pi-home', routerLink: '/' };
 
     this.kycForm = this.fb.group({
-
-
       // kyc tab details
       kycType1Holder: ['', Validators.required],
       kycType2Holder: [''],
@@ -145,14 +82,8 @@ export class KycDetailsComponent implements OnInit, OnChanges {
     // Add listeners to make CKYC fields required when KYC Type is selected (setup first)
     this.setupCKYCValidation();
 
-    localStorage.getItem('uccRegistrationData');
     // Load holding pattern from localStorage and disable fields accordingly (run after setting up listeners)
     this.loadHoldingPatternAndSetFieldStates();
-
-
-    // if (this.isUpdate) {
-    //   this.getEditApiData(this.clieCodeFromUpdate);
-    // }
   }
 
 
@@ -202,19 +133,6 @@ export class KycDetailsComponent implements OnInit, OnChanges {
     this.loadHoldingPatternAndSetFieldStates();
 
   }
-
-
-  //     navigate(index: number) {
-  //   const pages = [
-  //     'BseRegisterinvestors',
-  //     'addressDetails',
-  //     'kycDetails',
-  //     'depoBankDetails',
-  //     'nomineeDetails'
-  //   ];
-
-  //   this.router.navigate([pages[index]]);
-  // }
 
   setupCKYCValidation() {
     this.kycForm.get('ckycNo1Holder')?.disable();
@@ -368,7 +286,12 @@ export class KycDetailsComponent implements OnInit, OnChanges {
   }
 
   goToNextTab() {
-    this.nextTab.emit(3);  // navigate to tab index 1
+    this.nextTab.emit({
+      index: 2,
+      state: {
+        
+      }
+    });
   }
 
 
@@ -377,7 +300,12 @@ export class KycDetailsComponent implements OnInit, OnChanges {
   }
 
   goBack() {
-    this.nextTab.emit(1); // Go back to Address Details tab
+    this.nextTab.emit({
+      index: 1,
+      state: {
+        
+      }
+    });
   }
 
   get BseClientCode(): any {

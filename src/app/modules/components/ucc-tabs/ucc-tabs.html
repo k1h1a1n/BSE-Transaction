@@ -1,6 +1,6 @@
 <p-breadcrumb [model]="breadcrumb_items" [home]="home"></p-breadcrumb>
 <h5 class="PageHeading">BSE - Register Investors</h5>
-<div class="TabMainCntnr MainTabSect Width100perc mt-3">
+<!-- <div class="TabMainCntnr MainTabSect Width100perc mt-3">
     <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="abcd">
 
         <mat-tab label="Personal Details">
@@ -25,6 +25,34 @@
         </mat-tab>
 
     </mat-tab-group>
-</div>
+</div> -->
+<div class="TabMainCntnr MainTabSect Width100perc mt-3">
+    <mat-tab-group [selectedIndex]="(currentTab$ | async) ?? 0" class="abcd">
 
-<router-outlet></router-outlet>
+        <mat-tab label="Personal Details">
+            <app-bse-registerinvestors (nextTab)="goToTab($event.index)">
+            </app-bse-registerinvestors>
+        </mat-tab>
+
+        <mat-tab label="Address Details">
+            <app-address-details (nextTab)="goToTab($event.index)">
+            </app-address-details>
+        </mat-tab>
+
+        <mat-tab label="KYC Details">
+            <app-kyc-details (nextTab)="goToTab($event.index)">
+            </app-kyc-details>
+        </mat-tab>
+
+        <mat-tab label="Depository and Bank Details">
+            <app-depo-bank-detail (nextTab)="goToTab($event.index)">
+            </app-depo-bank-detail>
+        </mat-tab>
+
+        <mat-tab label="Nominee Details">
+            <app-nominee-detail (nextTab)="goToTab($event.index)">
+            </app-nominee-detail>
+        </mat-tab>
+
+    </mat-tab-group>
+</div>

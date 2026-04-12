@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { NomineeDetail } from '../nominee-detail/nominee-detail';
 import { DepoBankDetail } from '../depo-bank-detail/depo-bank-detail';
 import { BseRegisterinvestors } from '../bse-registerinvestors/bse-registerinvestors';
@@ -8,42 +8,36 @@ import { KycDetailsComponent } from '../kyc-details/kyc-details.component';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { AddressDetails } from '../address-details/address-details';
-import { Router, RouterOutlet } from '@angular/router';
+import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
 
 @Component({
   selector: 'app-ucc-tabs',
-  imports: [CommonModule, BreadcrumbModule, MatTabsModule, NomineeDetail, DepoBankDetail, BseRegisterinvestors,
-    KycDetailsComponent, RouterOutlet, AddressDetails],
-  //  imports: [CommonModule, RouterOutlet, BreadcrumbModule, MatTabsModule],
+  imports: [CommonModule, BreadcrumbModule, MatTabsModule, BseRegisterinvestors,
+    NomineeDetail, DepoBankDetail, KycDetailsComponent, AddressDetails],
   templateUrl: './ucc-tabs.html',
   styleUrl: './ucc-tabs.scss'
 })
 export class UccTabs {
-  @ViewChild(KycDetailsComponent) kycDetailsComp?: KycDetailsComponent;
+  private uccTabsFacade = inject(UCCTabsFacade);
   breadcrumb_items: MenuItem[] = [];
   home: MenuItem = {};
   selectedTabIndex: number = 0;  // First tab
   isEditMode = false;
-  isEdit: boolean = false;
   tabState: any = null;  // Store state passed between tabs
-
-  constructor(private router: Router) {
-    
-  }
-
-  tabChanged(i: number) {
-    // this.onTabChange.emit(i);
+  currentTab$ = this.uccTabsFacade.currentTab$;
+  constructor() {
+    this.createBreadcrumbs();
   }
 
   ngOnInit() {
-    console.log('ucc tabs called');
-    const navState = history.state;
-    console.log(navState, 'nav state');
+  }
 
-    this.isEdit = navState?.isEdit === true;
 
-    console.log(this.isEdit, 'isEdit');
-
+  goToTab(index: number) {
+    console.log('Navigating to tab index:', index);
+    this.uccTabsFacade.goTo(index);
+  }
+  private createBreadcrumbs() {
     this.breadcrumb_items = [
       { label: 'Home', routerLink: '/' },
       { label: 'CRM', routerLink: '/crm' },
@@ -51,28 +45,6 @@ export class UccTabs {
       { label: 'BSE Register Investors' },
     ];
     this.home = { icon: 'pi pi-home', routerLink: '/' };
-  }
-
-  tabStates: { [index: number]: any } = {};
-
-  goToTab(event: { index: number; state?: any } | number) {
-
-    if (typeof event === 'number') {
-      this.selectedTabIndex = event;
-      return;
-    }
-
-    this.selectedTabIndex = event.index;
-
-    // ✅ store state ONLY for that tab - create new object reference to trigger change detection
-    this.tabStates[event.index] = event.state ? { ...event.state } : null;
-
-    console.log('Tab state map:', this.tabStates);
-
-    // If KYC Details tab is selected (index 2), refresh field states
-    if (this.selectedTabIndex === 2 && this.kycDetailsComp) {
-      this.kycDetailsComp.refreshFieldStates();
-    }
   }
 
 }
