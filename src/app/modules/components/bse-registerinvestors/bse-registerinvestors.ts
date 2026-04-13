@@ -1628,7 +1628,7 @@ export class BseRegisterinvestors {
             }),
 
             tap((groupsArray: any[]) => {
-              this.idbsvc.setNewCollectionData('GROUP_BY_LOGIN', 'data', groupsArray, 'MM:15')
+              this.idbsvc.setNewCollectionData('GROUP_BY_LOGIN', 'data', groupsArray, 'DD:15')
                 .subscribe({
                   error: (err) => console.error('Cache failed', err)
                 });
