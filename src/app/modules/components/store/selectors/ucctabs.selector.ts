@@ -11,3 +11,11 @@ export const selectVisitedTabs = createSelector(
     selectUcctabsState,
     (state: UCCTabsState) => state.visitedTabs
 );
+export const selectIsEditMode = createSelector(
+    selectUcctabsState,
+    (state: UCCTabsState) => state.isEditMode
+);
+export const selectEditData = createSelector(
+    selectUcctabsState,
+    (state: UCCTabsState) => state.editData
+);

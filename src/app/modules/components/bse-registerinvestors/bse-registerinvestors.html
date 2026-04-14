@@ -5,7 +5,7 @@
             <div class="col-4">
                 <div class="InputControl">
                     <label>Search Group Code <span class="RedTxt">*</span></label>
-                    <div class="search-group-container" *ngIf="!editMode">
+                    <div class="search-group-container" *ngIf="!isEdit">
                         <p-autoComplete formControlName="groupSearch" [suggestions]="filteredGroups"
                             field="GroupDescription" dataKey="GroupID" [minLength]="3" [forceSelection]="true"
                             [showClear]="true" [dropdown]="false" [disabled]="isGroupLookupLoading"

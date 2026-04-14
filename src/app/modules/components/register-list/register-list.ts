@@ -30,9 +30,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { IndexedDBService } from '../../../shared';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Sso } from '../../../shared/components/sso/sso';
-import { appConfig } from '../../../app.config';
-import { SharedEnv } from '../../../shared/environments/environment';
+import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
 //for Table 
 export interface PeriodicElement {
   clientId: number;
@@ -83,7 +81,8 @@ export interface PeriodicElement {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterList {
-  isEditingRegistration: boolean = false;
+  isEditLoading: boolean = false;
+  editLoadingMessage: string = '';
   isUccStatusLoading: boolean = false;
   uccStatusTooltip: string = '';
   private idbsvc = inject(IndexedDBService);
@@ -146,7 +145,7 @@ export class RegisterList {
   home: MenuItem = {};
 
   //for table with checkbox
-  displayedColumns: string[] = ['select', 'clientId', 'UCCStatus', 'taxStatus', 'holdingPattern', 'fatcaStatus', 'firstApplication', 'secondApplication', 'thirdApplication', 'docStatus', 'nomAuthLink', 'bseStatus', 'createdOn', 'actions',];
+  displayedColumns: string[] = ['select', 'clientId', 'UCCStatus', 'taxStatus', 'holdingPattern', 'fatcaStatus', 'firstApplication', 'secondApplication', 'thirdApplication', 'docStatus', 'nomAuthLink', 'bseStatus', 'createdOn'];
   // 'memberId', 'eLog',
 
   dataSource = new MatTableDataSource<UccDetails>();
@@ -202,6 +201,7 @@ export class RegisterList {
     private dialog: MatDialog,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
+    private uccTabsFacade: UCCTabsFacade,
   ) { }
 
 
@@ -400,6 +400,7 @@ export class RegisterList {
 
     // Update table with filtered records
     this.dataSource.data = filteredList;
+    this.noDataFound = filteredList.length === 0;
 
     // Optional: clear checkbox selection
     this.selection.clear();
@@ -409,6 +410,7 @@ export class RegisterList {
   resetDateRange() {
     this.dateForm.reset();               // Clear form
     this.dataSource.data = [...this.uccDetailsList]; // Restore full list
+    this.noDataFound = false;
     // console.log(this.dataSource.data, 'data source');
 
     this.selection.clear();              // Clear checkbox selection
@@ -803,6 +805,7 @@ export class RegisterList {
           this.dataSource.data = res;
           this.dataSource.paginator = this.paginator;
           this.uccDetailsList = res;
+          this.noDataFound = res.length === 0;
 
           console.log(this.uccDetailsList, 'UCC merged data');
 
@@ -839,6 +842,9 @@ export class RegisterList {
   }
 
   createUccRegistration() {
+    // ✅ Reset edit mode in NgRx store for new registration
+    this.uccTabsFacade.resetEditMode();
+    this.uccTabsFacade.goTo(0); // Reset to first tab
     this.router.navigate(['home/MFEntryForms/CreateUcc']);
   }
 
@@ -855,7 +861,8 @@ export class RegisterList {
   }
 
   editRegistrationData(index: number) {
-    this.isEditingRegistration = true;
+    this.isEditLoading = true;
+    this.editLoadingMessage = 'Loading registration details...';
     this.getEditedUccData(index).subscribe({
       next: (res) => {
         // ✅ Mark as unsaved if editing
@@ -865,6 +872,11 @@ export class RegisterList {
         console.log('res of edited reg data', res);
         console.log('res of edited clie code', res[0].cliecode);
         localStorage.setItem('uccRegistrationData', JSON.stringify(res));
+
+        // ✅ Set edit mode in NgRx store before navigation (single object, not array)
+        this.uccTabsFacade.setEditMode(true, res[0]);
+        this.uccTabsFacade.goTo(0); // Reset to first tab
+
         this.router.navigate(['/app/uccTabs'], {
           state: {
             uccDetails: res,
@@ -873,17 +885,19 @@ export class RegisterList {
         });
         this.dialogRef?.close();
         console.log(this.isEdit, 'is edit');
-        this.isEditingRegistration = false;
+        this.isEditLoading = false;
       },
       error: (err) => {
         console.error('Registration Edit Error:', err);
         (window as any).OpenAlert('No records found.');
-        this.isEditingRegistration = false;
+        this.isEditLoading = false;
       }
     });
   }
 
   editAddressData(index: number) {
+    this.isEditLoading = true;
+    this.editLoadingMessage = 'Loading address details...';
     this.getEditedUccData(index).subscribe({
       next: (res) => {
 
@@ -907,16 +921,20 @@ export class RegisterList {
           }
         });
         this.dialogRef?.close();
+        this.isEditLoading = false;
       },
       error: (err) => {
         console.error('Registration Edit Error:', err);
 
         (window as any).OpenAlert('No records found.');
+        this.isEditLoading = false;
       }
     });
   }
 
   editBankAccountData(index: number) {
+    this.isEditLoading = true;
+    this.editLoadingMessage = 'Loading bank account details...';
     this.getEditedUccData(index).subscribe({
       next: (res) => {
         console.log(res, 'resofEdit data');
@@ -946,13 +964,14 @@ export class RegisterList {
           }
         });
         this.dialogRef?.close();
-
+        this.isEditLoading = false;
 
       },
       error: (err) => {
         console.error('Registration Edit Error:', err);
 
         this.sharedSer.OpenAlert('No records found.');
+        this.isEditLoading = false;
       }
     });
 
@@ -960,6 +979,8 @@ export class RegisterList {
   }
 
   editNomineeData(index: number) {
+    this.isEditLoading = true;
+    this.editLoadingMessage = 'Loading nominee details...';
     this.getEditedUccData(index).subscribe({
       next: (res) => {
         console.log(res, 'resofEdit data');
@@ -994,16 +1015,20 @@ export class RegisterList {
         else {
           this.sharedSer.OpenAlert('You have not opted for Nominee');
         }
+        this.isEditLoading = false;
       },
       error: (err) => {
         console.error('Registration Edit Error:', err);
 
         this.sharedSer.OpenAlert('No records found.');
+        this.isEditLoading = false;
       }
     });
   }
 
   editElogStatus(index: number) {
+    this.isEditLoading = true;
+    this.editLoadingMessage = 'Loading elog details...';
     this.getEditedUccData(index).subscribe({
       next: (res) => {
         this.router.navigate(['/app/elog-callback'], {
@@ -1013,16 +1038,20 @@ export class RegisterList {
           }
         });
         this.dialogRef?.close();
+        this.isEditLoading = false;
       },
       error: (err) => {
         console.error('Registration Edit Error:', err);
 
         this.sharedSer.OpenAlert('No records found.');
+        this.isEditLoading = false;
       }
     });
   }
 
   editFatcaStatus(index: number) {
+    this.isEditLoading = true;
+    this.editLoadingMessage = 'Loading FATCA details...';
     this.getEditedUccData(index).subscribe({
       next: (res) => {
         this.router.navigate(['/app/fataca']
@@ -1034,8 +1063,12 @@ export class RegisterList {
           }
         );
         this.dialogRef?.close();
+        this.isEditLoading = false;
       },
-      error: (err) => console.error('FATCA Edit Error:', err)
+      error: (err) => {
+        console.error('FATCA Edit Error:', err);
+        this.isEditLoading = false;
+      }
     });
   }
 
@@ -1397,240 +1430,6 @@ export class RegisterList {
 
     return isFatcaTrue;
   }
-
-  // ason 28-01-2026
-  // validateDataBeforeSubmit(clieCode: string) {
-
-  //   const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-  //   if (!card) return;
-
-  //   this.regnType = card.uccRegistration === '1' ? 'MOD' : 'NEW';
-  //   this.isBseSubmitting = true; // ✅ Show loader
-
-  //   const inputSaveToDB = { clieCode };
-  //   const mandatoryInput: checkMandatoryFieldsResponse = { clieCode };
-
-  //   this.bscUccSer.getFullValidatedResponse(inputSaveToDB).pipe(
-
-  //     /* STEP 1: Full validation */
-  //     tap(fullValidatedResponse => {
-  //       console.log(fullValidatedResponse, 'full validation response');
-  //     }),
-
-  //     /* STEP 2: Map payload */
-  //     map(fullValidatedResponse =>
-  //       this.mapValidatedResponseToBsePayload(fullValidatedResponse)
-  //     ),
-
-  //     /* STEP 3: FATCA check */
-  //     switchMap((bsePayload) => {
-
-  //       // Check FATCA status for the specific member being submitted
-
-  //       // const cardBeingSubmitted = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-  //       // if (!cardBeingSubmitted) {
-  //       //   this.isBseSubmitting = false; // ✅ Hide loader immediately
-  //       //   this.sharedSer.OpenAlert('Card not found for the selected client code.');
-  //       //   return EMPTY;
-  //       // }
-
-  //       // const fatcaStatus = this.getFatcaStatusForMember(cardBeingSubmitted.memberId);
-
-  //       // console.log(`FATCA check for client ${clieCode}, member ${cardBeingSubmitted.memberId}:`, fatcaStatus);
-
-  //       // if (!fatcaStatus.isCompleted) {
-  //       //   this.isBseSubmitting = false; // ✅ Hide loader immediately
-  //       //   this.sharedSer.OpenAlert(
-  //       //     'Your FATCA verification is still pending. Kindly complete it before submitting.'
-  //       //   );
-  //       //   return EMPTY;
-  //       // }
-
-
-  //       if(this.isFatcaValid(clieCode) === false) {
-  //          this.isBseSubmitting = false;
-
-  //          // Get the card index for FATCA navigation
-  //          const cardIndex = this.uccDetailsList.findIndex(x => x.bseClientCode === clieCode);
-
-  //          this.sharedSer.openDialogBox(
-  //           'Your FATCA verification is still pending. Kindly complete it before submitting.'
-  //         ).subscribe(result => {
-  //             console.log('Navigating to FATCA component for card index:', cardIndex);
-  //           // if (result && cardIndex !== -1) {
-
-  //               this.createFatcaStatus(cardIndex);
-  //             console.log('Navigating to FATCA component for card index:', cardIndex);
-  //           // }
-  //         });
-  //         return EMPTY;
-  //       }
-
-  //       return this.bscUccSer.checkMandatoryFields(mandatoryInput).pipe(
-  //         map(validationRes => ({ validationRes, bsePayload }))
-  //       );
-  //     }),
-
-  //     /* STEP 4: Mandatory field validation */
-  //     switchMap(({ validationRes, bsePayload }) => {
-
-  //       if (validationRes?.missingFields?.length > 0) {
-
-  // const message = `
-  // <div class="validation-message">
-  //   <p class="validation-message-header">
-  //     ${validationRes.message}
-  //   </p>
-  //   <ul class="validation-message-list">
-  //     ${validationRes.missingFields.map((field: string) => `
-  //       <li class="validation-message-item">
-  //         <img src="assets/images/alert-circle.png" class="validation-message-icon" />
-  //         <span class="validation-message-text">
-  //           ${field}
-  //         </span>
-  //       </li>
-  //     `).join('')}
-  //   </ul>
-  // </div>`;
-
-  //         this.isBseSubmitting = false; // ✅ Hide loader immediately
-  //         this.sharedSer.OpenAlert(message);
-  //         return EMPTY; // ❌ STOP FLOW
-  //       }
-
-  //       if (validationRes.message !== 'All mandatory fields are present.') {
-  //         this.isBseSubmitting = false; // ✅ Hide loader immediately
-  //         return EMPTY;
-  //       }
-
-
-  //       /* STEP 5: FINAL SUBMIT TO BSE */
-  //       return this.bscUccSer.saveDataToBSE(bsePayload);
-
-  //     }),
-
-  //     finalize(() => {
-  //       // ✅ Only hide loader if there was an error (success handler already handles it)
-  //       // this.isBseSubmitting = false; // Removed to prevent double setting
-  //     })
-
-  //   ).subscribe({
-
-  //     next: (res) => {
-  //       this.isBseSubmitting = false; // ✅ Hide loader immediately on success
-  //       console.log(res, 'BSE submit response');
-
-  //       // Update BSE submission status for the specific card
-  //       // const submittedCard = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-  //       // if (submittedCard && res?.successMsg) {
-  //       //   submittedCard.bseSubmissionStatus = 'Success';
-  //       //   this.dataSource.data = [...this.uccDetailsList];
-  //       // }
-
-  //       if (res?.successMsg) {
-  //         // ✅ Using custom successDia method
-  //         const combinedMessage = `${res.successMsg}\n\nYour Elog is generated. Do you want to authenticate it?`;
-
-  //         this.sharedSer.successDia(combinedMessage).subscribe(result => {
-  //           if (result === true) {
-  //             // User confirmed - authenticate ELOG
-  //             const card = this.uccDetailsList.find(x => x.bseClientCode === clieCode);
-  //             console.log(card, 'card object');
-  //             this.getElogLink(card);
-  //             console.log('User wants to authenticate ELOG');
-  //           }
-  //         });
-  //       }
-  //       else {
-  //         this.isBseSubmitting = false;
-  //         this.sharedSer.OpenAlert(res?.errors?.request || res?.title || 'Something went wrong, Please try again later!');
-  //       }
-  //     },
-
-  //     error: (error) => {
-  //       this.isBseSubmitting = false; // ✅ Hide loader immediately on error
-  //       console.log('error while saving data to BSE', error);
-
-  //       let errorMsg = 'Failed to submit data. Please try again later.';
-
-  //       // ✅ Handle 400 Bad Request with validation errors
-  //       if (error?.status === 400) {
-  //         const apiError = error?.error || error;
-
-  //         errorMsg = `<div style='text-align:left;'>`;
-
-  //         // Display title
-  //         if (apiError?.title) {
-  //           errorMsg += `<p style='color:black; font-weight:bold; margin-bottom:12px;'>${apiError.title}</p>`;
-  //         }
-
-  //         // Display request field errors
-  //         if (apiError?.errors?.request && Array.isArray(apiError.errors.request)) {
-  //           errorMsg += `<ul style='list-style:none; padding:0; margin:8px 0;'>`;
-  //           apiError.errors.request.forEach((err: string) => {
-  //             errorMsg += `
-  //               <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
-  //                 <img src='assets/images/alert-circle.png' 
-  //                      style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
-  //                 <span style='color:#C8102E;'>${err}</span>
-  //               </li>
-  //             `;
-  //           });
-  //           errorMsg += `</ul>`;
-  //         }
-
-  //         // Display all other field errors
-  //         if (apiError?.errors && typeof apiError.errors === 'object') {
-  //           errorMsg += `<ul style='list-style:none; padding:0; margin:0;'>`;
-
-  //           Object.keys(apiError.errors).forEach((field: string) => {
-  //             // Skip request field as we already displayed it
-  //             if (field === 'request') return;
-
-  //             const fieldErrors = apiError.errors[field];
-  //             if (Array.isArray(fieldErrors)) {
-  //               fieldErrors.forEach((err: string) => {
-  //                 errorMsg += `
-  //                   <li style='margin-bottom:8px; display:flex; align-items:flex-start;'>
-  //                     <img src='assets/images/alert-circle.png' 
-  //                          style='width:16px; height:16px; margin-right:8px; margin-top:2px; flex-shrink:0;' />
-  //                     <span style='color:#C8102E;'>
-  //                       <strong>${field}:</strong> ${err}
-  //                     </span>
-  //                   </li>
-  //                 `;
-  //               });
-  //             }
-  //           });
-
-  //           errorMsg += `</ul>`;
-  //         }
-
-  //         errorMsg += `</div>`;
-  //       }
-  //       // ✅ Handle 422 Unprocessable Entity
-  //       else if (error?.status === 422) {
-  //         const apiError = error?.error || error;
-  //         errorMsg = `<div style='text-align:left;'>`;
-  //         if (apiError?.errorMsg) {
-  //           errorMsg += `<strong>${apiError.errorMsg}</strong><br/>`;
-  //         }
-  //         if (apiError?.data?.messages?.length) {
-  //           errorMsg += '<ul style="padding-left:16px;">';
-  //           apiError.data.messages.forEach((msg: any) => {
-  //             errorMsg += `<li><span style='color:#C8102E;'>${msg.errcode} - ${msg.field}</span></li>`;
-  //           });
-  //           errorMsg += '</ul>';
-  //         }
-  //         errorMsg += '</div>';
-  //       }
-
-  //       this.sharedSer.OpenAlert(errorMsg);
-  //     }
-  //   });
-  // }
-
-
 
   validateDataBeforeSubmit(clieCode: string) {
 
@@ -2269,82 +2068,6 @@ export class RegisterList {
     });
   }
 
-  // getParticularUccData(memberid: string, clientCode: string) {
-
-  //   let input = {
-  //     data: {
-  //       member_code: {
-  //         member_id: memberid
-  //       },
-  //       investor: {
-  //         client_code: clientCode
-  //       }
-  //     }
-  //   }
-
-  //   this.isUccStatusLoading = true;
-  //   return this.bscUccSer.getPartUcc(input).subscribe({
-  //     next: (res) => {
-  //       console.log(res, 'res of particular ucc data');
-  //       // Handle success and error status
-  //       if (res?.status === 'success' && res?.data?.ucc_status) {
-  //         this.uccStatusTooltip = res.data.ucc_status;
-  //         console.log(this.uccStatusTooltip,'ucc status tooltip');
-
-  //       } 
-  //       else {
-  //         // this.uccStatusTooltip = 'Unable to fetch UCC status.';
-  //         this.sharedSer.OpenAlert('Unable to fetch UCC status.');
-  //       }
-  //       this.isUccStatusLoading = false;
-  //     },
-  //     error: (err) => {
-  //       console.error('Error fetching particular UCC data:', err);
-  //       this.uccStatusTooltip = 'Error fetching UCC status.';
-  //       this.isUccStatusLoading = false;
-  //     }
-  //   })
-
-
-  // }
-
-  //   refreshSelectedUccStatus() {
-  //   const selectedRows = this.selection.selected;
-
-  //   console.log(selectedRows, 'selected rows');
-
-  //   if (!selectedRows.length) {
-  //     this.sharedSer.OpenAlert('No rows selected!');
-  //     return;
-  //   }
-
-  //   selectedRows.forEach(row => {
-  //     if (row?.memberId && row?.bseClientCode) {
-  //       this.getParticularUccData(
-  //         row.memberId,
-  //         row.bseClientCode,
-  //         row
-  //       );
-  //     }
-  //   });
-  // }
-
-
-  // if bulk api calling is there
-  // refreshSelectedUccStatus() {
-  //   this.isUccFetching = true;
-  //   let pending = this.selection.selected.length;
-
-  //   this.selection.selected.forEach(row => {
-  //     this.getParticularUccData(row.memberId, row.bseClientCode, row, () => {
-  //       pending--;
-  //       if (pending === 0) {
-  //         this.isUccFetching = false;
-  //       }
-  //     });
-  //   });
-  // }
-
   getParticularUccData(memberId: string, clientCode: string, element: any) {
 
     if (element.isUccStatusLoading) {
@@ -2386,251 +2109,6 @@ export class RegisterList {
   }
 
 
-
-
-
-  // refreshSelectedUccStatus() {
-  //   const selectedRows = this.selection.selected;
-
-  //   if (!selectedRows.length) {
-  //     this.sharedSer.OpenAlert('No rows selected!');
-  //     return;
-  //   }
-
-  //   // 🔹 Turn ON modal loader once
-  //   this.isUccFetching = true;
-
-  //   let pendingCount = 0;
-
-  //   selectedRows.forEach(row => {
-  //     if (row?.memberId && row?.bseClientCode) {
-  //       pendingCount++;
-
-  //       this.getParticularUccData(
-  //         row.memberId,
-  //         row.bseClientCode,
-  //         row,
-  //         () => {
-  //           pendingCount--;
-
-  //           // 🔹 Close modal ONLY when all calls finish
-  //           if (pendingCount === 0) {
-  //             this.isUccFetching = false;
-  //           }
-  //         }
-  //       );
-  //     }
-  //   });
-
-  //   // Edge case
-  //   if (pendingCount === 0) {
-  //     this.isUccFetching = false;
-  //   }
-  // }
-
-  // getParticularUccData(
-  //   memberId: string,
-  //   clientCode: string,
-  //   element: any,
-  //   onComplete?: () => void
-  // ) {
-
-  //   if (element.isUccStatusLoading) {
-  //     onComplete?.();
-  //     return;
-  //   }
-
-  //   element.isUccStatusLoading = true;
-  //   element.uccStatus = null;
-
-  //   const input = {
-  //     data: {
-  //       member_code: { member_id: memberId },
-  //       investor: { client_code: clientCode }
-  //     }
-  //   };
-
-  //   this.bscUccSer.getPartUcc(input).subscribe({
-  //     next: (res) => {
-  //       if(res?.data?.data?.ucc_status) {
-  //       element.uccStatus = res?.data?.data?.ucc_status || 'UNKNOWN';
-  //       // element.isUccStatusLoading = false;
-  //       // onComplete?.(); 
-  //     }
-  //       else {
-  //           // this.uccStatusTooltip = 'Unable to fetch UCC status.';
-  //           this.sharedSer.OpenAlert('Unable to fetch UCC status.');
-  //             element.isUccStatusLoading = false;
-  //       onComplete?.(); // ✅ notify completion
-  //         }
-  //   },
-
-  //     error: () => {
-  //       element.uccStatus = 'ERROR';
-  //         this.sharedSer.OpenAlert('Unable to fetch UCC status.');
-  //             element.isUccStatusLoading = false;
-  //       onComplete?.(); // ✅ notify completion
-  //       element.isUccStatusLoading = false;
-  //       onComplete?.(); // ✅ notify completion
-  //     }
-  //   });
-  // }
-
-
-  // private updateRowUccStatus(clientCode: string, status: string) {
-  //   const data = this.dataSource.data;
-
-  //   const row = data.find(r => r.bseClientCode === clientCode);
-  // console.log(row,'row');
-
-  //   if (row) {
-  //     // row.uccStatus = status;
-
-  //     // 🔑 FORCE material table refresh
-  //     this.dataSource._updateChangeSubscription();
-  //   }
-  // }
-
-
-  // private showUccErrorOnce() {
-  //   if (!this.hasUccErrorAlertShown) {
-  //     this.hasUccErrorAlertShown = true;
-  //     this.sharedSer.OpenAlert('Unable to fetch UCC status.');
-  //   }
-  // }
-
-
-  // refreshSelectedUccStatus() {
-  //   const selectedRows = this.selection.selected;
-
-  //   if (!selectedRows.length) {
-  //     this.sharedSer.OpenAlert('No rows selected!');
-  //     return;
-  //   }
-
-  //   this.hasUccErrorAlertShown = false;
-
-  //   selectedRows.forEach(row => {
-  //     if (row?.memberId && row?.bseClientCode) {
-  //       this.getParticularUccData(
-  //         row.memberId,
-  //         row.bseClientCode,
-  //         // row
-  //       );
-  //     }
-  //   });
-  // }
-
-  // getParticularUccData(
-  //   memberId: string,
-  //   clientCode: string,
-  //   // element: any // element is no longer trusted
-  // ) {
-
-  //   const input = {
-  //     data: {
-  //       member_code: { member_id: memberId },
-  //       investor: { client_code: clientCode }
-  //     }
-  //   };
-
-  //   this.bscUccSer.getPartUcc(input).subscribe({
-  //     next: (res) => {
-  //       const status = res?.data?.data?.ucc_status;
-
-  //       if (status) {
-  //         this.updateRowUccStatus(clientCode, status);
-  //         this.finalUccStatus = status;
-  //       } else {
-  //         this.updateRowUccStatus(clientCode, 'UNKNOWN');
-  //         this.showUccErrorOnce();
-  //       }
-  //     },
-  //     error: () => {
-  //       this.updateRowUccStatus(clientCode, 'ERROR');
-  //       this.showUccErrorOnce();
-  //     }
-  //   });
-  // }
-
-
-
-  // private showUccErrorOnce() {
-  //   if (!this.hasUccErrorAlertShown) {
-  //     this.hasUccErrorAlertShown = true;
-  //     this.sharedSer.OpenAlert('Unable to fetch UCC status.');
-  //   }
-  // }
-
-
-  // refreshSelectedUccStatus() {
-  //   const selectedRows = this.selection.selected;
-
-  //   if (!selectedRows.length) {
-  //     this.sharedSer.OpenAlert('No rows selected!');
-  //     return;
-  //   }
-
-  //   this.isUccFetching = true;
-  //   this.hasUccErrorAlertShown = false;
-
-  //   selectedRows.forEach(row => {
-  //     if (row?.memberId && row?.bseClientCode) {
-  //       this.getParticularUccData(
-  //         row.memberId,
-  //         row.bseClientCode,
-  //         row
-  //       );
-  //     }
-  //   });
-  // }
-
-
-  // getParticularUccData(
-  //   memberId: string,
-  //   clientCode: string,
-  //   element: any
-  // ) {
-
-  //   if (element.isUccStatusLoading) {
-  //     return;
-  //   }
-
-  //   element.isUccStatusLoading = true;
-  //   element.uccStatus = null;
-
-  //   const input = {
-  //     data: {
-  //       member_code: { member_id: memberId },
-  //       investor: { client_code: clientCode }
-  //     }
-  //   };
-
-  //   this.bscUccSer.getPartUcc(input)
-  //     .pipe(
-  //       finalize(() => {
-  //         // 🔑 ALWAYS close loader (success OR error)
-  //         this.isUccFetching = false;
-  //         element.isUccStatusLoading = false;
-  //       })
-  //     )
-  //     .subscribe({
-  //       next: (res) => {
-  //         const status = res?.data?.data?.ucc_status;
-
-  //         if (status) {
-  //           element.uccStatus = status;
-  //         } else {
-  //           element.uccStatus = 'UNKNOWN';
-  //           this.showUccErrorOnce();
-  //         }
-  //       },
-  //       error: () => {
-  //         element.uccStatus = 'ERROR';
-  //         this.showUccErrorOnce();
-  //       }
-  //     });
-  // }
 
 
 
@@ -2885,13 +2363,6 @@ export class RegisterList {
     })
   }
 
-
-
-
-
-
-  // as on 6-02-2026 start here for valid nominee
-
   getvalidatrespforNomineeopt(clieCode: string) {
     let input: validDatawithNomineeopt = {
       clieCode: clieCode
@@ -2917,8 +2388,5 @@ export class RegisterList {
     });
   }
 
-
-
-  // end here
 }
 

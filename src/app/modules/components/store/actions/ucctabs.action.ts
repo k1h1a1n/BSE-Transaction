@@ -9,3 +9,10 @@ export const goToTab = createAction(
 export const nextTab = createAction('Next Tab');
 
 export const previousTab = createAction('Previous Tab');
+
+export const setEditMode = createAction(
+    '[UCC Tabs] Set Edit Mode',
+    props<{ isEditMode: boolean; editData: any | null }>()
+);
+
+export const resetEditMode = createAction('[UCC Tabs] Reset Edit Mode');

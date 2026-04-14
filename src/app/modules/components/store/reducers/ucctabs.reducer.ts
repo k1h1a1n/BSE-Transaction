@@ -50,5 +50,26 @@ export const ucctabsReducer = createReducer(
     console.log('[Reducer] New state after previousTab:', newState);
 
     return newState;
+  }),
+
+  on(UCCTabsActions.setEditMode, (state: UCCTabsState, { isEditMode, editData }) => {
+    console.log('[Reducer] setEditMode → isEditMode:', isEditMode);
+    console.log('[Reducer] setEditMode → editData:', editData);
+
+    return {
+      ...state,
+      isEditMode,
+      editData
+    };
+  }),
+
+  on(UCCTabsActions.resetEditMode, (state: UCCTabsState) => {
+    console.log('[Reducer] resetEditMode');
+
+    return {
+      ...state,
+      isEditMode: false,
+      editData: null
+    };
   })
 );

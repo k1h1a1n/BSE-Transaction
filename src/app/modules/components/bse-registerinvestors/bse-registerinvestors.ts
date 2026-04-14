@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
@@ -22,6 +22,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SharedEnv } from '../../../shared/environments/environment';
 import { IndexedDBService } from '../../../shared';
+import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
 
 
 
@@ -437,9 +438,7 @@ export class BseRegisterinvestors {
 
 
   today!: string;
-  isEditMode = false;
-  isEdit: boolean = false;
-  editMode: boolean = false;
+  isEdit: boolean = false;  // synced from NgRx store
   memberID!: string;
   selectedTabIndex = 1;   // default tab
   selectedMemberId = '';
@@ -454,7 +453,8 @@ export class BseRegisterinvestors {
   groupLookupError: string | null = null;
   isGroupLookupLoading = false;
   applicants: any[] = [];  // Array to hold applicant data
-  private idbsvc = inject(IndexedDBService)
+  private idbsvc = inject(IndexedDBService);
+  private uccTabsFacade = inject(UCCTabsFacade);
   @Output() nextTab = new EventEmitter<{ index: number, state?: any }>();
 
   ngOnInit() {
@@ -603,53 +603,26 @@ export class BseRegisterinvestors {
       holdingPattern: 'SI'
     })
     this.getGroupByLogin();
-
-    // Listen to holding pattern changes and update applicants
-    this.registrationForm.get('holdingPattern')?.valueChanges.subscribe(() => {
-      this.updateApplicantsForHoldingPattern();
-    });
-
-    // Initialize applicants array on form creation
-    this.updateApplicantsForHoldingPattern();
-
-    // when back btn clicked then only show this
-    // const saved = localStorage.getItem('uccRegistrationData');
-    // if (saved) {
-    //   this.registrationForm.patchValue(JSON.parse(saved));
-    // }
-
-    // Member details will be fetched when a group is selected
-    //  let groupmemb=JSON.parse(localStorage.getItem('GetGroupMembers_TTL')).httpResponse.body.GroupMembers;
-    //   this.memberList = groupmemb;
-    //   console.log(this.memberList, 'memberList');
-
     const currentDate = new Date();
-    this.today = currentDate.toISOString().split('T')[0]; // yyyy-mm-dd
+    this.today = currentDate.toISOString().split('T')[0];
 
     const randomTenDigitNumber = this.generateTenDigitCode();
     this.registrationForm.get('bseClientCode')?.setValue(randomTenDigitNumber.toString());
     console.log(randomTenDigitNumber, 'randomTenDigitNumber');
 
-    //      const savedData = localStorage.getItem('selectedMemberData');
-    // if (savedData) {
-    //   const parsedData = JSON.parse(savedData);
-    //   this.registrationForm.patchValue(parsedData);
-    // }
 
+    // ✅ Subscribe to NgRx store for edit mode
+    this.uccTabsFacade.isEditMode$.subscribe((isEditMode) => {
+      this.isEdit = isEditMode;
+      console.log('[BseRegisterinvestors] isEdit from store:', this.isEdit);
 
-    const navState = history.state;
-    this.isEdit = navState?.isEdit === true;
+      if (this.isEdit) {
+        this.isEditData();
+      }
+      this.updateFormControlsBasedOnEditMode();
+      this.updateRegistrationTypeOptions();
+    });
 
-    console.log(this.isEdit, 'isEdit');
-
-    if (this.isEdit) {
-      this.isEditData();
-    }
-    // this.isEditData();
-    this.updateFormControlsBasedOnEditMode();
-    // set edit-mode flag and update registration type options accordingly
-    this.isEditMode = this.isEdit;
-    this.updateRegistrationTypeOptions();
     this.registrationForm.get('memberName')?.valueChanges.subscribe(() => {
       this.updateBSEClientCode();
     });
@@ -730,9 +703,6 @@ export class BseRegisterinvestors {
       } else if (!this.isEdit && control.disabled) {
         control.enable();
         this.getGroupMemberDetails();
-        //  let groupmemb=JSON.parse(localStorage.getItem('GetGroupMembers_TTL')).httpResponse.body.GroupMembers;
-        // this.memberList = groupmemb;
-        // console.log(this.memberList, 'memberList');
       }
     });
 
@@ -751,80 +721,67 @@ export class BseRegisterinvestors {
 
 
   isEditData() {
-    this.isEdit = history.state?.isEdit === true;
-    console.log(this.isEdit, 'isEdit');
+    console.log(this.isEdit, 'isEdit from store');
 
-    if (history.state?.uccDetails) {
-      this.editMode = true;
-      const navState = history.state;
-      console.log(navState, 'nav state');
+    // ✅ Read edit data from NgRx store
+    this.uccTabsFacade.editData$.subscribe((editData) => {
+      if (editData) {
+        const ucc = editData;
+        this.memberID = ucc.MembID;
+        console.log(ucc, this.memberID, 'edit data from store and memberId');
+        console.log(ucc.cliecode, 'edited clie code');
+        localStorage.setItem('editedBseClientCode', ucc.cliecode);
 
-      const ucc = navState.uccDetails[0];
-      this.memberID = ucc.MembID;
-      console.log(ucc, this.memberID, 'nav state and memberId');
-      console.log(ucc.cliecode, 'edited clie code');
-      localStorage.setItem('editedBseClientCode', ucc.cliecode);
+        const nameParts = this.splitFullName(ucc.fullname);
 
-      const matchedMember = this.memberList.find(x => x.memberName === ucc.memberDetails);
+        this.registrationForm.patchValue({
+          bseClientCode: ucc.cliecode?.trim() || '',
+          firstName: nameParts.firstName,
+          middleName: nameParts.middleName,
+          lastName: nameParts.lastName,
+          gender: ucc.ClieGend,
+          dob: this.formatDateForInput(ucc.ClieDOB) || '',
+          pan: ucc.CliePAN?.trim() || '',
+          occupation: ucc.OccuCode?.trim() || '',
+          mobile: ucc.Mobil?.trim() || '',
+          mobileDeclaration: ucc.Filler1 || '',
+          email: ucc.Email?.trim() || '',
+          emailDeclaration: ucc.Filler2 || '',
+          taxStatus: ucc.TaxStatus || '',
+          holdingPattern: ucc.HoldID || '',
+          kycType: ucc.PH_KYCType || '',
+          nominationOpted: ucc.NomiOpt || '',
+          nominationAuthentication: ucc.NomiAuthMode || '',
+        });
+        console.log(this.registrationForm.value, 'patched value from store');
+      } else if (localStorage.getItem('uccRegistrationData')) {
+        // Fallback: read from localStorage
+        const uccList = JSON.parse(localStorage.getItem('uccRegistrationData') || '[]');
+        const ucc = uccList[0];
+        console.log(ucc, 'parsedData from localStorage');
 
-      const nameParts = this.splitFullName(ucc.fullname);
-
-
-      this.registrationForm.patchValue({
-        bseClientCode: ucc.cliecode?.trim() || '',
-        // memberName: ucc.fullname?.trim() || '',
-        firstName: nameParts.firstName,
-        middleName: nameParts.middleName,
-        lastName: nameParts.lastName,
-        gender: ucc.ClieGend,
-
-        dob: this.formatDateForInput(ucc.ClieDOB) || '',
-        pan: ucc.CliePAN?.trim() || '',
-        occupation: ucc.OccuCode?.trim() || '',
-        mobile: ucc.Mobil?.trim() || '',
-        mobileDeclaration: ucc.Filler1 || '',
-        email: ucc.Email?.trim() || '',
-        emailDeclaration: ucc.Filler2 || '',
-        taxStatus: ucc.TaxStatus || '',
-        holdingPattern: ucc.HoldID || '',
-        kycType: ucc.PH_KYCType || '',
-        nominationOpted: ucc.NomiOpt || '',
-        nominationAuthentication: ucc.NomiAuthMode || '',
-      });
-      console.log(this.registrationForm.value, 'patched value');
-    }
-
-    else if (localStorage.getItem('uccRegistrationData')) {
-
-      // const uccList = JSON.parse(localStorage.getItem('uccRegistrationData'));
-      const uccList = JSON.parse(localStorage.getItem('uccRegistrationData') || '[]');
-
-      const ucc = uccList[0]; // 
-      console.log(ucc, 'parsedData from localStorage');
-
-      this.registrationForm.patchValue({
-        bseClientCode: ucc?.cliecode?.trim() || '',
-        memberName: ucc.memberName?.trim() || ucc.fullname?.trim() || '',
-        dob: this.formatDateForInput(ucc.ClieDOB) || '',
-        pan: ucc.pan?.trim() || ucc.CliePAN?.trim() || '',
-        occupation: ucc.OccuCode?.trim() || '',
-        mobile: ucc.Mobil?.trim() || '',
-        mobileDeclaration: ucc.Filler1 || '',
-        email: ucc.Email?.trim() || '',
-        emailDeclaration: ucc.Filler2 || '',
-        taxStatus: ucc.taxStatus || ucc.TaxStatus || '',
-        holdingPattern: ucc.holdingPattern || ucc.HoldID || '',
-        kycType: ucc.PH_KYCType || '',
-        nominationOpted: ucc.NomiOpt || '',
-        nominationAuthentication: ucc.NomiAuthMode || '',
-      });
-
-    }
-    else {
-      const randomTenDigitNumber = this.generateTenDigitCode();
-      this.registrationForm.get('bseClientCode')?.setValue(randomTenDigitNumber.toString());
-      console.log(randomTenDigitNumber, 'randomTenDigitNumber');
-    }
+        this.registrationForm.patchValue({
+          bseClientCode: ucc?.cliecode?.trim() || '',
+          memberName: ucc.memberName?.trim() || ucc.fullname?.trim() || '',
+          dob: this.formatDateForInput(ucc.ClieDOB) || '',
+          pan: ucc.pan?.trim() || ucc.CliePAN?.trim() || '',
+          occupation: ucc.OccuCode?.trim() || '',
+          mobile: ucc.Mobil?.trim() || '',
+          mobileDeclaration: ucc.Filler1 || '',
+          email: ucc.Email?.trim() || '',
+          emailDeclaration: ucc.Filler2 || '',
+          taxStatus: ucc.taxStatus || ucc.TaxStatus || '',
+          holdingPattern: ucc.holdingPattern || ucc.HoldID || '',
+          kycType: ucc.PH_KYCType || '',
+          nominationOpted: ucc.NomiOpt || '',
+          nominationAuthentication: ucc.NomiAuthMode || '',
+        });
+      } else {
+        const randomTenDigitNumber = this.generateTenDigitCode();
+        this.registrationForm.get('bseClientCode')?.setValue(randomTenDigitNumber.toString());
+        console.log(randomTenDigitNumber, 'randomTenDigitNumber');
+      }
+    });
   }
 
 
@@ -838,7 +795,6 @@ export class BseRegisterinvestors {
       lastTwo = (lastTwo + 1) % 100;
       const newCode = base + lastTwo.toString().padStart(2, '0');
       bseControl?.setValue(newCode);
-      console.log(newCode, 'randomTenDigitNumber');
     }
   }
 
@@ -854,7 +810,7 @@ export class BseRegisterinvestors {
       groupSearch: '',
       memberName: '',
       memberSearch: '',
-      registrationType: this.isEditMode ? 'Mod' : 'New',
+      registrationType: this.isEdit ? 'Mod' : 'New',
       bseClientCode: this.generateTenDigitCode().toString(),
       taxStatus: this.taxStatusList[0]?.value || '',
       holdingPattern: this.holdingPatternList[0]?.value || '',
@@ -874,15 +830,6 @@ export class BseRegisterinvestors {
       kycType: 'K',
       ...overrides
     };
-  }
-
-  private ensureDisabledControls(): void {
-    ['taxStatus', 'holdingPattern'].forEach(controlName => {
-      const control = this.registrationForm.get(controlName);
-      if (control) {
-        control.disable({ emitEvent: false });
-      }
-    });
   }
 
   private resetFormToDefaults(preserve: Partial<Record<string, any>> = {}): void {
@@ -1022,9 +969,8 @@ export class BseRegisterinvestors {
     this.sharedService.OpenAlert(message);
   }
 
-
   updateRegistrationTypeOptions() {
-    if (!this.isEditMode) {
+    if (!this.isEdit) {
       // Add Mode: show all, default to New (enabled), others disabled
       this.registrationTypeOptions = [
         { label: 'New', value: 'New', disabled: false },
@@ -1794,21 +1740,6 @@ export class BseRegisterinvestors {
   getApplicantLabel(index: number): string {
     const labels = ['1st Applicant', '2nd Applicant', '3rd Applicant'];
     return labels[index] || `${index + 1}th Applicant`;
-  }
-
-  // Update applicants based on holding pattern
-  updateApplicantsForHoldingPattern(): void {
-    const holdingPattern = this.registrationForm.get('holdingPattern')?.value;
-    const applicantCount = this.applicantCountByHoldingPattern[holdingPattern] || 1;
-
-    // Update the applicants array
-    this.applicants = Array.from({ length: applicantCount }, (_, i) => ({
-      index: i,
-      label: this.getApplicantLabel(i),
-      formGroup: this.createApplicantFormGroup()
-    }));
-
-    console.log(`Holding Pattern: ${holdingPattern}, Applicant Count: ${applicantCount}`, this.applicants);
   }
 
   d_V() {
