@@ -12,7 +12,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
-import { UccMemberInfo } from '../../models/bseUCCModel';
+import { Applicant, UccMemberInfo, UccRegisterMember } from '../../models/bseUCCModel';
 import { Shared } from '../../../shared/services/shared';
 import { Location } from '@angular/common';
 import { catchError, debounceTime, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
@@ -652,15 +652,6 @@ export class BseRegisterinvestors {
 
 
   goToNextTab() {
-    console.log(this.registrationForm.value, 'registration form');
-    console.log('method called');
-
-
-    // if (this.registrationForm.invalid) {
-    //   this.registrationForm.markAllAsTouched();
-    //   return;
-    // }
-    // this.nextTab.emit(1);  // navigate to tab index 1
     this.submitDataandContinue();
   }
 
@@ -908,15 +899,6 @@ export class BseRegisterinvestors {
     );
   }
 
-  onMemberDropdownClick(): void {
-    if (!this.registrationForm.get('groupId')?.value) {
-      this.filteredMembers = [];
-      return;
-    }
-
-    this.filteredMembers = this.sortMembers(this.memberList);
-  }
-
   onMemberSelect(event: AutoCompleteSelectEvent) {
     const selectedMember = event?.value;
     if (selectedMember) {
@@ -1026,17 +1008,6 @@ export class BseRegisterinvestors {
       console.warn('⚠️ No group selected, skipping member fetch');
       return;
     }
-
-    // const input = {
-    //   lookUpID: this.selectedGrp,
-    //   lookUpDescription: this.getSelectedGroupDescription()
-    // };
-    // let resSelectedGroupID = localStorage.getItem('resSelectedGroupID');
-
-    // const input = {
-    //   GroupID: resSelectedGroupID
-    // };
-
     this.bseUCCService.getUccMemberDetails().subscribe({
       next: (res: any) => {
         console.log('Member details API response:', res);
@@ -1107,32 +1078,6 @@ export class BseRegisterinvestors {
     console.log(this.selectedMemberId, 'selected memb id');
 
     this.onMemberChange(this.selectedMemberId);
-  }
-
-  setupSearch() {
-    this.registrationForm.get('memberSearch')?.valueChanges.pipe(
-      debounceTime(200),
-      distinctUntilChanged()
-    ).subscribe(value => {
-      if (typeof value === 'string') {
-        const trimmed = value.trim();
-        const hadSelection = !!this.registrationForm.get('memberName')?.value;
-
-        if (hadSelection) {
-          this.selectedMemberId = '';
-          this.resetFormToDefaults({
-            groupId: this.selectedGrp,
-            groupSearch: this.getSelectedGroupDescription(),
-            memberSearch: value
-          });
-          localStorage.removeItem('selectedMemberData');
-        }
-
-        if (!trimmed) {
-          this.filteredMembers = [];
-        }
-      }
-    });
   }
 
   private sortMembers(list: any[]) {
@@ -1318,33 +1263,75 @@ export class BseRegisterinvestors {
 
   }
 
+  private buildInput(formValue: any): UccRegisterMember {
+    const applicants: Applicant[] = [];
+
+    // Applicant 1 (always present)
+    applicants.push(this.buildApplicant(formValue, 1));
+
+    // Applicant 2 (optional)
+    if (formValue.firstName_2) {
+      applicants.push(this.buildApplicant(formValue, 2));
+    }
+
+    // Applicant 3 (optional)
+    if (formValue.firstName_3) {
+      applicants.push(this.buildApplicant(formValue, 3));
+    }
+
+    return {
+      clieCode: formValue.bseClientCode,
+      holdingPattern: formValue.holdingPattern,
+      taxStatus: formValue.taxStatus,
+      fH_KYC_Type: 'K', // Ask Pooja about this field
+      nominationOpt: formValue.nominationOpted,
+      nominationAuth: formValue.nominationAuthentication,
+      Applicants: applicants
+    };
+  }
+
+  private buildApplicant(formValue: any, index: number): Applicant {
+    const suffix = index === 1 ? '' : `_${index}`;
+    return {
+      membID: 0,
+      firstName: formValue[`firstName${suffix}`],
+      middleName: formValue[`middleName${suffix}`],
+      lastName: formValue[`lastName${suffix}`],
+      occupation: formValue[`occupation${suffix}`],
+      mobileNumber: formValue[`mobile${suffix}`],
+      mobileDeclaration: formValue[`mobileDeclaration${suffix}`],
+      emailID: formValue[`email${suffix}`],
+      emailDeclaration: formValue[`emailDeclaration${suffix}`],
+      birthDate: formValue[`dob${suffix}`],
+      panNumber: formValue[`pan${suffix}`],
+      gender: formValue[`gender${suffix}`] || 'O'
+    };
+  }
+
   submitDataandContinue() {
+    // console.log(this.registrationForm, 'registration form');
+
+    if (this.registrationForm.invalid) {
+      Object.keys(this.registrationForm.controls).forEach(field => {
+        const control = this.registrationForm.get(field);
+        if (control?.invalid) {
+          console.log(field, control.errors);
+        }
+      });
+      this.registrationForm.markAllAsTouched();
+      return;
+    }
+    const rawFormValue = this.registrationForm.getRawValue();
+    console.log(rawFormValue, 'raw form value before formatting dob');
+    const input: UccRegisterMember = this.buildInput(rawFormValue);
+    console.log(input, 'input of registration');
+    return;
     this.nextTab.emit({
       index: 1,
       state: {
-        isUpdate: false,
-        MembID: null,
-        clieCode: 'test',
+
       }
     });
-    // console.log('method called');
-    // console.log(this.registrationForm, 'registration form');
-
-    // if (this.registrationForm.invalid) {
-    //   Object.keys(this.registrationForm.controls).forEach(field => {
-    //     const control = this.registrationForm.get(field);
-    //     if (control?.invalid) {
-    //       console.log(field, control.errors);
-    //     }
-    //   });
-    //   this.registrationForm.markAllAsTouched();
-    //   return;
-    // }
-    // console.log('method called');
-
-    // const rawFormValue = this.registrationForm.getRawValue();
-    // rawFormValue.dob = this.formatDateToYYYYMMDD(rawFormValue.dob);
-    // console.log(rawFormValue, 'dob');
 
     // localStorage.setItem('uccRegistrationData', JSON.stringify(rawFormValue));
     // const selectedLookUpID = this.registrationForm?.controls['memberName']?.value;
@@ -1435,7 +1422,6 @@ export class BseRegisterinvestors {
     console.log('method called');
 
     const rawFormValue = this.registrationForm.getRawValue();
-    // rawFormValue.dob = this.formatDateToDDMMYYYY(rawFormValue.dob);
     rawFormValue.dob = this.formatDateToYYYYMMDD(rawFormValue.dob);
     console.log(rawFormValue, 'dob');
 
@@ -1516,10 +1502,6 @@ export class BseRegisterinvestors {
         this.sharedService.OpenAlert('Something went wrong while saving registration details.');
       }
     });
-  }
-
-  navigateToList() {
-    this.router.navigate(['/app/registerdList']);
   }
 
   goBack() {
@@ -1700,48 +1682,6 @@ export class BseRegisterinvestors {
     );
   }
 
-  // Create form group for individual applicant
-  createApplicantFormGroup(): FormGroup {
-    return this.fb.group({
-      firstName: ['',
-        [Validators.required,
-        Validators.pattern(/^[A-Za-z ]+$/),
-        Validators.minLength(2),
-        Validators.maxLength(25)]],
-      middleName: ['',
-        [
-          Validators.pattern(/^[A-Za-z ]+$/),
-          Validators.minLength(1),
-          Validators.maxLength(25)]],
-      lastName: ['',
-        [Validators.required,
-        Validators.pattern(/^[A-Za-z ]+$/),
-        Validators.minLength(2),
-        Validators.maxLength(25)]],
-      pan: ['', [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]$/)]],
-      gender: ['', Validators.required],
-      dob: ['', [Validators.required, this.minimumAgeValidator(18)]],
-      occupation: ['', Validators.required],
-      mobile: ['',
-        Validators.compose([
-          Validators.required,
-          Validators.pattern(/^[6-9]\d{9}$/)
-        ])],
-      mobileDeclaration: ['', Validators.required],
-      email: ['', Validators.compose([
-        Validators.required,
-        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-      ])],
-      emailDeclaration: ['', Validators.required]
-    });
-  }
-
-  // Get applicant label (1st Applicant, 2nd Applicant, etc.)
-  getApplicantLabel(index: number): string {
-    const labels = ['1st Applicant', '2nd Applicant', '3rd Applicant'];
-    return labels[index] || `${index + 1}th Applicant`;
-  }
-
   d_V() {
     this.registrationForm.get('holdingPattern')?.valueChanges.subscribe((_) => {
       const __ = _;
@@ -1758,6 +1698,18 @@ export class BseRegisterinvestors {
         this.registrationForm.get('email_2')?.disable();
         this.registrationForm.get('emailDeclaration_2')?.disable();
         this.registrationForm.get('kycType_2')?.disable();
+      }else if(_ == 'JO' || _ == 'AS'){
+        this.registrationForm.get('firstName_2')?.enable();
+        this.registrationForm.get('middleName_2')?.enable();
+        this.registrationForm.get('lastName_2')?.enable();
+        this.registrationForm.get('pan_2')?.enable();
+        this.registrationForm.get('gender_2')?.enable();
+        this.registrationForm.get('dob_2')?.enable();
+        this.registrationForm.get('occupation_2')?.enable();
+        this.registrationForm.get('mobile_2')?.enable();
+        this.registrationForm.get('mobileDeclaration_2')?.enable();
+        this.registrationForm.get('email_2')?.enable();
+        this.registrationForm.get('emailDeclaration_2')?.enable();
       }
     })
   }

@@ -15,6 +15,31 @@ export class UccMemberInfo {
   fH_KYC_Type!: string;
 }
 
+export interface UccRegisterMember {
+  clieCode: string;
+  holdingPattern: 'SI' | 'JO' | 'AS'; // Single / Joint / Anyone or Survivor
+  taxStatus: string;
+  fH_KYC_Type: string;
+  nominationOpt: string;
+  nominationAuth: string;
+  Applicants: Applicant[];
+}
+
+export interface Applicant {
+  membID: number;
+  firstName: string;
+  middleName: string | null;
+  lastName: string;
+  occupation: string;
+  mobileNumber: string;
+  mobileDeclaration: string;
+  emailID: string;
+  emailDeclaration: string;
+  birthDate: string; // ISO string (can convert to Date if needed)
+  panNumber: string;
+  gender: 'M' | 'F' | 'O';
+}
+
 
 export class UccAddressDetails {
   clieCode!: string;
