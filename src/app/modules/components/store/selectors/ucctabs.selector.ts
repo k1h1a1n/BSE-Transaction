@@ -19,3 +19,11 @@ export const selectEditData = createSelector(
     selectUcctabsState,
     (state: UCCTabsState) => state.editData
 );
+export const selectRegistrationData = createSelector(
+    selectUcctabsState,
+    (state: UCCTabsState) => state.registrationData
+);
+export const selectSelectedMemberData = createSelector(
+    selectUcctabsState,
+    (state: UCCTabsState) => state.selectedMemberData
+);

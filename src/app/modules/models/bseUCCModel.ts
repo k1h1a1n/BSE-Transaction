@@ -43,8 +43,6 @@ export interface Applicant {
 
 export class UccAddressDetails {
   clieCode!: string;
-  MembID!: number;
-  Gender!: string;
   AddressLine1!: string;
   AddressLine2!: string;
   AddressLine3!: string;
@@ -52,10 +50,6 @@ export class UccAddressDetails {
   City!: string;
   State!: string;
   Country!: string;
-  FirstName!: string;
-  MiddleName!: string;
-  LastName!: string;
-  // AddressProof: string;
 }
 
 //   export class uccNomineeDetails {

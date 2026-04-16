@@ -366,32 +366,8 @@ export class BseRegisterinvestors {
           nominationAuthentication: ucc.NomiAuthMode || '',
         });
         console.log(this.registrationForm.value, 'patched value from store');
-      } else if (localStorage.getItem('uccRegistrationData')) {
-        // Fallback: read from localStorage
-        const uccList = JSON.parse(localStorage.getItem('uccRegistrationData') || '[]');
-        const ucc = uccList[0];
-        console.log(ucc, 'parsedData from localStorage');
-
-        this.registrationForm.patchValue({
-          bseClientCode: ucc?.cliecode?.trim() || '',
-          memberName: ucc.memberName?.trim() || ucc.fullname?.trim() || '',
-          dob: this.formatDateForInput(ucc.ClieDOB) || '',
-          pan: ucc.pan?.trim() || ucc.CliePAN?.trim() || '',
-          occupation: ucc.OccuCode?.trim() || '',
-          mobile: ucc.Mobil?.trim() || '',
-          mobileDeclaration: ucc.Filler1 || '',
-          email: ucc.Email?.trim() || '',
-          emailDeclaration: ucc.Filler2 || '',
-          taxStatus: ucc.taxStatus || ucc.TaxStatus || '',
-          holdingPattern: ucc.holdingPattern || ucc.HoldID || '',
-          kycType: ucc.PH_KYCType || '',
-          nominationOpted: ucc.NomiOpt || '',
-          nominationAuthentication: ucc.NomiAuthMode || '',
-        });
       } else {
-        const randomTenDigitNumber = this.generateTenDigitCode();
-        this.registrationForm.get('bseClientCode')?.setValue(randomTenDigitNumber.toString());
-        console.log(randomTenDigitNumber, 'randomTenDigitNumber');
+        console.warn('⚠️ No edit data found in store');
       }
     });
   }
@@ -906,7 +882,8 @@ export class BseRegisterinvestors {
     console.log(selectedMember, 'selected member');
 
     if (selectedMember) {
-      localStorage.setItem('selectedMemberData', JSON.stringify(selectedMember));
+      // Save to NgRx store instead of localStorage
+      this.uccTabsFacade.setSelectedMemberData(selectedMember);
       console.log('selectedMember', selectedMember.LookUpDescription || selectedMember.fullName);
       console.log('selected member', selectedMember.fullName);
       this.prefillForm(selectedMember);
@@ -1017,21 +994,36 @@ export class BseRegisterinvestors {
   submitDataandContinue() {
     // console.log(this.registrationForm, 'registration form');
 
-    if (this.registrationForm.invalid) {
-      Object.keys(this.registrationForm.controls).forEach(field => {
-        const control = this.registrationForm.get(field);
-        if (control?.invalid) {
-          console.log(field, control.errors);
-        }
-      });
-      this.registrationForm.markAllAsTouched();
-      return;
-    }
+    // if (this.registrationForm.invalid) {
+    //   Object.keys(this.registrationForm.controls).forEach(field => {
+    //     const control = this.registrationForm.get(field);
+    //     if (control?.invalid) {
+    //       console.log(field, control.errors);
+    //     }
+    //   });
+    //   this.registrationForm.markAllAsTouched();
+    //   return;
+    // }
+    // const rawFormValue = this.registrationForm.getRawValue();
+    // console.log(rawFormValue, 'raw form value before formatting dob');
+    // const input: UccRegisterMember = this.buildInput(rawFormValue);
+    // console.log(input, 'input of registration');
+    // return;
+
+    // ✅ Save registration form data to NgRx store
     const rawFormValue = this.registrationForm.getRawValue();
-    console.log(rawFormValue, 'raw form value before formatting dob');
-    const input: UccRegisterMember = this.buildInput(rawFormValue);
-    console.log(input, 'input of registration');
-    return;
+    const selectedLookUpID = this.registrationForm?.controls['memberName']?.value;
+    const selectedMemberId = (selectedLookUpID || '').toString();
+    const selectedMember = this.memberList.find(member => member.LookUpID === selectedMemberId);
+
+    rawFormValue.memberDetails = {
+      id: selectedMember?.LookUpID,
+      name: selectedMember?.LookUpDescription
+    };
+
+    this.uccTabsFacade.setRegistrationData(rawFormValue);
+    console.log(rawFormValue, '✅ Registration data saved to NgRx store');
+
     this.nextTab.emit({
       index: 1,
       state: {

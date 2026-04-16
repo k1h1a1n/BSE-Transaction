@@ -71,5 +71,21 @@ export const ucctabsReducer = createReducer(
       isEditMode: false,
       editData: null
     };
+  }),
+
+  on(UCCTabsActions.setRegistrationData, (state: UCCTabsState, { registrationData }) => {
+    console.log('[Reducer] setRegistrationData:', registrationData);
+    return {
+      ...state,
+      registrationData
+    };
+  }),
+
+  on(UCCTabsActions.setSelectedMemberData, (state: UCCTabsState, { selectedMemberData }) => {
+    console.log('[Reducer] setSelectedMemberData:', selectedMemberData);
+    return {
+      ...state,
+      selectedMemberData
+    };
   })
 );

@@ -16,3 +16,13 @@ export const setEditMode = createAction(
 );
 
 export const resetEditMode = createAction('[UCC Tabs] Reset Edit Mode');
+
+export const setRegistrationData = createAction(
+    '[UCC Tabs] Set Registration Data',
+    props<{ registrationData: any }>()
+);
+
+export const setSelectedMemberData = createAction(
+    '[UCC Tabs] Set Selected Member Data',
+    props<{ selectedMemberData: any }>()
+);
