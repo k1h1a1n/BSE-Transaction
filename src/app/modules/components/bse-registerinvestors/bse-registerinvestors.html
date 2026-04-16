@@ -438,8 +438,20 @@
             <div class="TabInputSect">
                 <div class="row">
                     <div class="col-4">
-                        <div class="InputControl">
-                            <label>First Name <span class="RedTxt">*</span></label>
+                        <div class="InputControl">                            <label>Select Member <span class="RedTxt">*</span></label>
+                            <mat-form-field class="Width100perc">
+                                <mat-select formControlName="memberName_2" placeholder="Select member..."
+                                    (selectionChange)="selectMember_2($event.value)">
+                                    <mat-option value="" disabled>Select member...</mat-option>
+                                    <mat-option *ngFor="let member of filteredMembers_2" [value]="member.LookUpID">
+                                        {{ member.LookUpDescription }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="InputControl">                            <label>First Name <span class="RedTxt">*</span></label>
                             <input type="text" pInputText class="Width100perc" formControlName="firstName_2" required
                                 maxlength="25" />
 
@@ -694,12 +706,26 @@
 
         @if (['JO' , 'AS'].includes(registrationForm.get('holdingPattern')?.value)) {
             <div class="TabInputCntnr mt-3">
-                <h5 class="TabCntnrHead mb-0">Personal Details 3rd Applicant <span class="RedTxt">*</span></h5>
+                <h5 class="TabCntnrHead mb-0">Personal Details 3rd Applicant</h5>
                 <div class="TabInputSect">
                     <div class="row">
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>First Name <span class="RedTxt">*</span></label>
+                                <label>Select Member</label>
+                                <mat-form-field class="Width100perc">
+                                    <mat-select formControlName="memberName_3" placeholder="Select member..."
+                                        (selectionChange)="selectMember_3($event.value)">
+                                        <mat-option value="" disabled>Select member...</mat-option>
+                                        <mat-option *ngFor="let member of filteredMembers_3" [value]="member.LookUpID">
+                                            {{ member.LookUpDescription }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="InputControl">
+                                <label>First Name</label>
                                 <input type="text" pInputText class="Width100perc" formControlName="firstName_3"
                                     maxlength="25" />
     
@@ -742,7 +768,7 @@
                         </div>
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>Last Name <span class="RedTxt">*</span></label>
+                                <label>Last Name</label>
                                 <input type="text" pInputText class="Width100perc" formControlName="lastName_3"
                                     maxlength="25" (input)="allowOnlyChars($event,'lastName_3')" />
     
@@ -766,7 +792,7 @@
                         </div>
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>PAN Number <span class="RedTxt">*</span></label>
+                                <label>PAN Number</label>
                                 <input type="text" pInputText class="Width100perc" formControlName="pan_3"
                                     pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" />
                                 <div *ngIf="registrationForm.controls['pan_3'].touched && registrationForm.controls['pan_3'].hasError('required')"
@@ -782,7 +808,7 @@
     
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>Gender<span class="RedTxt">*</span></label>
+                                <label>Gender</label>
                                 <mat-radio-group class="Width100perc d-flex" aria-label="Select an option"
                                     formControlName="gender_3">
                                     <mat-radio-button value="F">Female</mat-radio-button>
@@ -799,7 +825,7 @@
     
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>DOB <span class="RedTxt">*</span></label>
+                                <label>DOB</label>
                                 <input type="text" pInputText class="Width100perc" formControlName="dob_3" type="date"
                                     [max]="today" />
                                 <div *ngIf="registrationForm.controls['dob_3'].touched && registrationForm.controls['dob_3'].hasError('required')"
@@ -815,7 +841,7 @@
     
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>Occupation <span class="RedTxt">*</span></label>
+                                <label>Occupation</label>
                                 <!-- <select id="occupation" formControlName="occupation" required>
                                     <option value="" disabled>Select Occupation</option>
                                     <option *ngFor="let occupation of occupationList" [value]="occupation.key">
@@ -840,7 +866,7 @@
     
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>Email Declaration <span class="RedTxt">*</span></label>
+                                <label>Email Declaration</label>
                                 <!-- <select id="occupation" formControlName="emailDeclaration" required>
                                     <option value="" disabled>Select Email Declaration</option>
                                     <option *ngFor="let occupation of emailDeclarationOptions" [value]="occupation.key">
@@ -865,7 +891,7 @@
     
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>Mobile Declaration <span class="RedTxt">*</span></label>
+                                <label>Mobile Declaration</label>
                                 <!-- <select id="occupation" formControlName="mobileDeclaration" required>
                                     <option value="" disabled>Select Mobile Declaration</option>
                                     <option *ngFor="let occupation of mobileDeclarationOptions" [value]="occupation.key">
@@ -890,7 +916,7 @@
     
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>Mobile Number <span class="RedTxt">*</span></label>
+                                <label>Mobile Number</label>
                                 <input type="text" pInputText class="Width100perc" formControlName="mobile_3" />
                                 <div *ngIf="registrationForm.controls['mobile_3'].touched && registrationForm.controls['mobile_3'].hasError('required')"
                                     class="error-message">
@@ -906,7 +932,7 @@
     
                         <div class="col-4">
                             <div class="InputControl">
-                                <label>Email Number <span class="RedTxt">*</span></label>
+                                <label>Email Number</label>
                                 <input type="text" pInputText class="Width100perc" formControlName="email_3" />
                                 <div *ngIf="registrationForm.controls['email_3'].touched && registrationForm.controls['email_3'].hasError('required')"
                                     class="error-message">
@@ -952,7 +978,7 @@
             </div>
         }
 
-        <div class="progress-container mt-3" *ngIf="isLoading" [@slideDown]>
+        <div class="progress-container mt-3" *ngIf="isLoading">
             <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
             <p class="progress-text">⏳ Saving registration details...</p>
         </div>

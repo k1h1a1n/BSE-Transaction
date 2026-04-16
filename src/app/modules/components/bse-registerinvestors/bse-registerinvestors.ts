@@ -23,6 +23,11 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SharedEnv } from '../../../shared/environments/environment';
 import { IndexedDBService } from '../../../shared';
 import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
+import {
+  TAX_STATUS_LIST, HOLDING_PATTERN_LIST, KYC_TYPE_OPTIONS, STATE_LIST, COUNTRY_LIST,
+  EMAIL_DECLARATION_OPTIONS, MOBILE_DECLARATION_OPTIONS, APPLICANT_COUNT_BY_HOLDING_PATTERN,
+  OCCUPATION_LIST, REGISTRATION_TYPE_OPTIONS
+} from './bse-registerinvestors.constants';
 
 
 
@@ -34,17 +39,7 @@ import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
     MatOptionModule, ProgressBarModule, AutoCompleteModule],
   templateUrl: './bse-registerinvestors.html',
   styleUrls: ['./bse-registerinvestors.scss'],
-  animations: [
-    trigger('slideDown', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-20px)' }),
-        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-      ]),
-      transition(':leave', [
-        animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
-      ])
-    ])
-  ]
+  animations: []
 })
 export class BseRegisterinvestors {
   isLoading: boolean = false;
@@ -54,387 +49,26 @@ export class BseRegisterinvestors {
   }
 
 
-  taxStatusList = [
-    { value: '01', label: 'Individual' },
-    // { value: '02', label: 'On behalf of minor' },
-    // { value: '03', label: 'HUF' },
-    // { value: '04', label: 'Company' },
-    // { value: '13', label: 'Sole Proprietorship' },
-    // { value: '21', label: 'NRE' },
-    // { value: '24', label: 'NRO' },
-    // { value: '26', label: 'NRI - MINOR' },
-    // { value: '27', label: 'NRI - HUF' }
-  ];
+  taxStatusList = TAX_STATUS_LIST;
 
-  //   taxStatusList = [
-  //   // { value: '0', label: 'Select' },
-  //   { value: 'Individual', label: 'Individual' },
-  //   { value: 'On behalf of minor', label: 'On behalf of minor' },
-  //   { value: 'HUF', label: 'HUF' },
-  //   { value: 'Company', label: 'Company' },
-  //   { value: 'Sole Proprietorship', label: 'Sole Proprietorship' },
-  //   { value: 'NRE', label: 'NRE' },
-  //   { value: 'NRO', label: 'NRO' },
-  //   { value: 'NRI - MINOR', label: 'NRI - MINOR' },
-  //   { value: 'NRI - HUF', label: 'NRI - HUF' }
-  // ];
+  holdingPatternList = HOLDING_PATTERN_LIST;
 
-  holdingPatternList = [
-    // { value: '0', label: 'Select' },
-    { value: 'SI', label: 'Single' },
-    { value: 'JO', label: 'Joint' },
-    { value: 'AS', label: 'Anyone or Survivor' }
-  ];
+  kycTypeOptions = KYC_TYPE_OPTIONS;
 
-  kycTypeOptions = [
-    { key: 'B', value: 'BIOMETRIC KYC' },
-    // { key: 'C', value: 'CKYC Compliant' },
-    { key: 'E', value: 'Aadhhaar EKYC PAN' },
-    { key: 'K', value: 'KRA Compliant' }
-  ];
+  stateList = STATE_LIST;
 
-  stateList = [
-    // { key: '0', value: 'Select' },
-    { key: 'AN', value: 'Andaman & Nicobar' },
-    { key: 'AR', value: 'ArunachalPradesh' },
-    { key: 'AP', value: 'Andhra Pradesh' },
-    { key: 'AS', value: 'Assam' },
-    { key: 'BH', value: 'Bihar' },
-    { key: 'CH', value: 'Chandigarh' },
-    { key: 'CG', value: 'Chhattisgarh' },
-    { key: 'DL', value: 'Delhi' },
-    { key: 'GO', value: 'GOA' },
-    { key: 'GU', value: 'Gujarat' },
-    { key: 'HA', value: 'Haryana' },
-    { key: 'HP', value: 'Himachal Pradesh' },
-    { key: 'JM', value: 'Jammu & Kashmir' },
-    { key: 'JK', value: 'Jharkhand' },
-    { key: 'KA', value: 'Karnataka' },
-    { key: 'KE', value: 'Kerala' },
-    { key: 'MP', value: 'Madhya Pradesh' },
-    { key: 'MA', value: 'Maharashtra' },
-    { key: 'MN', value: 'Manipur' },
-    { key: 'ME', value: 'Meghalaya' },
-    { key: 'MI', value: 'Mizoram' },
-    { key: 'NA', value: 'Nagaland' },
-    { key: 'ND', value: 'New Delhi' },
-    { key: 'OR', value: 'Odisha' },
-    { key: 'PO', value: 'Pondicherry' },
-    { key: 'PU', value: 'Punjab' },
-    { key: 'RA', value: 'Rajasthan' },
-    { key: 'SI', value: 'Sikkim' },
-    { key: 'TN', value: 'Tamil Nadu' },
-    { key: 'TR', value: 'Tripura' },
-    { key: 'UP', value: 'Uttar Pradesh' },
-    { key: 'UC', value: 'Uttaranchal' },
-    { key: 'WB', value: 'West Bengal' },
-    { key: 'DN', value: 'Dadra and Nagar Haveli' },
-    { key: 'DD', value: 'Daman and Diu' }
-  ];
+  countryList = COUNTRY_LIST;
 
-  countryList = [
-    // { key: '', value: '-- Select --' },
-    { key: 'Afghanistan', value: 'Afghanistan' },
-    { key: 'Aland Islands', value: 'Aland Islands' },
-    { key: 'Albania', value: 'Albania' },
-    { key: 'Algeria', value: 'Algeria' },
-    { key: 'American Samoa', value: 'American Samoa' },
-    { key: 'Andorra', value: 'Andorra' },
-    { key: 'Angola', value: 'Angola' },
-    { key: 'Anguilla', value: 'Anguilla' },
-    { key: 'Antarctica', value: 'Antarctica' },
-    { key: 'Antigua and Barbuda', value: 'Antigua and Barbuda' },
-    { key: 'Argentina', value: 'Argentina' },
-    { key: 'Armenia', value: 'Armenia' },
-    { key: 'Aruba', value: 'Aruba' },
-    { key: 'Australia', value: 'Australia' },
-    { key: 'Austria', value: 'Austria' },
-    { key: 'Azerbaijan', value: 'Azerbaijan' },
-    { key: 'Bahamas', value: 'Bahamas' },
-    { key: 'Bahrain', value: 'Bahrain' },
-    { key: 'Bangladesh', value: 'Bangladesh' },
-    { key: 'Barbados', value: 'Barbados' },
-    { key: 'Belarus', value: 'Belarus' },
-    { key: 'Belgium', value: 'Belgium' },
-    { key: 'Belize', value: 'Belize' },
-    { key: 'Benin', value: 'Benin' },
-    { key: 'Bermuda', value: 'Bermuda' },
-    { key: 'Bhutan', value: 'Bhutan' },
-    { key: 'Bolivia', value: 'Bolivia' },
-    { key: 'Bosnia and Herzegovina', value: 'Bosnia and Herzegovina' },
-    { key: 'Botswana', value: 'Botswana' },
-    { key: 'Bouvet Island', value: 'Bouvet Island' },
-    { key: 'Brazil', value: 'Brazil' },
-    { key: 'British Indian Ocean Territory', value: 'British Indian Ocean Territory' },
-    { key: 'Brunei Darussalam', value: 'Brunei Darussalam' },
-    { key: 'Bulgaria', value: 'Bulgaria' },
-    { key: 'Burkina Faso', value: 'Burkina Faso' },
-    { key: 'Burundi', value: 'Burundi' },
-    { key: 'Cambodia', value: 'Cambodia' },
-    { key: 'Cameroon', value: 'Cameroon' },
-    { key: 'Canada', value: 'Canada' },
-    { key: 'Cape Verde', value: 'Cape Verde' },
-    { key: 'Cayman Islands', value: 'Cayman Islands' },
-    { key: 'Central African Republic', value: 'Central African Republic' },
-    { key: 'Chad', value: 'Chad' },
-    { key: 'Chile', value: 'Chile' },
-    { key: 'China', value: 'China' },
-    { key: 'Christmas Island', value: 'Christmas Island' },
-    { key: 'Cocos (Keeling) Islands', value: 'Cocos (Keeling) Islands' },
-    { key: 'Colombia', value: 'Colombia' },
-    { key: 'Comoros', value: 'Comoros' },
-    { key: 'Congo', value: 'Congo' },
-    { key: 'Congo, The Democratic Republic of The', value: 'Congo, The Democratic Republic of The' },
-    { key: 'Cook Islands', value: 'Cook Islands' },
-    { key: 'Costa Rica', value: 'Costa Rica' },
-    { key: "Cote D'ivoire", value: "Cote D'ivoire" },
-    { key: 'Croatia', value: 'Croatia' },
-    { key: 'Cuba', value: 'Cuba' },
-    { key: 'Cyprus', value: 'Cyprus' },
-    { key: 'Czech Republic', value: 'Czech Republic' },
-    { key: 'Denmark', value: 'Denmark' },
-    { key: 'Djibouti', value: 'Djibouti' },
-    { key: 'Dominica', value: 'Dominica' },
-    { key: 'Dominican Republic', value: 'Dominican Republic' },
-    { key: 'Ecuador', value: 'Ecuador' },
-    { key: 'Egypt', value: 'Egypt' },
-    { key: 'El Salvador', value: 'El Salvador' },
-    { key: 'Equatorial Guinea', value: 'Equatorial Guinea' },
-    { key: 'Eritrea', value: 'Eritrea' },
-    { key: 'Estonia', value: 'Estonia' },
-    { key: 'Ethiopia', value: 'Ethiopia' },
-    { key: 'Falkland Islands (Malvinas)', value: 'Falkland Islands (Malvinas)' },
-    { key: 'Faroe Islands', value: 'Faroe Islands' },
-    { key: 'Fiji', value: 'Fiji' },
-    { key: 'Finland', value: 'Finland' },
-    { key: 'France', value: 'France' },
-    { key: 'French Guiana', value: 'French Guiana' },
-    { key: 'French Polynesia', value: 'French Polynesia' },
-    { key: 'French Southern Territories', value: 'French Southern Territories' },
-    { key: 'Gabon', value: 'Gabon' },
-    { key: 'Gambia', value: 'Gambia' },
-    { key: 'Georgia', value: 'Georgia' },
-    { key: 'Germany', value: 'Germany' },
-    { key: 'Ghana', value: 'Ghana' },
-    { key: 'Gibraltar', value: 'Gibraltar' },
-    { key: 'Greece', value: 'Greece' },
-    { key: 'Greenland', value: 'Greenland' },
-    { key: 'Grenada', value: 'Grenada' },
-    { key: 'Guadeloupe', value: 'Guadeloupe' },
-    { key: 'Guam', value: 'Guam' },
-    { key: 'Guatemala', value: 'Guatemala' },
-    { key: 'Guernsey', value: 'Guernsey' },
-    { key: 'Guinea', value: 'Guinea' },
-    { key: 'Guinea-bissau', value: 'Guinea-bissau' },
-    { key: 'Guyana', value: 'Guyana' },
-    { key: 'Haiti', value: 'Haiti' },
-    { key: 'Heard Island and Mcdonald Islands', value: 'Heard Island and Mcdonald Islands' },
-    { key: 'Holy See (Vatican City State)', value: 'Holy See (Vatican City State)' },
-    { key: 'Honduras', value: 'Honduras' },
-    { key: 'Hong Kong', value: 'Hong Kong' },
-    { key: 'Hungary', value: 'Hungary' },
-    { key: 'Iceland', value: 'Iceland' },
-    { key: 'India', value: 'India' },
-    { key: 'Indonesia', value: 'Indonesia' },
-    { key: 'Iran, Islamic Republic of', value: 'Iran, Islamic Republic of' },
-    { key: 'Iraq', value: 'Iraq' },
-    { key: 'Ireland', value: 'Ireland' },
-    { key: 'Isle of Man', value: 'Isle of Man' },
-    { key: 'Israel', value: 'Israel' },
-    { key: 'Italy', value: 'Italy' },
-    { key: 'Jamaica', value: 'Jamaica' },
-    { key: 'Japan', value: 'Japan' },
-    { key: 'Jersey', value: 'Jersey' },
-    { key: 'Jordan', value: 'Jordan' },
-    { key: 'Kazakhstan', value: 'Kazakhstan' },
-    { key: 'Kenya', value: 'Kenya' },
-    { key: 'Kiribati', value: 'Kiribati' },
-    { key: "Korea, Democratic People's Republic of", value: "Korea, Democratic People's Republic of" },
-    { key: 'Korea, Republic of', value: 'Korea, Republic of' },
-    { key: 'Kuwait', value: 'Kuwait' },
-    { key: 'Kyrgyzstan', value: 'Kyrgyzstan' },
-    { key: "Lao People's Democratic Republic", value: "Lao People's Democratic Republic" },
-    { key: 'Latvia', value: 'Latvia' },
-    { key: 'Lebanon', value: 'Lebanon' },
-    { key: 'Lesotho', value: 'Lesotho' },
-    { key: 'Liberia', value: 'Liberia' },
-    { key: 'Libyan Arab Jamahiriya', value: 'Libyan Arab Jamahiriya' },
-    { key: 'Liechtenstein', value: 'Liechtenstein' },
-    { key: 'Lithuania', value: 'Lithuania' },
-    { key: 'Luxembourg', value: 'Luxembourg' },
-    { key: 'Macao', value: 'Macao' },
-    { key: 'Macedonia, The Former Yugoslav Republic of', value: 'Macedonia, The Former Yugoslav Republic of' },
-    { key: 'Madagascar', value: 'Madagascar' },
-    { key: 'Malawi', value: 'Malawi' },
-    { key: 'Malaysia', value: 'Malaysia' },
-    { key: 'Maldives', value: 'Maldives' },
-    { key: 'Mali', value: 'Mali' },
-    { key: 'Malta', value: 'Malta' },
-    { key: 'Marshall Islands', value: 'Marshall Islands' },
-    { key: 'Martinique', value: 'Martinique' },
-    { key: 'Mauritania', value: 'Mauritania' },
-    { key: 'Mauritius', value: 'Mauritius' },
-    { key: 'Mayotte', value: 'Mayotte' },
-    { key: 'Mexico', value: 'Mexico' },
-    { key: 'Micronesia, Federated States of', value: 'Micronesia, Federated States of' },
-    { key: 'Moldova, Republic of', value: 'Moldova, Republic of' },
-    { key: 'Monaco', value: 'Monaco' },
-    { key: 'Mongolia', value: 'Mongolia' },
-    { key: 'Montenegro', value: 'Montenegro' },
-    { key: 'Montserrat', value: 'Montserrat' },
-    { key: 'Morocco', value: 'Morocco' },
-    { key: 'Mozambique', value: 'Mozambique' },
-    { key: 'Myanmar', value: 'Myanmar' },
-    { key: 'Namibia', value: 'Namibia' },
-    { key: 'Nauru', value: 'Nauru' },
-    { key: 'Nepal', value: 'Nepal' },
-    { key: 'Netherlands', value: 'Netherlands' },
-    { key: 'Netherlands Antilles', value: 'Netherlands Antilles' },
-    { key: 'New Caledonia', value: 'New Caledonia' },
-    { key: 'New Zealand', value: 'New Zealand' },
-    { key: 'Nicaragua', value: 'Nicaragua' },
-    { key: 'Niger', value: 'Niger' },
-    { key: 'Nigeria', value: 'Nigeria' },
-    { key: 'Niue', value: 'Niue' },
-    { key: 'Norfolk Island', value: 'Norfolk Island' },
-    { key: 'Northern Mariana Islands', value: 'Northern Mariana Islands' },
-    { key: 'Norway', value: 'Norway' },
-    { key: 'Oman', value: 'Oman' },
-    { key: 'Pakistan', value: 'Pakistan' },
-    { key: 'Palau', value: 'Palau' },
-    { key: 'Palestinian Territory, Occupied', value: 'Palestinian Territory, Occupied' },
-    { key: 'Panama', value: 'Panama' },
-    { key: 'Papua New Guinea', value: 'Papua New Guinea' },
-    { key: 'Paraguay', value: 'Paraguay' },
-    { key: 'Peru', value: 'Peru' },
-    { key: 'Philippines', value: 'Philippines' },
-    { key: 'Pitcairn', value: 'Pitcairn' },
-    { key: 'Poland', value: 'Poland' },
-    { key: 'Portugal', value: 'Portugal' },
-    { key: 'Puerto Rico', value: 'Puerto Rico' },
-    { key: 'Qatar', value: 'Qatar' },
-    { key: 'Reunion', value: 'Reunion' },
-    { key: 'Romania', value: 'Romania' },
-    { key: 'Russian Federation', value: 'Russian Federation' },
-    { key: 'Rwanda', value: 'Rwanda' },
-    { key: 'Saint Helena', value: 'Saint Helena' },
-    { key: 'Saint Kitts and Nevis', value: 'Saint Kitts and Nevis' },
-    { key: 'Saint Lucia', value: 'Saint Lucia' },
-    { key: 'Saint Pierre and Miquelon', value: 'Saint Pierre and Miquelon' },
-    { key: 'Saint Vincent and The Grenadines', value: 'Saint Vincent and The Grenadines' },
-    { key: 'Samoa', value: 'Samoa' },
-    { key: 'San Marino', value: 'San Marino' },
-    { key: 'Sao Tome and Principe', value: 'Sao Tome and Principe' },
-    { key: 'Saudi Arabia', value: 'Saudi Arabia' },
-    { key: 'Senegal', value: 'Senegal' },
-    { key: 'Serbia', value: 'Serbia' },
-    { key: 'Seychelles', value: 'Seychelles' },
-    { key: 'Sierra Leone', value: 'Sierra Leone' },
-    { key: 'Singapore', value: 'Singapore' },
-    { key: 'Slovakia', value: 'Slovakia' },
-    { key: 'Slovenia', value: 'Slovenia' },
-    { key: 'Solomon Islands', value: 'Solomon Islands' },
-    { key: 'Somalia', value: 'Somalia' },
-    { key: 'South Africa', value: 'South Africa' },
-    { key: 'South Georgia and The South Sandwich Islands', value: 'South Georgia and The South Sandwich Islands' },
-    { key: 'Spain', value: 'Spain' },
-    { key: 'Sri Lanka', value: 'Sri Lanka' },
-    { key: 'Sudan', value: 'Sudan' },
-    { key: 'Suriname', value: 'Suriname' },
-    { key: 'Svalbard and Jan Mayen', value: 'Svalbard and Jan Mayen' },
-    { key: 'Swaziland', value: 'Swaziland' },
-    { key: 'Sweden', value: 'Sweden' },
-    { key: 'Switzerland', value: 'Switzerland' },
-    { key: 'Syrian Arab Republic', value: 'Syrian Arab Republic' },
-    { key: 'Taiwan', value: 'Taiwan' },
-    { key: 'Tajikistan', value: 'Tajikistan' },
-    { key: 'Tanzania, United Republic of', value: 'Tanzania, United Republic of' },
-    { key: 'Thailand', value: 'Thailand' },
-    { key: 'Timor-leste', value: 'Timor-leste' },
-    { key: 'Togo', value: 'Togo' },
-    { key: 'Tokelau', value: 'Tokelau' },
-    { key: 'Tonga', value: 'Tonga' },
-    { key: 'Trinidad and Tobago', value: 'Trinidad and Tobago' },
-    { key: 'Tunisia', value: 'Tunisia' },
-    { key: 'Turkey', value: 'Turkey' },
-    { key: 'Turkmenistan', value: 'Turkmenistan' },
-    { key: 'Turks and Caicos Islands', value: 'Turks and Caicos Islands' },
-    { key: 'Tuvalu', value: 'Tuvalu' },
-    { key: 'Uganda', value: 'Uganda' },
-    { key: 'Ukraine', value: 'Ukraine' },
-    { key: 'United Arab Emirates', value: 'United Arab Emirates' },
-    { key: 'United Kingdom', value: 'United Kingdom' },
-    { key: 'United States', value: 'United States' },
-    { key: 'United States Minor Outlying Islands', value: 'United States Minor Outlying Islands' },
-    { key: 'Uruguay', value: 'Uruguay' },
-    { key: 'Uzbekistan', value: 'Uzbekistan' },
-    { key: 'Vanuatu', value: 'Vanuatu' },
-    { key: 'Venezuela', value: 'Venezuela' },
-    { key: 'Viet Nam', value: 'Viet Nam' },
-    { key: 'Virgin Islands, British', value: 'Virgin Islands, British' },
-    { key: 'Virgin Islands, U.S.', value: 'Virgin Islands, U.S.' },
-    { key: 'Wallis and Futuna', value: 'Wallis and Futuna' },
-    { key: 'Western Sahara', value: 'Western Sahara' },
-    { key: 'Yemen', value: 'Yemen' },
-    { key: 'Zambia', value: 'Zambia' },
-    { key: 'Zimbabwe', value: 'Zimbabwe' }
+  emailDeclarationOptions = EMAIL_DECLARATION_OPTIONS;
 
-  ];
-
-  emailDeclarationOptions = [
-    // { key: '0', value: 'Select Declaration' },
-    { key: 'SE', value: 'SE - Self' },
-    { key: 'SP', value: 'SP - Spouse' },
-    { key: 'DC', value: 'DC - Dependent Children' },
-    { key: 'DS', value: 'DS - Dependent Siblings' },
-    { key: 'DP', value: 'DP - Dependent Parents' },
-    { key: 'GD', value: 'GD - Guardian' },
-    { key: 'PM', value: 'PM - PMS' },
-    { key: 'CD', value: 'CD - Custodian' },
-    { key: 'PO', value: 'PO – POA' }
-  ];
-
-  mobileDeclarationOptions = [
-    // { key: '0', value: 'Select' },
-    { key: 'SE', value: 'SE - Self' },
-    { key: 'SP', value: 'SP - Spouse' },
-    { key: 'DC', value: 'DC - Dependent Children' },
-    { key: 'DS', value: 'DS - Dependent Siblings' },
-    { key: 'DP', value: 'DP - Dependent Parents' },
-    { key: 'GD', value: 'GD - Guardian' },
-    { key: 'PM', value: 'PM - PMS' },
-    { key: 'CD', value: 'CD - Custodian' },
-    { key: 'PO', value: 'PO – POA' }
-  ];
+  mobileDeclarationOptions = MOBILE_DECLARATION_OPTIONS;
 
   // Applicant count mapping for holding patterns
-  applicantCountByHoldingPattern: { [key: string]: number } = {
-    'SI': 1,  // Single - 1 applicant
-    'JO': 2,  // Joint - 2 applicants
-    'AS': 3   // Anyone or Survivor - 3 applicants
-  };
+  applicantCountByHoldingPattern = APPLICANT_COUNT_BY_HOLDING_PATTERN;
 
-  occupationList = [
-    // { key: '0', value: 'Select' },
-    { key: '04', value: 'Agriculture' },
-    { key: '01', value: 'Business' },
-    { key: '06', value: 'Housewife' },
-    { key: '03', value: 'Professional' },
-    { key: '05', value: 'Retired' },
-    { key: '02', value: 'Services' },
-    { key: '07', value: 'Student' },
-    { key: '41', value: 'Private Sector Service' },
-    { key: '42', value: 'Public Sector/Government Service' },
-    { key: '43', value: 'Forex Dealer' },
-    { key: '09', value: 'Not Specified' },
-    { key: '08', value: 'Others' }
-  ];
+  occupationList = OCCUPATION_LIST;
 
-  registrationTypeOptions = [
-    { label: 'New', value: 'New', disabled: false },
-    { label: 'Mod', value: 'Mod', disabled: false },
-    // { label: 'Nom', value: 'Nom', disabled: false },
-  ];
+  registrationTypeOptions = [...REGISTRATION_TYPE_OPTIONS];
 
 
   today!: string;
@@ -444,6 +78,8 @@ export class BseRegisterinvestors {
   selectedMemberId = '';
   selectedGrp: string = '';
   filteredMembers: any[] = [];
+  filteredMembers_2: any[] = [];
+  filteredMembers_3: any[] = [];
   registrationForm!: FormGroup;
   memberList: any[] = [];
   fullMemberData: any[] = [];
@@ -512,7 +148,8 @@ export class BseRegisterinvestors {
       kycType: ['K', Validators.required],
 
 
-      // 2nt Applicant Section
+      // 2nd Applicant Section
+      memberName_2: [''],
       firstName_2: ['',
         [Validators.required,
         Validators.pattern(/^[A-Za-z ]+$/), // ✅ only letters + spaces
@@ -548,6 +185,7 @@ export class BseRegisterinvestors {
       kycType_2: ['K', Validators.required],
 
       // 3rd Applicant Section
+      memberName_3: [''],
       firstName_3: ['',
 
         // [Validators.required,
@@ -625,37 +263,22 @@ export class BseRegisterinvestors {
 
     this.registrationForm.get('memberName')?.valueChanges.subscribe(() => {
       this.updateBSEClientCode();
+      this.updateFilteredMembers();
+    });
+
+    this.registrationForm.get('memberName_2')?.valueChanges.subscribe(() => {
+      this.updateFilteredMembers();
+    });
+
+    this.registrationForm.get('memberName_3')?.valueChanges.subscribe(() => {
+      this.updateFilteredMembers();
     });
 
   }
 
-
-  // tabRoutes: { [key: number]: string } = {
-  //   0: 'BseRegisterinvestors',
-  //   1: 'addressDetails',
-  //   2: 'kycDetails',
-  //   3: 'depoBankDetails',
-  //   4: 'nomineeDetails'
-  // };
-
-  // navigate(index: number) {
-  //   console.log('Selected Tab:', index);
-  //   const route = this.tabRoutes[index];
-
-  //   if (route) {
-  //     this.router.navigate([route]);
-  //   } else {
-  //     console.warn("No route found for index", index);
-  //   }
-  // }
-
-
-
   goToNextTab() {
     this.submitDataandContinue();
   }
-
-
 
   splitFullName(fullName: any) {
     const parts = fullName.trim().split(/\s+/); // split by spaces
@@ -679,7 +302,6 @@ export class BseRegisterinvestors {
 
     return { firstName, middleName, lastName };
   }
-
 
   updateFormControlsBasedOnEditMode() {
     const controls = ['taxStatus', 'holdingPattern', 'bseClientCode', 'dob', 'pan', 'nominationOpted', 'nominationAuthentication', 'kycType'];
@@ -709,7 +331,6 @@ export class BseRegisterinvestors {
       });
     }
   }
-
 
   isEditData() {
     console.log(this.isEdit, 'isEdit from store');
@@ -775,7 +396,6 @@ export class BseRegisterinvestors {
     });
   }
 
-
   updateBSEClientCode(): void {
     const bseControl = this.registrationForm.get('bseClientCode');
     let value = bseControl?.value || '';
@@ -831,11 +451,6 @@ export class BseRegisterinvestors {
     const defaults = this.buildFormDefaults(preserve);
     this.registrationForm.reset({}, { emitEvent: false });
     this.registrationForm.patchValue(defaults, { emitEvent: false });
-
-    // Re-disable nominationOpted after patching values
-    // this.registrationForm.get('nominationOpted')?.disable({ emitEvent: false });
-
-    // this.ensureDisabledControls();
     this.registrationForm.markAsPristine();
     this.registrationForm.markAsUntouched();
     this.updateRegistrationTypeOptions();
@@ -1039,6 +654,7 @@ export class BseRegisterinvestors {
         }
 
         this.filteredMembers = this.sortMembers(this.memberList);
+        this.updateFilteredMembers();
         console.log(this.memberList, '✅ Transformed member list');
       },
       error: (err) => {
@@ -1084,6 +700,105 @@ export class BseRegisterinvestors {
     return [...(list || [])].sort((a, b) =>
       (a?.LookUpDescription || '').localeCompare(b?.LookUpDescription || '', undefined, { sensitivity: 'base' })
     );
+  }
+
+  updateFilteredMembers() {
+    const selected1 = this.registrationForm.get('memberName')?.value;
+    const selected2 = this.registrationForm.get('memberName_2')?.value;
+    const selected3 = this.registrationForm.get('memberName_3')?.value;
+
+    // 2nd applicant: exclude member selected in 1st
+    this.filteredMembers_2 = this.memberList.filter(m => m.LookUpID !== selected1);
+
+    // 3rd applicant: exclude members selected in 1st and 2nd
+    this.filteredMembers_3 = this.memberList.filter(m => m.LookUpID !== selected1 && m.LookUpID !== selected2);
+
+    // If currently selected member_2 is now excluded, clear it
+    if (selected2 && !this.filteredMembers_2.find(m => m.LookUpID === selected2)) {
+      this.registrationForm.get('memberName_2')?.setValue('', { emitEvent: false });
+      this.clearApplicantFields(2);
+    }
+    // If currently selected member_3 is now excluded, clear it
+    if (selected3 && !this.filteredMembers_3.find(m => m.LookUpID === selected3)) {
+      this.registrationForm.get('memberName_3')?.setValue('', { emitEvent: false });
+      this.clearApplicantFields(3);
+    }
+  }
+
+  clearApplicantFields(index: number) {
+    const suffix = `_${index}`;
+    const fields = ['firstName', 'middleName', 'lastName', 'pan', 'gender', 'dob', 'occupation', 'mobile', 'mobileDeclaration', 'email', 'emailDeclaration'];
+    fields.forEach(f => {
+      this.registrationForm.get(`${f}${suffix}`)?.setValue('', { emitEvent: false });
+    });
+  }
+
+  selectMember_2(memberId: string) {
+    const selected = this.filteredMembers_2.find(m => m.LookUpID === memberId);
+    if (!selected) return;
+
+    const fullMember = this.fullMemberData.find(member => {
+      const id = (member.membID || member.membId || member.LookUpID || member.lookUpID || '').toString();
+      return id === memberId;
+    });
+
+    if (fullMember) {
+      const displayName = fullMember.fullName || fullMember.LookUpDescription || selected.LookUpDescription || '';
+      const nameParts = this.splitFullName(displayName);
+      const formattedDOB = this.formatDateForInput(fullMember.birtDate || fullMember.birthDate);
+      this.registrationForm.patchValue({
+        firstName_2: nameParts.firstName || fullMember.firsName || '',
+        middleName_2: nameParts.middleName || fullMember.middName || '',
+        lastName_2: nameParts.lastName || fullMember.lastName || '',
+        dob_2: formattedDOB || '',
+        pan_2: (fullMember.pan || fullMember.PAN || '').trim(),
+        email_2: (fullMember.emailID || fullMember.email || '').trim(),
+        mobile_2: (fullMember.mobileNo || fullMember.mobile || '').trim(),
+        gender_2: fullMember.clieGender || fullMember.gender || '',
+      }, { emitEvent: false });
+    } else {
+      const nameParts = this.splitFullName(selected.LookUpDescription);
+      this.registrationForm.patchValue({
+        firstName_2: nameParts.firstName,
+        middleName_2: nameParts.middleName,
+        lastName_2: nameParts.lastName,
+      }, { emitEvent: false });
+    }
+    this.updateFilteredMembers();
+  }
+
+  selectMember_3(memberId: string) {
+    const selected = this.filteredMembers_3.find(m => m.LookUpID === memberId);
+    if (!selected) return;
+
+    const fullMember = this.fullMemberData.find(member => {
+      const id = (member.membID || member.membId || member.LookUpID || member.lookUpID || '').toString();
+      return id === memberId;
+    });
+
+    if (fullMember) {
+      const displayName = fullMember.fullName || fullMember.LookUpDescription || selected.LookUpDescription || '';
+      const nameParts = this.splitFullName(displayName);
+      const formattedDOB = this.formatDateForInput(fullMember.birtDate || fullMember.birthDate);
+      this.registrationForm.patchValue({
+        firstName_3: nameParts.firstName || fullMember.firsName || '',
+        middleName_3: nameParts.middleName || fullMember.middName || '',
+        lastName_3: nameParts.lastName || fullMember.lastName || '',
+        dob_3: formattedDOB || '',
+        pan_3: (fullMember.pan || fullMember.PAN || '').trim(),
+        email_3: (fullMember.emailID || fullMember.email || '').trim(),
+        mobile_3: (fullMember.mobileNo || fullMember.mobile || '').trim(),
+        gender_3: fullMember.clieGender || fullMember.gender || '',
+      }, { emitEvent: false });
+    } else {
+      const nameParts = this.splitFullName(selected.LookUpDescription);
+      this.registrationForm.patchValue({
+        firstName_3: nameParts.firstName,
+        middleName_3: nameParts.middleName,
+        lastName_3: nameParts.lastName,
+      }, { emitEvent: false });
+    }
+    this.updateFilteredMembers();
   }
 
   restrictSpecialCharacters(event: KeyboardEvent): void {
@@ -1228,15 +943,6 @@ export class BseRegisterinvestors {
 
     console.log(this.registrationForm.value);
 
-    // // Mark all controls as touched + dirty
-    // Object.keys(this.registrationForm.controls).forEach(field => {
-    //   const control = this.registrationForm.get(field);
-    //   control?.markAsTouched();
-    //   control?.markAsDirty();
-    //   control?.updateValueAndValidity(); // 🔁 Trigger validation
-    // });
-
-
   }
 
   mapFormToUccMemberInfo(formValue: any): UccMemberInfo {
@@ -1293,7 +999,7 @@ export class BseRegisterinvestors {
   private buildApplicant(formValue: any, index: number): Applicant {
     const suffix = index === 1 ? '' : `_${index}`;
     return {
-      membID: 0,
+      membID: Number(formValue[`memberName${suffix}`]),
       firstName: formValue[`firstName${suffix}`],
       middleName: formValue[`middleName${suffix}`],
       lastName: formValue[`lastName${suffix}`],
@@ -1510,8 +1216,6 @@ export class BseRegisterinvestors {
 
   get getIfaEmailIdFromLocalStorage() {
     const ifaDetails = SharedEnv.IFAEmailId;
-    console.log(ifaDetails, 'ifa details');
-    console.log(SharedEnv.IFAEmailId, 'IFA Email ID from local storage');
     return ifaDetails;
   }
 
@@ -1686,6 +1390,8 @@ export class BseRegisterinvestors {
     this.registrationForm.get('holdingPattern')?.valueChanges.subscribe((_) => {
       const __ = _;
       if (_ == 'SI') {
+        this.registrationForm.get('memberName_2')?.disable();
+        this.registrationForm.get('memberName_3')?.disable();
         this.registrationForm.get('firstName_2')?.disable();
         this.registrationForm.get('middleName_2')?.disable();
         this.registrationForm.get('lastName_2')?.disable();
@@ -1699,6 +1405,8 @@ export class BseRegisterinvestors {
         this.registrationForm.get('emailDeclaration_2')?.disable();
         this.registrationForm.get('kycType_2')?.disable();
       }else if(_ == 'JO' || _ == 'AS'){
+        this.registrationForm.get('memberName_2')?.enable();
+        this.registrationForm.get('memberName_3')?.enable();
         this.registrationForm.get('firstName_2')?.enable();
         this.registrationForm.get('middleName_2')?.enable();
         this.registrationForm.get('lastName_2')?.enable();

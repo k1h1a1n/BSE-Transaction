@@ -9,7 +9,7 @@
 //     return this.configFileData.ConfigData || {};
 //   }
 
-  
+
 //   private static get appSettings() {
 //     return this.configData.personalizeSetting || {
 //       autoAdvisorAuth: "",
@@ -41,7 +41,7 @@
 //   static get ASSETS_CDN_URL() { return this.configData.assetsCdnUrl || ''; }
 //   static get TermsandConditions() { return this.configData.termsAndCondUrl || ''; }
 
-  
+
 
 //   static logEnv() {
 //     console.log('🌍 SharedEnv Snapshot:', {
@@ -62,9 +62,9 @@ const appSettings = ConfigData.personalizeSetting || {
   autoAdvisorAuth: "",
   skipPatternLock: false,
   skipLogout: false,
-  externalLogoutUrl : "",
-    IsCreateNewUser: false,
-  IsInvestNow:  false,
+  externalLogoutUrl: "",
+  IsCreateNewUser: false,
+  IsInvestNow: false,
   IsCreateNewUcc: false
 };
 
@@ -78,45 +78,45 @@ export const SharedEnv = {
   ecasurl: ConfigData.ecasurl,
   onboarding: ConfigData.onboarding,  // for internal use : https://entifaonbrd.wm-enterprise.com & for client JhaveriTrade : http://wmentcustonbuat.jhaveritrade.com
   ASSETS_CDN_URL: ConfigData.assetsCdnUrl || '',
-  TermsandConditions : ConfigData.termsAndCondUrl || '',
-  ssoUrl : ConfigData.ssoUrl || '',
-   uccUrl : ConfigData.uccUrl || '',
-   elogUccUrl : ConfigData.elogUccUrl || '',
-  isMobileOTP : ConfigData.isMobileOTP,
-  ShareApp : ConfigFileData?.['ShareApp'],
-  UPIHandles : ConfigFileData?.['UPIHandles'] || [],
-  WhatsAppMsg : ConfigFileData?.['WhatsAppMsg'] || [],
+  TermsandConditions: ConfigData.termsAndCondUrl || '',
+  ssoUrl: ConfigData.ssoUrl || '',
+  uccUrl: ConfigData.uccUrl || '',
+  elogUccUrl: ConfigData.elogUccUrl || '',
+  isMobileOTP: ConfigData.isMobileOTP,
+  ShareApp: ConfigFileData?.['ShareApp'],
+  UPIHandles: ConfigFileData?.['UPIHandles'] || [],
+  WhatsAppMsg: ConfigFileData?.['WhatsAppMsg'] || [],
 
-  PersonalizeSetting : appSettings.autoAdvisorAuth,
-  SkipLogout : appSettings.skipLogout,
-  externalLogoutUrl : appSettings.externalLogoutUrl,
-    IsCreateNewUser : appSettings.IsCreateNewUser,
-  IsInvestNow : appSettings.IsInvestNow,
-  IsCreateNewUcc : appSettings.IsCreateNewUcc,
+  PersonalizeSetting: appSettings.autoAdvisorAuth,
+  SkipLogout: appSettings.skipLogout,
+  externalLogoutUrl: appSettings.externalLogoutUrl,
+  IsCreateNewUser: appSettings.IsCreateNewUser,
+  IsInvestNow: appSettings.IsInvestNow,
+  IsCreateNewUcc: appSettings.IsCreateNewUcc,
   // IFADBNameDBKey : ConfigData.IFADBNameDBKey || '',
-  
+
   // GrouID:'58',//'7275',//'0',
-  GrouID:'7275',//'0',
+  GrouID: '7275',//'0',
   //  IFAID: "RJYvPoURzxtufN4kwyb9dg==",
- IFAID: '7BaxTwKLbS2mDfX6s3ls7g==',//'UaxOhI77stL7vN5hj3S4xg==',//'Ujdi5+kC5M7KmV6tgB2j3Q==',
+  IFAID: '7BaxTwKLbS2mDfX6s3ls7g==',//'UaxOhI77stL7vN5hj3S4xg==',//'Ujdi5+kC5M7KmV6tgB2j3Q==',
   //  IFAID:  'UaxOhI77stL7vN5hj3S4xg==', //SB IFAID
   // IFAID: '27bgc7eiR5RoCV5xXvTcTQ==', // SB Prod IFAID
   IsWMPRO: true,
-  GroupName:'',
+  GroupName: '',
   // IFAEmailId: 'tejas.gawde@datacomp.in',
   IFAEmailId: 'jyoti.pasi@datacomp.in',// jyoti pasi login ifadb 23
 
   // IFAEmailId: 'shashikant.kale@saraswatbank.com', // SB MailID
   // IFAEmailId: 'Admin', // SB Prod IFAEmialId
   ValidDocuTypes: ".xls,.xlsx,.doc,.docx,.pdf,.jpg,.png,.jpeg,.txt",
-  timeOutErrorMsg:"",
-  noInternetConnMsg:"",
-  OrderCount:0,
-  serverno:'0',
+  timeOutErrorMsg: "",
+  noInternetConnMsg: "",
+  OrderCount: 0,
+  serverno: '0',
   //  IFAKey: "ocevM71Mb+iJMng/1p8iEwH8HKmPczdGiVjcaCxTpGc=",
   //  IFAKey: "MAvh9CEWMwNZ5JEbThW5Isl1/Gq8RbHygOUFgg9dnyk=",
-   IFAKey: "ocevM71Mb+iJMng/1p8iEwH8HKmPczdGiVjcaCxTpGc=", // jyoti pasi login ifadb 23
-userID:'1',
+  IFAKey: "ocevM71Mb+iJMng/1p8iEwH8HKmPczdGiVjcaCxTpGc=", // jyoti pasi login ifadb 23
+  userID: '1',
 
 
   // by pooja asOn 10/01/2025
@@ -130,4 +130,3 @@ userID:'1',
     worksheetName: 'Indices',
   }
 };
-console.log(SharedEnv,'sharedEnv');
