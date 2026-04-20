@@ -448,7 +448,6 @@ export class BseRegisterinvestors {
       this.fullMemberData = [];
       this.selectedMemberId = '';
       localStorage.removeItem('selectedGroupID');
-      localStorage.removeItem('selectedMemberData');
       localStorage.removeItem('GetGroupMembersUCC_TTL');
     }
 
@@ -883,7 +882,6 @@ export class BseRegisterinvestors {
 
     if (selectedMember) {
       // Save to NgRx store instead of localStorage
-      this.uccTabsFacade.setSelectedMemberData(selectedMember);
       console.log('selectedMember', selectedMember.LookUpDescription || selectedMember.fullName);
       console.log('selected member', selectedMember.fullName);
       this.prefillForm(selectedMember);
@@ -1010,19 +1008,13 @@ export class BseRegisterinvestors {
     // console.log(input, 'input of registration');
     // return;
 
-    // ✅ Save registration form data to NgRx store
+    // ✅ Build UccRegisterMember and save to NgRx store
     const rawFormValue = this.registrationForm.getRawValue();
-    const selectedLookUpID = this.registrationForm?.controls['memberName']?.value;
-    const selectedMemberId = (selectedLookUpID || '').toString();
-    const selectedMember = this.memberList.find(member => member.LookUpID === selectedMemberId);
+    const input: UccRegisterMember = this.buildInput(rawFormValue);
+    console.log('✅ UccRegisterMember input:', JSON.stringify(input, null, 2));
 
-    rawFormValue.memberDetails = {
-      id: selectedMember?.LookUpID,
-      name: selectedMember?.LookUpDescription
-    };
-
-    this.uccTabsFacade.setRegistrationData(rawFormValue);
-    console.log(rawFormValue, '✅ Registration data saved to NgRx store');
+    this.uccTabsFacade.setRegistrationData(input);
+    console.log(input, '✅ UccRegisterMember saved to NgRx store');
 
     this.nextTab.emit({
       index: 1,
@@ -1330,7 +1322,6 @@ export class BseRegisterinvestors {
     this.fullMemberData = [];
     this.selectedMemberId = '';
     localStorage.removeItem('selectedGroupID');
-    localStorage.removeItem('selectedMemberData');
     localStorage.removeItem('GetGroupMembersUCC_TTL');
   }
 
@@ -1341,7 +1332,6 @@ export class BseRegisterinvestors {
     });
     this.selectedMemberId = '';
     this.filteredMembers = [...this.memberList];
-    localStorage.removeItem('selectedMemberData');
   }
 
   groupidbyMembId() {

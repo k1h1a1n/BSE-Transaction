@@ -36,10 +36,10 @@ export class AddressDetails  {
   addressForm!: FormGroup;
   isEdit: boolean = false;
   clientCode: any;
-  isUpdate: boolean = false;
   clieCodeFromUpdate: any;
   editedResp: any = [];
   memberList: any[] = [];
+  editClientCode: string = '';
 
   private uccTabsFacade = inject(UCCTabsFacade);
 
@@ -53,22 +53,6 @@ export class AddressDetails  {
   ngOnInit() {
 
     this.addressForm = this.fb.group({
-      firstName: ['',
-        [Validators.required,
-        Validators.pattern(/^[A-Za-z ]+$/),
-        Validators.minLength(2),
-        Validators.maxLength(25)]],
-      middleName: ['',
-        [
-          Validators.pattern(/^[A-Za-z ]+$/),
-          Validators.minLength(1),
-          Validators.maxLength(25)]],
-      lastName: ['',
-        [Validators.required,
-        Validators.pattern(/^[A-Za-z ]+$/),
-        Validators.minLength(2),
-        Validators.maxLength(25)]],
-      gender: ['', Validators.required],
       state: ['MA', Validators.required],
       city: ['', [Validators.required,
       Validators.pattern(/^[a-zA-Z .'-]+$/),
@@ -91,9 +75,6 @@ export class AddressDetails  {
         Validators.maxLength(50)]],
     });
 
-    // ✅ Pre-seed required name/gender fields from NgRx store registration data
-    this.seedMandatoryFields();
-
     // ✅ Subscribe to NgRx store for edit mode
     this.uccTabsFacade.isEditMode$.subscribe((isEditMode) => {
       this.isEdit = isEditMode;
@@ -101,6 +82,14 @@ export class AddressDetails  {
 
       if (this.isEdit) {
         this.onEditMode();
+      }
+    });
+
+    // ✅ Get client code from NgRx store (editData in edit mode)
+    this.uccTabsFacade.editData$.subscribe((editData) => {
+      if (editData?.cliecode) {
+        this.editClientCode = editData.cliecode;
+        console.log('[AddressDetails] editClientCode from store:', this.editClientCode);
       }
     });
   }
@@ -162,23 +151,6 @@ export class AddressDetails  {
     console.log(this.addressForm.value, 'address form value of selected member');
   }
 
-  private seedMandatoryFields() {
-    // ✅ Read from NgRx store instead of localStorage
-    this.uccTabsFacade.registrationData$.subscribe((regData) => {
-      if (regData) {
-        this.addressForm.patchValue({
-          firstName: regData.firstName || '',
-          middleName: regData.middleName || '',
-          lastName: regData.lastName || '',
-          gender: regData.gender || ''
-        });
-        console.log('Address mandatory fields prefilled from NgRx store registration data');
-      } else {
-        console.warn('No registration data in store to prefill address form');
-      }
-    });
-  }
-
   get MemberDetailID(): string | null {
     // ✅ Read from NgRx store - use sync approach with a local variable
     let memberId: string | null = null;
@@ -189,56 +161,17 @@ export class AddressDetails  {
   }
 
   get BseClientCode(): any {
-    // ✅ Read from NgRx store
+    // ✅ Read from NgRx store (UccRegisterMember has clieCode)
     let bseCode: any = null;
     this.uccTabsFacade.registrationData$.subscribe((regData) => {
-      bseCode = regData?.bseClientCode || null;
+      bseCode = regData?.clieCode || null;
     }).unsubscribe();
     return bseCode;
   }
 
-  getmandatoryDetOfRegistration() {
-    // ✅ Read from NgRx store synchronously
-    let result: any = null;
-    this.uccTabsFacade.registrationData$.subscribe((parsed) => {
-      if (!parsed) {
-        result = null;
-        return;
-      }
-
-      let firstName = (parsed.firstName || '').toString().trim();
-      let middleName = (parsed.middleName || '').toString().trim();
-      let lastName = (parsed.lastName || '').toString().trim();
-      const gender = (parsed.gender || '').toString().trim();
-
-      if ((!firstName && !middleName && !lastName) && parsed.memberDetails?.name) {
-        const parts = parsed.memberDetails.name.trim().split(/\s+/);
-        if (parts.length === 1) {
-          firstName = parts[0];
-        } else if (parts.length === 2) {
-          firstName = parts[0];
-          lastName = parts[1];
-        } else if (parts.length > 2) {
-          firstName = parts[0];
-          lastName = parts[parts.length - 1];
-          middleName = parts.slice(1, -1).join(' ');
-        }
-      }
-
-      result = {
-        firstName: firstName || null,
-        middleName: middleName || null,
-        lastName: lastName || null,
-        gender: gender || null,
-        raw: parsed
-      };
-    }).unsubscribe();
-    return result;
-  }
-
   mapFormToUccAddressDetails(formValue: any): UccAddressDetails {
     return {
-      clieCode: this.BseClientCode,
+      clieCode: this.isEdit ? this.editClientCode : this.BseClientCode,
       AddressLine1: formValue.addLine1,
       AddressLine2: formValue.addLine2,
       AddressLine3: formValue.addLine3,
@@ -250,11 +183,19 @@ export class AddressDetails  {
   }
 
   submitData() {
-    // ✅ Log the input instead of calling API
+    if (this.addressForm.invalid) {
+      this.addressForm.markAllAsTouched();
+      const invalidControls = Object.keys(this.addressForm.controls)
+        .filter(key => this.addressForm.get(key)?.invalid);
+      console.warn('Address form invalid. Invalid controls:', invalidControls);
+      return;
+    }
+
     const rawFormValue = this.addressForm.getRawValue();
     const input: UccAddressDetails = this.mapFormToUccAddressDetails(rawFormValue);
-    console.log(input, '✅ Address input (API call commented out)');
-    return
+    console.log('✅ Address Save Input JSON:', JSON.stringify(input, null, 2));
+
+    // TODO: Uncomment API call when validations are confirmed
     this.nextTab.emit({
       index: 2,
       state: {}
@@ -301,13 +242,19 @@ export class AddressDetails  {
   }
 
   updateDataAndContinue() {
-    console.log("update called");
+    if (this.addressForm.invalid) {
+      this.addressForm.markAllAsTouched();
+      const invalidControls = Object.keys(this.addressForm.controls)
+        .filter(key => this.addressForm.get(key)?.invalid);
+      console.warn('Address form invalid. Invalid controls:', invalidControls);
+      return;
+    }
 
-    // ✅ Log the input instead of calling API
     const rawFormValue = this.addressForm.getRawValue();
     const input: UccAddressDetails = this.mapFormToUccAddressDetails(rawFormValue);
-    console.log(input, '✅ Address update input (API call commented out)');
-    return
+    console.log('✅ Address Update Input JSON:', JSON.stringify(input, null, 2));
+
+    // TODO: Uncomment API call when validations are confirmed
     this.nextTab.emit({
       index: 2,
       state: {}

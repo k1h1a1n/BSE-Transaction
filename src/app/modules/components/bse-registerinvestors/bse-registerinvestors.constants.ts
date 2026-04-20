@@ -18,7 +18,7 @@ export const HOLDING_PATTERN_LIST = [
 
 export const KYC_TYPE_OPTIONS = [
   { key: 'B', value: 'BIOMETRIC KYC' },
-  // { key: 'C', value: 'CKYC Compliant' },
+  { key: 'C', value: 'CKYC Compliant' },
   { key: 'E', value: 'Aadhhaar EKYC PAN' },
   { key: 'K', value: 'KRA Compliant' }
 ];

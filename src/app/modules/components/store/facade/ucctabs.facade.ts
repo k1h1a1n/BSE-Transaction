@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
-import { selectCurrentTab, selectEditData, selectIsEditMode, selectRegistrationData, selectSelectedMemberData, selectVisitedTabs } from "../selectors/ucctabs.selector";
+import { selectCurrentTab, selectEditData, selectIsEditMode, selectRegistrationData, selectVisitedTabs } from "../selectors/ucctabs.selector";
 import { Store } from "@ngrx/store";
-import { goToTab, nextTab, previousTab, resetEditMode, setEditMode, setRegistrationData, setSelectedMemberData } from "../actions/ucctabs.action";
+import { goToTab, nextTab, previousTab, resetEditMode, setEditMode, setRegistrationData } from "../actions/ucctabs.action";
 
 @Injectable({ providedIn: 'root' })
 export class UCCTabsFacade {
@@ -11,7 +11,6 @@ export class UCCTabsFacade {
   isEditMode$ = this.store.select(selectIsEditMode);
   editData$ = this.store.select(selectEditData);
   registrationData$ = this.store.select(selectRegistrationData);
-  selectedMemberData$ = this.store.select(selectSelectedMemberData);
 
   next() {
     this.store.dispatch(nextTab());
@@ -39,10 +38,5 @@ export class UCCTabsFacade {
   setRegistrationData(data: any) {
     console.log('Dispatching setRegistrationData action:', data);
     this.store.dispatch(setRegistrationData({ registrationData: data }));
-  }
-
-  setSelectedMemberData(data: any) {
-    console.log('Dispatching setSelectedMemberData action:', data);
-    this.store.dispatch(setSelectedMemberData({ selectedMemberData: data }));
   }
 }

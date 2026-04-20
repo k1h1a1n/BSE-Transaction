@@ -23,7 +23,3 @@ export const selectRegistrationData = createSelector(
     selectUcctabsState,
     (state: UCCTabsState) => state.registrationData
 );
-export const selectSelectedMemberData = createSelector(
-    selectUcctabsState,
-    (state: UCCTabsState) => state.selectedMemberData
-);

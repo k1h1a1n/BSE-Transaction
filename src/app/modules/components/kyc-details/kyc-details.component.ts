@@ -1,6 +1,5 @@
-import { Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
@@ -8,12 +7,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
-import { NomineeDetail } from '../nominee-detail/nominee-detail';
-import { DepoBankDetail } from '../depo-bank-detail/depo-bank-detail';
-import { MenuItem } from 'primeng/api';
-import { UccTabs } from '../ucc-tabs/ucc-tabs';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { MatOptionModule } from '@angular/material/core';
@@ -21,18 +14,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { Shared } from '../../../shared/services/shared';
 import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
-import { BseUccEditDetails, KYCRequest } from '../../models/bseUCCModel';
+import { KYCRequest } from '../../models/bseUCCModel';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
 
-export interface TabNavigationEvent {
-  index: number;
-  state?: {
-    isUpdateBank: boolean;
-    MembID: any;
-    clieCode: any;
-    h_p: string
-  };
-}
 @Component({
   selector: 'app-kyc-details',
   imports: [BreadcrumbModule, FormsModule, ButtonModule, ReactiveFormsModule, CommonModule,
@@ -41,12 +26,11 @@ export interface TabNavigationEvent {
   templateUrl: './kyc-details.component.html',
   styleUrls: ['./kyc-details.component.scss']
 })
-export class KycDetailsComponent {
-  // selectedTabIndex = 1;
+export class KycDetailsComponent implements OnInit {
   isLoading: boolean = false;
 
   kycForm!: FormGroup;
-  Validators = Validators; // Expose Validators to template
+  Validators = Validators;
   kycTypeOptions = [
     { key: 'B', value: 'BIOMETRIC KYC' },
     { key: 'C', value: 'CKYC Compliant' },
@@ -54,291 +38,211 @@ export class KycDetailsComponent {
     { key: 'K', value: 'KRA Compliant' }
   ];
 
-  breadcrumb_items: MenuItem[] = [];
-  home: MenuItem = {};
   @Output() nextTab = new EventEmitter<any>();
+  isEdit: boolean = false;
   isUpdate: boolean = false;
-  memberIdFromUpdate: any;
-  clieCodeFromUpdate: any;
-  editedResp: any;
+  editClientCode: string = '';
+  holdingPattern: string = '';
+  taxStatus: string = '';
+  applicantCount: number = 1;
 
-  constructor(private fb: FormBuilder, private bseUccReg: BseUCCRegister, private sharedService: Shared, private router: Router, private location: Location) { }
+  private uccTabsFacade = inject(UCCTabsFacade);
 
+  constructor(
+    private fb: FormBuilder,
+    private bseUccReg: BseUCCRegister,
+    private sharedService: Shared,
+    private router: Router,
+    private location: Location
+  ) {}
 
   ngOnInit() {
-
     this.kycForm = this.fb.group({
-      // kyc tab details
       kycType1Holder: ['', Validators.required],
       kycType2Holder: [''],
       kycType3Holder: [''],
       kycTypeGuardian: [''],
-      ckycNo1Holder: [''],
-      ckycNo2Holder: [''],
-      ckycNo3Holder: [''],
-      ckycNoGuardian: [''],
+      ckycNo1Holder: [{ value: '', disabled: true }],
+      ckycNo2Holder: [{ value: '', disabled: true }],
+      ckycNo3Holder: [{ value: '', disabled: true }],
+      ckycNoGuardian: [{ value: '', disabled: true }],
     });
 
-    // Add listeners to make CKYC fields required when KYC Type is selected (setup first)
-    this.setupCKYCValidation();
+    // Setup CKYC conditional validation for all 4 pairs
+    this.setupCKYCToggle('kycType1Holder', 'ckycNo1Holder');
+    this.setupCKYCToggle('kycType2Holder', 'ckycNo2Holder');
+    this.setupCKYCToggle('kycType3Holder', 'ckycNo3Holder');
+    this.setupCKYCToggle('kycTypeGuardian', 'ckycNoGuardian');
 
-    // Load holding pattern from localStorage and disable fields accordingly (run after setting up listeners)
-    this.loadHoldingPatternAndSetFieldStates();
-  }
-
-
-  getEditApiData(bseCode: any) {
-    const input: BseUccEditDetails = {
-      clieCode: bseCode
-    };
-    return this.bseUccReg.editUccDetails(input).subscribe({
-      next: (res) => {
-        console.log(res, 'res Edit api');
-        this.editedResp = res[0];
-        console.log(this.editedResp, 'edited resp');
-        this.onUpdate();
-      },
-
-      error: (err) => {
-        console.error('Error fetching edit data', err);
-
-      }
-    })
-  }
-
-  onUpdate() {
-    if (this.isUpdate) {
-      const navState = history.state;
-      console.log(navState, 'nav state');
-      console.log(this.editedResp);
-      localStorage.setItem('editedBseClientCode', this.editedResp.cliecode);
-
-      this.kycForm.patchValue({
-        kycType1Holder: this.editedResp.kycType1Holder || '',
-        kycType2Holder: this.editedResp.kycType2Holder || '',
-        kycType3Holder: this.editedResp.kycType3Holder || '',
-        kycTypeGuardian: this.editedResp.kycTypeGuardian || '',
-        ckycNo1Holder: this.editedResp.ckycNo1Holder || '',
-        ckycNo2Holder: this.editedResp.ckycNo2Holder || '',
-        ckycNo3Holder: this.editedResp.ckycNo3Holder || '',
-        ckycNoGuardian: this.editedResp.ckycNoGuardian || ''
-      });
-
-
-      this.loadHoldingPatternAndSetFieldStates();
-    }
-  }
-  // This method can be called from parent to refresh field states
-  public refreshFieldStates() {
-    this.loadHoldingPatternAndSetFieldStates();
-
-  }
-
-  setupCKYCValidation() {
-    this.kycForm.get('ckycNo1Holder')?.disable();
-    // 1st Holder CKYC validation based on KYC Type selection
-    this.kycForm.get('kycType1Holder')?.valueChanges.subscribe(value => {
-      this.syncPrimaryCkycField(value);
-    });
-    this.syncPrimaryCkycField(this.kycForm.get('kycType1Holder')?.value);
-
-    // 2nd Holder CKYC validation based on KYC Type selection
-    this.kycForm.get('kycType2Holder')?.valueChanges.subscribe(value => {
-      const kycTypeField = this.kycForm.get('kycType2Holder');
-      const ckycField = this.kycForm.get('ckycNo2Holder');
-      // Only enable if the KYC type field itself is enabled (respects holding pattern)
-      if (value && kycTypeField?.enabled) {
-        ckycField?.setValidators([Validators.required]);
-        ckycField?.enable();
-      } else if (!kycTypeField?.enabled) {
-        // If KYC type is disabled (due to holding pattern), keep CKYC disabled
-        ckycField?.clearValidators();
-        ckycField?.disable();
-      } else {
-        ckycField?.clearValidators();
-      }
-      ckycField?.updateValueAndValidity();
+    // ✅ Subscribe to NgRx store for edit mode & client code
+    this.uccTabsFacade.isEditMode$.subscribe((isEditMode) => {
+      this.isEdit = isEditMode;
+      this.isUpdate = isEditMode;
+      console.log('[KycDetails] isEdit from store:', this.isEdit);
     });
 
-    // 3rd Holder CKYC validation based on KYC Type selection
-    this.kycForm.get('kycType3Holder')?.valueChanges.subscribe(value => {
-      const kycTypeField = this.kycForm.get('kycType3Holder');
-      const ckycField = this.kycForm.get('ckycNo3Holder');
-      // Only enable if the KYC type field itself is enabled (respects holding pattern)
-      if (value && kycTypeField?.enabled) {
-        ckycField?.setValidators([Validators.required]);
-        ckycField?.enable();
-      } else if (!kycTypeField?.enabled) {
-        // If KYC type is disabled (due to holding pattern), keep CKYC disabled
-        ckycField?.clearValidators();
-        ckycField?.disable();
-        // Guardian CKYC validation based on KYC Type selection
-        this.kycForm.get('kycTypeGuardian')?.valueChanges.subscribe(value => {
-          const kycTypeField = this.kycForm.get('kycTypeGuardian');
-          const ckycField = this.kycForm.get('ckycNoGuardian');
-          // Only enable if the KYC type field itself is enabled (respects holding pattern)
-          if (value && kycTypeField?.enabled) {
-            ckycField?.setValidators([Validators.required]);
-            ckycField?.enable();
-          } else if (!kycTypeField?.enabled) {
-            // If KYC type is disabled (due to holding pattern), keep CKYC disabled
-            ckycField?.clearValidators();
-            ckycField?.disable();
-          } else {
-            ckycField?.clearValidators();
-          }
-          ckycField?.updateValueAndValidity();
-        }); ckycField?.setValidators([Validators.required]);
-        ckycField?.enable();
-      } else {
-        ckycField?.clearValidators();
-      }
-      ckycField?.updateValueAndValidity();
-    });
-  }
+    this.uccTabsFacade.editData$.subscribe((editData) => {
+      if (editData) {
+        this.editClientCode = editData.cliecode || '';
+        console.log('[KycDetails] editClientCode from store:', this.editClientCode);
 
-  loadHoldingPatternAndSetFieldStates() {
-    const storedData = localStorage.getItem('uccRegistrationData');
-    if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-        const holdingPattern = parsedData?.holdingPatternDetails?.value || parsedData?.holdingPattern;
+        // In edit mode, get holding pattern & tax status from edit data and patch form
+        if (this.isEdit) {
+          if (editData.HoldID) this.holdingPattern = editData.HoldID;
+          if (editData.TaxStatus) this.taxStatus = editData.TaxStatus;
+          this.applyFieldStates();
 
-        console.log('Holding Pattern:', holdingPattern);
-
-        // If holding pattern is 'SI' (Single), disable 2nd, 3rd holder and guardian fields
-        if (holdingPattern === 'SI') {
-          this.kycForm.get('kycType2Holder')?.disable();
-          this.kycForm.get('kycType2Holder')?.clearValidators();
-          this.kycForm.get('kycType2Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('kycType3Holder')?.disable();
-          this.kycForm.get('kycType3Holder')?.clearValidators();
-          this.kycForm.get('kycType3Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('kycTypeGuardian')?.disable();
-          this.kycForm.get('kycTypeGuardian')?.clearValidators();
-          this.kycForm.get('kycTypeGuardian')?.updateValueAndValidity();
-
-          this.kycForm.get('ckycNo2Holder')?.disable();
-          this.kycForm.get('ckycNo2Holder')?.clearValidators();
-          this.kycForm.get('ckycNo2Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('ckycNo3Holder')?.disable();
-          this.kycForm.get('ckycNo3Holder')?.clearValidators();
-          this.kycForm.get('ckycNo3Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('ckycNoGuardian')?.disable();
-          this.kycForm.get('ckycNoGuardian')?.clearValidators();
-          this.kycForm.get('ckycNoGuardian')?.updateValueAndValidity();
-
-          console.log('Holding pattern is Single - disabled 2nd, 3rd holder and guardian fields');
-        } else {
-          // For other holding patterns (Joint, etc.), enable all fields and make them required
-          this.kycForm.get('kycType2Holder')?.enable();
-          this.kycForm.get('kycType2Holder')?.setValidators([Validators.required]);
-          this.kycForm.get('kycType2Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('kycType3Holder')?.enable();
-          this.kycForm.get('kycType3Holder')?.setValidators([Validators.required]);
-          this.kycForm.get('kycType3Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('kycTypeGuardian')?.enable();
-          this.kycForm.get('kycTypeGuardian')?.setValidators([Validators.required]);
-          this.kycForm.get('kycTypeGuardian')?.updateValueAndValidity();
-
-          this.kycForm.get('ckycNo2Holder')?.enable();
-          this.kycForm.get('ckycNo2Holder')?.setValidators([Validators.required]);
-          this.kycForm.get('ckycNo2Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('ckycNo3Holder')?.enable();
-          this.kycForm.get('ckycNo3Holder')?.setValidators([Validators.required]);
-          this.kycForm.get('ckycNo3Holder')?.updateValueAndValidity();
-
-          this.kycForm.get('ckycNoGuardian')?.enable();
-          this.kycForm.get('ckycNoGuardian')?.setValidators([Validators.required]);
-          this.kycForm.get('ckycNoGuardian')?.updateValueAndValidity();
-
-          console.log('Holding pattern is not Single - enabled all fields with required validation');
+          // Patch form with edit data
+          this.kycForm.patchValue({
+            kycType1Holder: editData.PH_KYCType || editData.kycType1Holder || '',
+            kycType2Holder: editData.SH_KYCType || editData.kycType2Holder || '',
+            kycType3Holder: editData.TH_KYCType || editData.kycType3Holder || '',
+            kycTypeGuardian: editData.GD_KYCType || editData.kycTypeGuardian || '',
+            ckycNo1Holder: editData.PH_CKYCNo || editData.ckycNo1Holder || '',
+            ckycNo2Holder: editData.SH_CKYCNo || editData.ckycNo2Holder || '',
+            ckycNo3Holder: editData.TH_CKYCNo || editData.ckycNo3Holder || '',
+            ckycNoGuardian: editData.GD_CKYCNo || editData.ckycNoGuardian || '',
+          });
         }
-      } catch (e) {
-        console.error('Error parsing localStorage data:', e);
       }
-    }
+    });
+
+    // ✅ Get data from NgRx store registrationData (UccRegisterMember) for create mode
+    this.uccTabsFacade.registrationData$.subscribe((regData) => {
+      if (regData && !this.isEdit) {
+        // regData is now UccRegisterMember with clieCode, holdingPattern, taxStatus, Applicants[]
+        this.editClientCode = regData.clieCode || '';
+        this.holdingPattern = regData.holdingPattern || '';
+        this.taxStatus = regData.taxStatus || '';
+        this.applicantCount = regData.Applicants?.length || 1;
+        console.log('[KycDetails] From store → clieCode:', this.editClientCode,
+          'holdingPattern:', this.holdingPattern, 'taxStatus:', this.taxStatus,
+          'applicantCount:', this.applicantCount);
+        this.applyFieldStates();
+      }
+    });
   }
 
-  private syncPrimaryCkycField(value: string | null | undefined) {
-    const ckycField = this.kycForm.get('ckycNo1Holder');
-    if (!ckycField) {
+  /**
+   * Setup CKYC No field toggle:
+   * - Enabled + required ONLY when dropdown value is 'C' (CKYC Compliant)
+   * - Disabled + cleared otherwise
+   */
+  private setupCKYCToggle(kycTypeControl: string, ckycNoControl: string) {
+    this.kycForm.get(kycTypeControl)?.valueChanges.subscribe((value) => {
+      const ckycField = this.kycForm.get(ckycNoControl);
+      const kycTypeField = this.kycForm.get(kycTypeControl);
+      if (!ckycField || !kycTypeField) return;
+
+      // Only toggle if the parent kycType field is enabled
+      if (kycTypeField.disabled) {
+        ckycField.clearValidators();
+        ckycField.setValue('', { emitEvent: false });
+        ckycField.disable({ emitEvent: false });
+        ckycField.updateValueAndValidity({ emitEvent: false });
+        return;
+      }
+
+      if (value === 'C') {
+        ckycField.setValidators([Validators.required]);
+        ckycField.enable({ emitEvent: false });
+      } else {
+        ckycField.clearValidators();
+        ckycField.setValue('', { emitEvent: false });
+        ckycField.disable({ emitEvent: false });
+      }
+      ckycField.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  /**
+   * Apply field enable/disable based on holding pattern and tax status.
+   *
+   * Holding pattern:
+   *   SI (Single)             → 1 applicant  → only 1st holder
+   *   JO (Joint)              → 2 applicants → 1st + 2nd holder
+   *   AS (Anyone or Survivor) → 3 applicants → 1st + 2nd + 3rd holder
+   *
+   * Tax status:
+   *   02 (Minor) → enable guardian fields, disable all holder fields
+   */
+  private applyFieldStates() {
+    const isMinor = this.taxStatus === '02';
+    // Use Applicants array length from store; fallback to holding pattern map
+    const fallbackMap: { [key: string]: number } = { 'SI': 1, 'JO': 2, 'AS': 3 };
+    const applicantCount = this.applicantCount > 0 ? this.applicantCount : (fallbackMap[this.holdingPattern] || 1);
+
+    console.log('[KycDetails] applyFieldStates → applicantCount:', applicantCount, 'isMinor:', isMinor);
+
+    if (isMinor) {
+      // Minor mode: disable all holder fields, enable guardian
+      this.disableField('kycType1Holder');
+      this.disableField('kycType2Holder');
+      this.disableField('kycType3Holder');
+      this.disableField('ckycNo1Holder');
+      this.disableField('ckycNo2Holder');
+      this.disableField('ckycNo3Holder');
+      this.enableField('kycTypeGuardian', true);
+      // ckycNoGuardian toggled by setupCKYCToggle when kycTypeGuardian value changes
       return;
     }
 
-    if (value === 'C') {
-      ckycField.setValidators([Validators.required]);
-      ckycField.enable();
+    // Not minor → disable guardian
+    this.disableField('kycTypeGuardian');
+    this.disableField('ckycNoGuardian');
+
+    // 1st holder — always enabled
+    this.enableField('kycType1Holder', true);
+    // ckycNo1Holder toggled by setupCKYCToggle
+
+    // 2nd holder
+    if (applicantCount >= 2) {
+      this.enableField('kycType2Holder', true);
     } else {
-      ckycField.clearValidators();
-      ckycField.setValue('');
-      ckycField.disable();
+      this.disableField('kycType2Holder');
+      this.disableField('ckycNo2Holder');
     }
 
-    ckycField.updateValueAndValidity({ emitEvent: false });
-  }
-
-  goToNextTab() {
-    this.nextTab.emit({
-      index: 2,
-      state: {
-        
-      }
-    });
-  }
-
-
-  navToDepoBankDetail() {
-    this.router.navigate(['/app/depoBankDetails'])
-  }
-
-  goBack() {
-    this.nextTab.emit({
-      index: 1,
-      state: {
-        
-      }
-    });
-  }
-
-  get BseClientCode(): any {
-    const data = localStorage.getItem('uccRegistrationData');
-    if (data) {
-      try {
-        const parsed = JSON.parse(data);
-        return parsed?.bseClientCode || null;
-      } catch (e) {
-        console.error('Invalid JSON in localStorage:', e);
-      }
+    // 3rd holder
+    if (applicantCount >= 3) {
+      this.enableField('kycType3Holder', true);
+    } else {
+      this.disableField('kycType3Holder');
+      this.disableField('ckycNo3Holder');
     }
-    return null;
   }
 
-
-
-  get MemberDetailID(): string | null {
-    const data = localStorage.getItem('uccRegistrationData');
-    if (data) {
-      try {
-        const parsed = JSON.parse(data);
-        return parsed?.memberDetails?.id || null;
-      } catch (e) {
-        console.error('Error parsing uccRegistrationData:', e);
-      }
+  private enableField(controlName: string, required: boolean = false) {
+    const control = this.kycForm.get(controlName);
+    if (!control) return;
+    control.enable({ emitEvent: false });
+    if (required) {
+      control.setValidators([Validators.required]);
+    } else {
+      control.clearValidators();
     }
-    return null;
+    control.updateValueAndValidity({ emitEvent: false });
   }
 
-  mapFormToUccAddressDetails(formValue: any): KYCRequest {
+  private disableField(controlName: string) {
+    const control = this.kycForm.get(controlName);
+    if (!control) return;
+    control.clearValidators();
+    control.setValue('', { emitEvent: false });
+    control.disable({ emitEvent: false });
+    control.updateValueAndValidity({ emitEvent: false });
+  }
+
+  /**
+   * Get client code: from edit store in edit mode, else from registration store
+   */
+  get clientCode(): string {
+    return this.editClientCode || '';
+  }
+
+  mapFormToKYCRequest(formValue: any): KYCRequest {
     return {
-      clientCode: this.BseClientCode,
+      clientCode: this.clientCode,
       kycType1Holder: formValue.kycType1Holder || '',
       kycType2Holder: formValue.kycType2Holder || '',
       kycType3Holder: formValue.kycType3Holder || '',
@@ -350,93 +254,58 @@ export class KycDetailsComponent {
     };
   }
 
-
-  kycVerification() {
-
+  goBack() {
     this.nextTab.emit({
-      index: 3,
-      state: {
-        isUpdateBank: true,
-        MembID: this.MemberDetailID || null,
-        clieCode: '',
-        h_p: ''
-      }
+      index: 1,
+      state: {}
     });
-    // if (this.kycForm.invalid) {
-    //   this.kycForm.markAllAsTouched();
-    //   this.sharedService.OpenAlert('Please fill all required fields correctly.');
-    //   return;
-    // }
-
-    // this.loadHoldingPatternAndSetFieldStates();
-    // console.log('KYC Verification form data:', this.kycForm.value);
-
-    // let kycFormValue = this.mapFormToUccAddressDetails(this.kycForm.getRawValue());
-    // console.log(kycFormValue, 'kyc form value');
-    // this.isLoading = true;
-
-    // this.bseUccReg.getKycVerification(kycFormValue).subscribe(response => {
-    //   console.log('KYC Verification response:', response);
-    //   this.isLoading = false;
-    //   if (response && response.success === true) {
-    //     this.sharedService.successDia('KYC Saved Successfully!').subscribe(result => {
-    //       if (result) {  
-    //         this.nextTab.emit(3);
-    //       }
-    //     });
-    //   } else {
-    //     this.isLoading = false;
-    //     this.sharedService.OpenAlert('KYC Saving Failed: ' + (response.message || 'Unknown error'));
-    //   }
-    // }, error => {
-    //   this.isLoading = false;
-    //   this.sharedService.OpenAlert('KYC Saving Error: ' + (error.message || 'Unknown error'));
-    // });
   }
 
+  /**
+   * Save & Continue — validate, print JSON, move to next tab
+   */
+  kycVerification() {
+    if (this.kycForm.invalid) {
+      this.kycForm.markAllAsTouched();
+      const invalidControls = Object.keys(this.kycForm.controls)
+        .filter(key => this.kycForm.get(key)?.invalid);
+      console.warn('KYC form invalid. Invalid controls:', invalidControls);
+      this.sharedService.OpenAlert('Please fill all required fields correctly.');
+      return;
+    }
+
+    const rawFormValue = this.kycForm.getRawValue();
+    const input: KYCRequest = this.mapFormToKYCRequest(rawFormValue);
+    console.log('✅ KYC Save Input JSON:', JSON.stringify(input, null, 2));
+
+    // TODO: Uncomment API call when ready
+    this.nextTab.emit({
+      index: 3,
+      state: {}
+    });
+  }
+
+  /**
+   * Update & Continue — validate, print JSON, move to next tab
+   */
   kycUpdateVerification() {
-    console.log("cupdate method called");
-    // if (this.kycForm.invalid) {
-    //   this.kycForm.markAllAsTouched();
-    //   this.sharedService.OpenAlert('Please fill all required fields correctly.');
-    //   return;
-    // }
+    if (this.kycForm.invalid) {
+      this.kycForm.markAllAsTouched();
+      const invalidControls = Object.keys(this.kycForm.controls)
+        .filter(key => this.kycForm.get(key)?.invalid);
+      console.warn('KYC form invalid. Invalid controls:', invalidControls);
+      this.sharedService.OpenAlert('Please fill all required fields correctly.');
+      return;
+    }
 
-    // this.loadHoldingPatternAndSetFieldStates();
-    // console.log('KYC Verification form data:', this.kycForm.value);
+    const rawFormValue = this.kycForm.getRawValue();
+    const input: KYCRequest = this.mapFormToKYCRequest(rawFormValue);
+    console.log('✅ KYC Update Input JSON:', JSON.stringify(input, null, 2));
 
-    // const editedBseClientCode = localStorage.getItem('editedBseClientCode');
-    // console.log(editedBseClientCode, 'edited BSE Client Code');
-
-    // const input: KYCRequest = this.mapFormToUccAddressDetails(this.kycForm.getRawValue());
-    // input.clientCode = this.BseClientCode || '';
-    // console.log(input, 'kyc form value');
-
-    // this.isLoading = true;
-    // this.bseUccReg.getKycVerification(input).subscribe(response => {
-    //   console.log('KYC Verification response:', response);
-    //   this.isLoading = false;
-    //   if (response && response.success === true) {
-    //     this.sharedService.successDia('KYC Saved Successfully!').subscribe(result => {
-    //       if (result) {
-    //         this.nextTab.emit({
-    //           index: 3,
-    //           state: {
-    //             isUpdateBank: true,
-    //             MembID: this.MemberDetailID || null,
-    //             clieCode: editedBseClientCode || input.clientCode || '',
-    //             h_p: ''
-    //           }
-    //         });
-    //       }
-    //     });
-    //   } else {
-    //     this.isLoading = false;
-    //     this.sharedService.OpenAlert('KYC Saving Failed: ' + (response.message || 'Unknown error'));
-    //   }
-    // }, error => {
-    //   this.isLoading = false;
-    //   this.sharedService.OpenAlert('KYC Saving Error: ' + (error.message || 'Unknown error'));
-    // });
+    // TODO: Uncomment API call when ready
+    this.nextTab.emit({
+      index: 3,
+      state: {}
+    });
   }
 }

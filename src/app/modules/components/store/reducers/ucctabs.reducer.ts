@@ -79,13 +79,5 @@ export const ucctabsReducer = createReducer(
       ...state,
       registrationData
     };
-  }),
-
-  on(UCCTabsActions.setSelectedMemberData, (state: UCCTabsState, { selectedMemberData }) => {
-    console.log('[Reducer] setSelectedMemberData:', selectedMemberData);
-    return {
-      ...state,
-      selectedMemberData
-    };
   })
 );

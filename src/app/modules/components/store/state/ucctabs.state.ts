@@ -5,7 +5,6 @@ export interface UCCTabsState {
   isEditMode: boolean;
   editData: any | null;
   registrationData: any | null;
-  selectedMemberData: any | null;
 }
 
 export const initialTabState: UCCTabsState = {
@@ -13,6 +12,5 @@ export const initialTabState: UCCTabsState = {
   visitedTabs: [0],
   isEditMode: false,
   editData: null,
-  registrationData: null,
-  selectedMemberData: null
+  registrationData: null
 };

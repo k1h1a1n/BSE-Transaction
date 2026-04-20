@@ -22,7 +22,3 @@ export const setRegistrationData = createAction(
     props<{ registrationData: any }>()
 );
 
-export const setSelectedMemberData = createAction(
-    '[UCC Tabs] Set Selected Member Data',
-    props<{ selectedMemberData: any }>()
-);
