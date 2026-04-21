@@ -566,7 +566,7 @@
         </button>
 
         <button pButton class="Blue_FilledBtn ms-1" (click)="addNomineeandExit()" [disabled]="isLoading">
-            <span pButtonLabel>Save & Exit</span>
+            <span pButtonLabel>{{ isEdit ? 'Update & Exit' : 'Save & Exit' }}</span>
         </button>
     </div>
     <!-- </mat-tab> -->

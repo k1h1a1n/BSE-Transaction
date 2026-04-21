@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { combineLatest, Subject, takeUntil } from 'rxjs';
+import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -28,7 +30,14 @@ import { COUNTRY_CODE_LIST } from '../address-details/country-list';
 })
 
 
-export class NomineeDetail {
+export class NomineeDetail implements OnInit, OnDestroy {
+  private uccTabsFacade = inject(UCCTabsFacade);
+  private destroy$ = new Subject<void>();
+
+  isEdit: boolean = false;
+  currentClientCode: string | null = null;
+  currentMemberId: string | null = null;
+
   isLoading: boolean = false;
   requiresContactDetails: boolean = false;
 
@@ -411,6 +420,35 @@ export class NomineeDetail {
     const currentDate = new Date();
     this.today = currentDate.toISOString().split('T')[0];
 
+    // ✅ Combined edit-mode + edit-data subscription (NgRx store)
+    combineLatest([
+      this.uccTabsFacade.isEditMode$,
+      this.uccTabsFacade.editData$
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([isEditMode, editData]) => {
+        this.isEdit = isEditMode;
+
+        if (!editData) {
+          return;
+        }
+
+        const trim = (v: any) => (v ?? '').toString().trim();
+        this.currentClientCode = trim(editData.cliecode || editData.clieCode) || this.currentClientCode;
+        this.currentMemberId = trim(editData.MembID || editData.membID) || this.currentMemberId;
+      });
+
+    // ✅ Registration data stream (non-edit new-registration flow)
+    this.uccTabsFacade.registrationData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((registrationData: any) => {
+        if (!registrationData) {
+          return;
+        }
+        this.currentClientCode = registrationData.bseClientCode || registrationData.clieCode || this.currentClientCode;
+        this.currentMemberId = registrationData.memberDetails?.id || registrationData.membID || this.currentMemberId;
+      });
+
     // Load existing nominees from localStorage
     this.loadExistingNominees();
 
@@ -488,7 +526,8 @@ export class NomineeDetail {
 
       // isMinor: [null],
 
-      isMinor: [''],
+      // Default to "No" — minor selection radio defaults to N
+      isMinor: ['N'],
 
       applicablePercentage: ['', isRequired ? [
         Validators.required,
@@ -1113,7 +1152,7 @@ export class NomineeDetail {
             this.nomineeForm.reset();
             this.nomineeForm.patchValue({
               relation: '0',
-              isMinor: '',
+              isMinor: 'N',
               identityType: '',
               country: ''
             });
@@ -1211,7 +1250,7 @@ export class NomineeDetail {
             this.nomineeForm.reset();
             this.nomineeForm.patchValue({
               relation: '0',
-              isMinor: '',
+              isMinor: 'N',
               identityType: '',
               country: ''
             });
@@ -1223,6 +1262,8 @@ export class NomineeDetail {
             this.getNomineeListandExit(clientCode!);
             this.isLoading = false;
 
+            // Save & Exit → navigate to listing page
+            this.router.navigate(['/app/registerdList']);
           }
           )
         }
@@ -1552,29 +1593,18 @@ export class NomineeDetail {
   // end here
 
   get MemberDetailID(): string | null {
-    const data = localStorage.getItem('uccRegistrationData');
-    if (data) {
-      try {
-        const parsed = JSON.parse(data);
-        return parsed?.memberDetails?.id || null;
-      } catch (e) {
-        console.error('Error parsing uccRegistrationData:', e);
-      }
-    }
-    return null;
+    // Prefer NgRx store values (set via editData$ / registrationData$)
+    return this.currentMemberId || null;
   }
 
   get BseClientCode(): string | null {
-    const data = localStorage.getItem('uccRegistrationData');
-    if (data) {
-      try {
-        const parsed = JSON.parse(data);
-        return parsed?.bseClientCode || null;
-      } catch (e) {
-        console.error('Invalid JSON in localStorage:', e);
-      }
-    }
-    return null;
+    // Prefer NgRx store values (set via editData$ / registrationData$)
+    return this.currentClientCode || null;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /// fro update-edit mode- add-edit
