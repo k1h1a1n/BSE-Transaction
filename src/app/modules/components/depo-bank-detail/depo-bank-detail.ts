@@ -7,14 +7,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
 import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
 import { Router } from '@angular/router';
 import { distinctUntilChanged, skip, Subject, takeUntil } from 'rxjs';
 import { BankDetailsModel, bseBankListApiInput, deleteBankData, uccBankDetails } from '../../models/bseUCCModel';
 import { MenuItem } from 'primeng/api';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { Shared } from '../../../shared/services/shared';
 import { Location } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,18 +20,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
-import { validateVerticalPosition } from '@angular/cdk/overlay';
-import { UccTabs } from '../ucc-tabs/ucc-tabs';
 import { ProgressBarModule } from 'primeng/progressbar';
+import {
+  ACCOUNT_TYPES,
+  CLIENT_TYPE_OPTIONS,
+  DEFAULT_TDPS,
+  DIVIDEND_PAYOUT_OPTIONS,
+  PMS_TYPE_OPTIONS,
+} from './depo-bank-detail.constants';
 
-export interface TabNavigationEvent {
-  index: number;
-  state?: {
-    isUpdateNominee: boolean;
-    MembID: any;
-    clieCode: any;
-  };
-}
 
 
 @Component({
@@ -54,39 +49,17 @@ export class DepoBankDetail {
   isSetDefault: boolean = false;
   bankDetailsList: any[] = [];
   memberId: any;
-  accountTypes = [
-    { value: 'SB', label: 'Saving Bank' },
-    { value: 'CB', label: 'Current Bank' },
-    { value: 'NRE', label: 'NRE Account' },
-    { value: 'NRO', label: 'NRO Account' }
-  ];
-  dividendPayoutOptions = [
-    { key: '01', value: 'Cheque' },
-    { key: '02', value: 'Direct Credit' },
-    { key: '03', value: 'ECS' },
-    { key: '04', value: 'NEFT' },
-    { key: '05', value: 'RTGS' }
-  ];
+  accountTypes = ACCOUNT_TYPES;
+  dividendPayoutOptions = DIVIDEND_PAYOUT_OPTIONS;
 
   // as on 3-06-2025
-  clientTypeOptions = [
-    { value: 'P', label: 'Physical' },
-    // { value: 'D', label: 'Demat' }
-  ];
+  clientTypeOptions = CLIENT_TYPE_OPTIONS;
   // end here
 
-  defaTDPs = [
-    //  { key: 'NSDL', value: 'NSDL' },
-    // { key: 'CDSL', value: 'CDSL' }
-    'NSDL',
-    'CDSL'
-  ];
+  defaTDPs = DEFAULT_TDPS;
 
 
-  pmsType = [
-    { key: 'Y', value: 'Yes' },
-    { key: 'N', value: 'No' },
-  ];
+  pmsType = PMS_TYPE_OPTIONS;
 
   bankFormArray: any;
   savedBankEntries: any[] = []; // Store saved bank entries temporarily
@@ -342,22 +315,7 @@ export class DepoBankDetail {
       this.getBankList(bseClieCode);
     }
 
-
-
   }
-
-
-  //     navigate(index: number) {
-  //   const pages = [
-  //     'BseRegisterinvestors',
-  //     'addressDetails',
-  //     'kycDetails',
-  //     'depoBankDetails',
-  //     'nomineeDetails'
-  //   ];
-
-  //   this.router.navigate([pages[index]]);
-  // }
 
   goToNextTab() {
     const storedData = localStorage.getItem('uccRegistrationData');
