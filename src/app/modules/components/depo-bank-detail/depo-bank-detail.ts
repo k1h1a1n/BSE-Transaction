@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
@@ -14,7 +14,6 @@ import { BankDetailsModel, bseBankListApiInput, deleteBankData, uccBankDetails }
 import { MenuItem } from 'primeng/api';
 import { MatTableModule } from '@angular/material/table';
 import { Shared } from '../../../shared/services/shared';
-import { Location } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
@@ -28,6 +27,7 @@ import {
   DIVIDEND_PAYOUT_OPTIONS,
   PMS_TYPE_OPTIONS,
 } from './depo-bank-detail.constants';
+import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
 
 
 
@@ -40,6 +40,7 @@ import {
   styleUrl: './depo-bank-detail.scss',
 })
 export class DepoBankDetail {
+  private uccTabsFacade = inject(UCCTabsFacade);
   isLoading: boolean = false;
 
   bankForm!: FormGroup;
@@ -123,6 +124,8 @@ export class DepoBankDetail {
   isUpdate: boolean = false;
   memberIdFromUpdate: any;
   clieCodeFromUpdate: any;
+  currentClientCode: string | null = null;
+  currentMemberId: string | null = null;
 
   private destroy$ = new Subject<void>();
   private depositorySubscriptionsAdded = false;
@@ -131,7 +134,6 @@ export class DepoBankDetail {
     private fb: FormBuilder,
     private router: Router,
     private bseUccSer: BseUCCRegister,
-    private location: Location,
     private sharedServ: Shared
 
   ) { }
@@ -170,6 +172,34 @@ export class DepoBankDetail {
     ];
 
     this.home = { icon: 'pi pi-home', routerLink: '/' };
+
+    this.uccTabsFacade.isEditMode$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isEditMode) => {
+        this.isEdit = isEditMode;
+      });
+
+    this.uccTabsFacade.editData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((editData) => {
+        if (!editData) {
+          return;
+        }
+
+        this.currentClientCode = editData.cliecode || editData.clieCode || this.currentClientCode;
+        this.currentMemberId = editData.MembID || editData.membID || this.currentMemberId;
+      });
+
+    this.uccTabsFacade.registrationData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((registrationData) => {
+        if (!registrationData) {
+          return;
+        }
+
+        this.currentClientCode = registrationData.bseClientCode || registrationData.clieCode || this.currentClientCode;
+        this.currentMemberId = registrationData.memberDetails?.id || registrationData.membID || this.currentMemberId;
+      });
 
 
     // 1️⃣ Initialize the FormArray FIRST
@@ -306,9 +336,7 @@ export class DepoBankDetail {
     this.handleDepositoryLogic();
 
     // Load existing bank list if client code exists
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    const bseClieCode = parsedData?.bseClientCode || '';
+    const bseClieCode = this.resolveClientID() || '';
     console.log(bseClieCode, 'bseclie code');
 
     if (bseClieCode) {
@@ -632,9 +660,7 @@ export class DepoBankDetail {
     }
 
     // Save to API
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    const bseClieCode = parsedData?.bseClientCode || '';
+    const bseClieCode = this.resolveClientID() || '';
 
     if (!bseClieCode) {
       this.sharedServ.OpenAlert('Client code not found. Please complete previous steps.');
@@ -650,7 +676,6 @@ export class DepoBankDetail {
     payload.clieCode = bseClieCode;
 
     console.log('Saving bank to API:', payload);
-
     this.isLoading = true;
 
     this.bseUccSer.getUccBankData(payload).subscribe({
@@ -1018,18 +1043,40 @@ export class DepoBankDetail {
     return true;
   }
 
+  private isDepoEditMode(): boolean {
+    return this.isEditBankDetail || this.isEditBankinNormalMode;
+  }
 
-  submit() {
+  private logEditModeBankInputAndMoveNext(): void {
+    const formValue = this.bankForm.getRawValue();
+    const resolvedClientCode = this.resolveClientID() || '';
+    const input = {
+      ...formValue,
+      clieCode: resolvedClientCode,
+      bankDetails: this.savedBankEntries.length > 0 ? this.savedBankEntries : formValue.bankDetails
+    };
+
+    console.log('Edit mode: skipping bank API and moving to next tab. Input:', input);
     this.nextTab.emit({
       index: 4,
-      state: {
-
-      }
+      state: {}
     });
   }
 
 
   submit_() {
+    this.nextTab.emit({
+      index: 4
+    });
+  }
+
+
+  submit() {
+    if (this.isDepoEditMode()) {
+      this.logEditModeBankInputAndMoveNext();
+      return;
+    }
+
     // Mark all form controls as touched to show validation errors
     this.bankForm.markAllAsTouched();
     this.bankFormArray.controls.forEach((control: any) => control.markAllAsTouched());
@@ -1133,17 +1180,13 @@ export class DepoBankDetail {
 
     console.log(mainData, bankData);
 
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-
-    const bseClieCode = parsedData?.bseClientCode || '';
+    const bseClieCode = this.resolveClientID() || '';
     console.log('BSE Client Code:', bseClieCode);
     console.log('client code', bseClieCode);
 
     const payload = this.mapFormToPayload();
     payload.clieCode = bseClieCode;
-    console.log(payload);
-
+    console.log('Saving bank to API:', payload);
     this.bseUccSer.getUccBankData(payload).subscribe({
       next: (response: { success: boolean; message: string }) => {
         console.log('Bank API Response:', response);
@@ -1190,9 +1233,7 @@ export class DepoBankDetail {
     console.log('Default bank set to index:', index);
 
     // Update on server
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    const bseClieCode = parsedData?.bseClientCode || '';
+    const bseClieCode = this.resolveClientID() || '';
 
     if (bseClieCode) {
       const payload = this.mapFormToPayloadWithBanks(this.savedBankEntries);
@@ -1263,118 +1304,6 @@ export class DepoBankDetail {
   }
 
 
-  // saveAndEditinNormal(){
-
-  //      console.log('call update in normal');
-
-  //     if (this.bankForm.invalid) {
-  //       this.bankForm.markAllAsTouched();
-  //       return;
-  //     }
-
-  //     const formValue = this.bankForm.getRawValue();
-  //     console.log(formValue, 'form VAlue of bank');
-
-  // const mainData = { ...this.bankForm.value };
-  // const bankData = [...this.bankFormArray.value];
-
-  // console.log(mainData, bankData);
-
-
-  //   const payload = this.mapFormToPayload();
-  //   console.log(payload);
-  //     // const clicode = this.resolveClientID();
-
-
-  //      const storedData = localStorage.getItem('uccRegistrationData');
-  //     const parsedData = storedData ? JSON.parse(storedData) : null;
-
-  //     const bseClieCode = parsedData?.bseClientCode || '';
-  //     console.log('BSE Client Code:', bseClieCode);
-  //     console.log('client code', clicode);
-
-  //     formValue.bseClientCode = bseClieCode;
-  //     formValue.membID = this.getMembId;
-  //     console.log('form value', formValue.bseClientCode);
-
-  //   // let storedData = JSON.parse(localStorage.getItem('getBankList') || '[]');
-  //   // storedData = Array.isArray(storedData) ? storedData : [];
-
-  //     console.log(storedData, 'storedData before update');
-  //  let patchedList = storedData.map(bank => this.mapStoredBankToPatched(bank));
-
-  //  console.log(patchedList,'patched list');
-  // //  localStorage.setItem('getNomineekList', JSON.stringify(patchedList));
-
-  //   console.log(this.bankIndexinNormalMode, 'bank index from other comp');
-
-  //   // 🔹 Get only this client's nominees
-  //   const clientBanks = patchedList.filter(n => n.clieCode === clicode);
-  //   console.log(clientBanks, 'client banks');
-
-
-  //   if (this.bankIndexinNormalMode !== null && this.bankIndexinNormalMode >= 0) {
-  //   // Directly update by index
-  //   patchedList[this.bankIndexinNormalMode] = { 
-  //     ...patchedList[this.bankIndexinNormalMode], 
-  //     ...formValue 
-  //   };
-  //   console.log("✅ Updated BANK:", patchedList[this.bankIndexinNormalMode]);
-  // } 
-  //   else {
-  //     patchedList.push(formValue);
-  //     console.log("➕ Added new BANK:", formValue);
-  //   }
-
-  //   console.log(patchedList, 'stored data after update');
-
-
-  // const updatedClientBanks = patchedList.filter(bank => bank.bseClientCode === clicode);
-
-  //    if (updatedClientBanks.length > 5) {
-  //       this.sharedService.OpenAlertPopup('You can only add up to 5 bank details!', () => {
-  //         this.router.navigate(['/home/MFEntryForms/bankList']);
-  //       });
-  //       return;
-  //     }
-
-  //     // localStorage.setItem('bankAddListInNormalMode', JSON.stringify(storedData));
-  //     console.log(updatedClientBanks, 'updated bank list');
-
-
-
-  //     let listToMap: any[] = [];
-
-  //     if (patchedList.length === 0) {
-  //       listToMap = patchedList; // completely empty
-  //     } else {
-  //       listToMap = updatedClientBanks; // only this client's banks
-  //     }
-
-
-  //     const bankInput: uccBankDetails = this.mapFormToBankDetails(listToMap, clicode);
-  //     console.log(bankInput, 'bank input');
-
-
-  //     this.bseUccSer.getUccBankData(bankInput).subscribe({
-  //       next: (response: { success: boolean; message: string }) => {
-  //         console.log('Bank API Response:', response);
-
-  //         if (response.success) {
-  //           this.sharedService.OpenAlertPopup(response.message, () => {
-  //             // this.getBankDropdown(this.resolveMembID()); 
-  //             this.router.navigate(['/home/MFEntryForms/bankList']);
-  //           });
-  //         } else {
-  //           this.sharedService.OpenAlertPopup('Failed to save bank details.');
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('Bank API Error:', err);
-  //         this.sharedService.OpenAlertPopup('Something went wrong while saving bank details.');
-  //       }
-  //     });
-  // }
 
 
 
@@ -1471,21 +1400,6 @@ export class DepoBankDetail {
   }
 
 
-  // nextTab(): void {
-  //   if (
-  //     this.activeTab === 0 &&
-  //     (this.bankForm.invalid)
-  //   ) {
-  //     this.bankForm.markAllAsTouched();
-  //     return;
-  //   }
-
-  //   if (this.activeTab < 2) {
-  //     console.log('Bank Form value', this.bankForm.value,);
-  //     this.SaveAndContinue();
-  //   }
-  // }
-
 
   prefillForm(bankDetail: any) {
     this.bankForm.patchValue({
@@ -1507,6 +1421,10 @@ export class DepoBankDetail {
 
 
   get BseClientCode(): string | null {
+    if (this.currentClientCode) {
+      return this.currentClientCode;
+    }
+
     const data = localStorage.getItem('uccRegistrationData');
     if (data) {
       try {
@@ -1516,6 +1434,7 @@ export class DepoBankDetail {
         console.error('Invalid JSON in localStorage:', e);
       }
     }
+
     return null;
   }
 
@@ -1610,21 +1529,11 @@ export class DepoBankDetail {
 
 
 
-  // get getMembId(): string | null {
-  //   const data = localStorage.getItem('uccRegistrationData');
-  //   if (data) {
-  //     try {
-  //       const parsed = JSON.parse(data);
-  //       return parsed?.memberDetails.id || null;
-  //     } catch (e) {
-  //       console.error('Invalid JSON in localStorage:', e);
-  //     }
-  //   }
-  //   return null;
-  // }
-
-
   get getMembId(): string {
+    if (this.currentMemberId) {
+      return this.currentMemberId;
+    }
+
     const data = localStorage.getItem('uccRegistrationData');
     if (data) {
       try {
@@ -1634,40 +1543,10 @@ export class DepoBankDetail {
         console.error('Invalid JSON in localStorage:', e);
       }
     }
+
     return '';
   }
 
-
-  // patchValueFromBankDetails(data: any) {
-  //   const rawAccType = (data.bankAccoType || '').trim().toUpperCase();
-
-  //   // Check if it's one of the valid accountTypes
-  //   const isValidAccType = this.accountTypes.some(type => type.value === rawAccType);
-
-
-  //   this.bankForm.patchValue({
-  //     ifsc: (data.ifscCode || '').trim(),
-  //     MICR: (data.micrNumb || '').trim(),
-  //     branchName: data.bankBran ? data.bankBran.trim() : '', // explicitly patch empty string
-  //     bankName: data.bankName ? data.bankName.trim() : '',
-  //     accountNumber: data.bankAccoNumb ? data.bankAccoNumb.trim() : '',
-  //     // accountType: data.bankAccoType ? data.bankAccoType.trim() : this.bankForm.value.accountType,
-
-  //     accountType: isValidAccType ? rawAccType : this.bankForm.value.accountType
-
-  //   });
-
-  //   console.log('Patched values:', {
-  //     ifsc: (data.ifscCode || '').trim(),
-  //     MICR: (data.micrNumb || '').trim(),
-  //     branchName: (data.bankBran || '').trim(),
-  //     bankName: (data.bankName || '').trim(),
-  //     accountNumber: (data.bankAccoNumb || '').trim(),
-  //     // accountType: (data.bankAccoType || '').trim()
-  //     accountType: isValidAccType ? rawAccType : this.bankForm.value.accountType
-  //   });
-
-  // }
 
   patchValueFromBankDetails(data: any) {
     const rawAccType = (data.bankAccoType || '').trim().toUpperCase();
@@ -1689,13 +1568,6 @@ export class DepoBankDetail {
     console.log('Mapped BankDetailsModel → Form:', model);
   }
 
-
-  // checkIfscLength() {
-  //   const ifscValue = this.bankForm.get('ifsc')?.value || '';
-  //   if (ifscValue.length === 11) {
-  //     this.getbankDetialsByIFSCData();
-  //   }
-  // }
 
   addNewBank() {
     this.showBankInputField = true;
@@ -1842,65 +1714,6 @@ export class DepoBankDetail {
   }
 
 
-  // getbankDetialsByIFSCData(ifscValue?: string) {
-  //   const ifsc = ifscValue || this.bankForm.get('ifsc')?.value?.trim();
-  //   if (!ifsc) return;
-
-  //   let input = { ifscCode: ifsc };
-  //   this.bseUccSer.getbankDetialsByIFSC(input).subscribe({
-  //     next: (res) => {
-  //       console.log('res of bank data by IFSC', res);
-  //       const resData = Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
-
-  //       if (resData) {
-  //         this.bankForm.patchValue({
-  //           bankName: (resData.bankNAme || '').trim(),
-  //           branchName: (resData.bankBranch || '').trim(),
-  //           MICR: (resData.micrCode || '').trim()
-  //         });
-  //       } else {
-  //         this.sharedServ.OpenAlert(res.message || 'Bank not found for this IFSC');
-  //       }
-  //     },
-  //     error: (err) => {
-  //       console.error('Error fetching IFSC details', err);
-  //       this.sharedServ.OpenAlert('Something went wrong while fetching IFSC details.');
-  //     }
-  //   });
-  // }
-
-  //   getbankDetialsByIFSCData(index: number, ifscValue?: string) {
-  //   const row = this.bankFormArray.at(index);
-
-  //   if (!row) return;
-
-  //   const ifsc = ifscValue || row.get('ifsc')?.value?.trim();
-  //   if (!ifsc) return;
-
-
-  //   const input = { ifscCode: ifsc };
-
-  //   this.bseUccSer.getbankDetialsByIFSC(input).subscribe({
-  //     next: (res) => {
-  //       const resData = Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
-
-  //       if (resData) {
-  //         row.patchValue({
-  //           bankName: resData.bankNAme?.trim() || '',
-  //           branchName: resData.bankBranch?.trim() || '',
-  //           micr: resData.micrCode?.trim() || ''
-  //         });
-  //       } else {
-  //         this.sharedServ.OpenAlert(res.message || 'Bank not found for this IFSC');
-  //       }
-  //     },
-  //     error: () => {
-  //       this.sharedServ.OpenAlert('Something went wrong while fetching IFSC details.');
-  //     }
-  //   });
-
-  // }
-
   getbankDetialsByIFSCData(index: number, ifscValue?: string) {
     const row = this.bankFormArray.at(index);
     if (!row) return;
@@ -1930,286 +1743,6 @@ export class DepoBankDetail {
     });
   }
 
-
-
-
-
-  // getEditedUccData(clieCode: any) {
-  //   // const selectedUcc = this.uccDetailsList[index];
-  //   // const bseCode = selectedUcc.bseClientCode;
-
-  //   const input: BseUccEditDetails = {
-  //     clieCode: clieCode
-  //   };
-
-  //   this.bseUccSer.editUccDetails(input).subscribe({
-  //     next: (res: any) => {
-  //       console.log(res, 'res of edit details');
-  //     },
-
-  //     error: (err) => {
-  //       console.log(err);
-  //     }
-  //   })
-  // }
-
-  // for add-edit= normal mode-working
-  // SaveAndContinue(){
-
-  //      console.log('call update');
-
-  //     if (this.bankForm.invalid) {
-  //       this.bankForm.markAllAsTouched();
-  //       return;
-  //     }
-
-  //     const formValue = this.bankForm.getRawValue();
-  //     console.log(formValue, 'form VAlue of bank');
-
-
-
-  //     const clicode = this.resolveClientID();
-  //     console.log('client code', clicode);
-
-  //     formValue.bseClientCode = clicode;
-  //     console.log('form value', formValue.bseClientCode);
-
-  //   let storedData = JSON.parse(localStorage.getItem('bankAddListInNormalMode') || '[]');
-  //   storedData = Array.isArray(storedData) ? storedData : [];
-
-  // console.log(storedData,'storedData');
-
-
-  //   console.log(this.bankIndexinNormalMode, 'bank index from other comp');
-
-  // const clientBanks = storedData.filter(bank => bank.bseClientCode === clicode);
-
-  // console.log(clientBanks,'client banks');
-
-
-  // if (this.bankIndexinNormalMode !== null && this.bankIndexinNormalMode >= 0) {
-  //   const selectedBank = clientBanks[this.bankIndexinNormalMode];
-
-
-  // console.log(selectedBank,'selected bank');
-
-  //   if (selectedBank) {
-  //     const actualIndex = storedData.findIndex(
-  //       bank =>
-  //         bank.bseClientCode === selectedBank.bseClientCode &&
-  //         String(bank.accountNumber) === String(selectedBank.accountNumber) &&
-  //         bank.ifsc === selectedBank.ifsc &&
-
-
-  //         // ason 14-08-2025
-  //           bank.bankName === selectedBank.bankName &&
-  // bank.branchName === selectedBank.branchName &&
-  // bank.MICR === selectedBank.MICR &&
-  // bank.accountType ===  selectedBank.accountType && 
-  // bank.clientType ===  selectedBank.clientType &&
-  // bank.dividendPayout ===  selectedBank. dividendPayout &&
-  // bank?.setAsDefault ===  selectedBank?.setAsDefault
-  // // end here
-  //     );
-
-  //     if (actualIndex !== -1) {
-  //       storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
-  //     }
-  //   }
-  // } else {
-  //   storedData.push(formValue);
-  // }
-
-  // console.log(storedData,'stored data');
-  // const updatedClientBanks = storedData.filter(bank => bank.bseClientCode === clicode);
-
-  //    if (updatedClientBanks.length > 5) {
-  //       this.sharedService.OpenAlertPopup('You can only add up to 5 bank details!', () => {
-  //         this.router.navigate(['/home/MFEntryForms/bankList']);
-  //       });
-  //       return;
-  //     }
-
-  //     localStorage.setItem('bankAddListInNormalMode', JSON.stringify(storedData));
-  //     console.log(updatedClientBanks, 'updated bank list');
-
-  //     // Always decide what list you want to map
-  //     // const listToMap = storedData.length === 0 ? storedData : clientBankList;
-
-  //     let listToMap: any[] = [];
-
-  //     if (storedData.length === 0) {
-  //       listToMap = storedData; // completely empty
-  //     } else {
-  //       listToMap = updatedClientBanks; // only this client's banks
-  //     }
-
-
-  //     const bankInput: uccBankDetails = this.mapFormToBankDetails(listToMap, clicode);
-  //     console.log(bankInput, 'bank input');
-
-
-  //     this.bseUccSer.getUccBankData(bankInput).subscribe({
-  //       next: (response: { success: boolean; message: string }) => {
-  //         console.log('Bank API Response:', response);
-
-  //         if (response.success) {
-  //           this.sharedService.OpenAlertPopup(response.message, () => {
-  //             // this.getBankDropdown(this.resolveMembID()); 
-  //             this.router.navigate(['/home/MFEntryForms/bankList']);
-  //           });
-  //         } else {
-  //           this.sharedService.OpenAlertPopup('Failed to save bank details.');
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('Bank API Error:', err);
-  //         this.sharedService.OpenAlertPopup('Something went wrong while saving bank details.');
-  //       }
-  //     });
-  // }
-
-
-  //for edit-add = normal mode
-  //   SaveAndExit(){
-
-  //      console.log('call update');
-
-  //     if (this.bankForm.invalid) {
-  //       this.bankForm.markAllAsTouched();
-  //       return;
-  //     }
-
-  //     const formValue = this.bankForm.getRawValue();
-  //     console.log(formValue, 'form VAlue of bank');
-
-
-
-  //     const clicode = this.resolveClientID();
-  //     console.log('client code', clicode);
-
-  //     formValue.bseClientCode = clicode;
-  //     console.log('form value', formValue.bseClientCode);
-
-  //   let storedData = JSON.parse(localStorage.getItem('bankAddListInNormalMode') || '[]');
-  //   storedData = Array.isArray(storedData) ? storedData : [];
-
-  // console.log(storedData,'storedData');
-
-
-  //   console.log(this.bankIndexinNormalMode, 'bank index from other comp');
-
-  // const clientBanks = storedData.filter(bank => bank.bseClientCode === clicode);
-
-  // console.log(clientBanks,'client banks');
-
-
-  // if (this.bankIndexinNormalMode !== null && this.bankIndexinNormalMode >= 0) {
-  //   const selectedBank = clientBanks[this.bankIndexinNormalMode];
-
-
-  // console.log(selectedBank,'selected bank');
-
-  //   if (selectedBank) {
-  //     const actualIndex = storedData.findIndex(
-  //       bank =>
-  //         bank.bseClientCode === selectedBank.bseClientCode &&
-  //         String(bank.accountNumber) === String(selectedBank.accountNumber) &&
-  //         bank.ifsc === selectedBank.ifsc &&
-
-  //                 // ason 14-08-2025
-  //           bank.bankName === selectedBank.bankName &&
-  // bank.branchName === selectedBank.branchName &&
-  // bank.MICR === selectedBank.MICR &&
-  // bank.accountType ===  selectedBank.accountType && 
-  // bank.clientType ===  selectedBank.clientType &&
-  // bank.dividendPayout ===  selectedBank. dividendPayout &&
-  // bank?.setAsDefault ===  selectedBank?.setAsDefault
-  // // end here
-  //     );
-
-  //     if (actualIndex !== -1) {
-  //       storedData[actualIndex] = { ...storedData[actualIndex], ...formValue };
-  //     }
-  //   }
-  // } else {
-  //   storedData.push(formValue);
-  // }
-
-  // console.log(storedData,'stored data');
-  // const updatedClientBanks = storedData.filter(bank => bank.bseClientCode === clicode);
-
-  //    if (updatedClientBanks.length > 5) {
-  //       this.sharedService.OpenAlertPopup('You can only add up to 5 bank details!', () => {
-  //         this.router.navigate(['/home/MFEntryForms/uccList']);
-  //       });
-  //       return;
-  //     }
-
-  //     localStorage.setItem('bankAddListInNormalMode', JSON.stringify(storedData));
-  //     console.log(updatedClientBanks, 'updated bank list');
-
-  //     // Always decide what list you want to map
-  //     // const listToMap = storedData.length === 0 ? storedData : clientBankList;
-
-  //     let listToMap: any[] = [];
-
-  //     if (storedData.length === 0) {
-  //       listToMap = storedData; // completely empty
-  //     } else {
-  //       listToMap = updatedClientBanks; // only this client's banks
-  //     }
-
-
-  //     const bankInput: uccBankDetails = this.mapFormToBankDetails(listToMap, clicode);
-  //     console.log(bankInput, 'bank input');
-
-
-  //     this.bseUccSer.getUccBankData(bankInput).subscribe({
-  //       next: (response: { success: boolean; message: string }) => {
-  //         console.log('Bank API Response:', response);
-
-  //         if (response.success) {
-  //           this.sharedService.OpenAlertPopup(response.message, () => {
-  //             // this.getBankDropdown(this.resolveMembID()); 
-  //             this.router.navigate(['/home/MFEntryForms/uccList']);
-  //           });
-  //         } else {
-  //           this.sharedService.OpenAlertPopup('Failed to save bank details.');
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('Bank API Error:', err);
-  //         this.sharedService.OpenAlertPopup('Something went wrong while saving bank details.');
-  //       }
-  //     });
-  // }
-
-
-
-  // isAddOrEditBankData() {
-  //   if (this.isAddNewBank) {
-  //     // this.getBankDropdown(this.resolveMembID());
-  //     this.updateAndContinue();
-  //   }
-  //   else if (this.isEditBankDetail) {
-  //     this.updateAndContinue();
-  //   }
-  // }
-
-  private resolveMembID(): string | null {
-    if (this.isAddNewBank) {
-      return this.isAddMembID;
-    }
-    else if (this.isEditBankDetail) {
-      return this.isEditMembID;
-    }
-    else if (this.isEditBankinNormalMode) {
-      return this.getMembId;
-    } else {
-      return this.getMembId;
-    }
-  }
 
   private resolveClientID(): string | null {
     if (this.isAddNewBank) {
@@ -2249,107 +1782,6 @@ export class DepoBankDetail {
       membID: stored.membID
     };
   }
-
-
-  // mapFormToPayload() {
-  //   const formValue = this.bankForm.value;
-
-  //   const payload: any = {
-  //     clientType: formValue.clientType,
-  //     clieCode: '',
-  //     // pms: formValue.pms,
-  //     defaTDP: formValue.defaTDP || "",
-  //     cdsldpid: formValue.cdsldpid || "",
-  //     cdslcltid: formValue.cdslcltid || "",
-  //     cmbpiD_ID: formValue.cmbpiD_ID || "",
-  //     nsdldpid: formValue.nsdldpid || "",
-  //     nsdlcltid: formValue.nsdlcltid || "",
-  //     diviPayMode: "02",     // static if needed
-  //   };
-
-
-  //   // 🔥 Map bankDetails[] → neftCode, neftCode2, neftCode3,... format
-  //   formValue.bankDetails.forEach((bank: any, index: number) => {
-  //     const idx = index === 0 ? "" : index + 1; // '' -> first bank, '2' -> second, ...
-
-  //       // 🔍 Check if row is fully empty (ignore micr)
-  //     const rowEmpty =
-  //       !bank.ifsc &&
-  //       !bank.bankName &&
-  //       !bank.accountNumber
-
-  //     // 🚫 Skip mapping this row completely
-  //     if (rowEmpty) return;
-
-
-  //     // Always map these fields
-  //     payload[`neftCode${idx}`]   = bank.ifsc || "";
-  //     payload[`accNo${idx}`]      = bank.accountNumber || "";
-  //     payload[`acctype${idx}`]    = bank.accountType || "";
-  //     payload[`bankName${idx}`]   = bank.bankName || "";
-  //     payload[`bankBranch${idx}`] = bank.bankBranch || ""; // if not present, add in your form
-  //     payload[`mcirnO${idx}`]     = bank.micr || "";
-  //     payload[`bank${idx}Default`] = bank.isDefault ? 1 : 0;
-
-
-  //   });
-
-  //   return payload;
-  // }
-
-
-  // mapFormToPayload() {
-  //   const formValue = this.bankForm.value;
-
-  //   const payload: any = {
-  //     clientType: formValue.clientType,
-  //     clieCode: formValue.clieCode || "",
-  //     defaTDP: formValue.defaTDP || "",
-  //     cdsldpid: formValue.cdsldpid || "",
-  //     cdslcltid: formValue.cdslcltid || "",
-  //     cmbpiD_ID: formValue.cmbpiD_ID || "",
-  //     nsdldpid: formValue.nsdldpid || "",
-  //     nsdlcltid: formValue.nsdlcltid || "",
-  //     diviPayMode: "02",
-
-  //   };
-
-  //   // Ensure full 5 rows mapping
-  //   formValue.bankDetails.forEach((bank: any, index: number) => {
-
-  //     const idx = index === 0 ? "" : index + 1;
-
-  //     // Detect if row has actual data
-  //     const rowHasData =
-  //       bank.ifsc ||
-  //       bank.bankName ||
-  //       bank.accountNumber
-
-  //     if (!rowHasData) {
-  //       // Empty row → send blank fields
-  //       payload[`neftCode${idx}`] = "";
-  //       payload[`accNo${idx}`] = "";
-  //       payload[`acctype${idx}`] = "";
-  //       payload[`bankName${idx}`] = "";
-  //       payload[`bankBranch${idx}`] = "";
-  //       payload[`mcirnO${idx}`] = "";
-  //       payload[`bank${idx}Default`] = 0;
-  //       return;
-  //     }
-
-  //     // Filled row → send actual values
-  //     payload[`neftCode${idx}`] = bank.ifsc || "";
-  //     payload[`accNo${idx}`] = bank.accountNumber || "";
-  //     payload[`acctype${idx}`] = bank.accountType || "";
-  //     payload[`bankName${idx}`] = bank.bankName || "";
-  //     payload[`bankBranch${idx}`] = bank.bankBranch || "";
-  //     payload[`mcirnO${idx}`] = bank.micr || "";
-  //     payload[`bank${idx}Default`] = bank.isDefault ? 1 : 0;
-  //   });
-
-  //   return payload;
-  // }
-
 
   mapFormToPayload() {
     const formValue = this.bankForm.getRawValue(); // Use getRawValue to get disabled fields too
@@ -2706,9 +2138,7 @@ export class DepoBankDetail {
 
   // Helper method to update default bank on server
   updateDefaultBankOnServer(index: number) {
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    const bseClieCode = parsedData?.bseClientCode || '';
+    const bseClieCode = this.resolveClientID() || '';
 
     if (bseClieCode && this.savedBankEntries.length > 0) {
       // Set the specified index as default

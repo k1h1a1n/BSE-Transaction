@@ -988,10 +988,10 @@
                 <i class="pi pi-angle-left" pButtonIcon></i>
                 <span pButtonLabel>Back</span>
             </button>
-            <button pButton class="Blue_FilledBtn ms-1" *ngIf="!isEdit" (click)="goToNextTab()" [disabled]="isLoading">
+            <button pButton class="Blue_FilledBtn ms-1" *ngIf="!isEdit" (click)="saveDataAndContinue()" [disabled]="isLoading">
                 <span pButtonLabel>Save & Continue</span>
             </button>
-            <button pButton class="Blue_FilledBtn ms-1" *ngIf="isEdit" (click)="updateDataandContinue()"
+            <button pButton class="Blue_FilledBtn ms-1" *ngIf="isEdit" (click)="saveDataAndContinue(true)"
                 [disabled]="isLoading">
                 <span pButtonLabel>Update & Continue</span>
             </button>

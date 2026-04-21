@@ -170,11 +170,11 @@
         <i class="pi pi-angle-left" pButtonIcon></i>
         <span pButtonLabel>Back</span>
     </button>
-    <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="!isEdit" (click)="submitData()"
+    <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="!isEdit" (click)="saveAddressAndContinue()"
         [disabled]="isLoading">
         <span pButtonLabel>Save & Continue</span>
     </button>
-    <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="isEdit" (click)="updateDataAndContinue()"
+    <button type="button" pButton class="Blue_FilledBtn ms-1" *ngIf="isEdit" (click)="saveAddressAndContinue(true)"
         [disabled]="isLoading">
         <span pButtonLabel>Update & Continue</span>
     </button>

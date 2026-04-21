@@ -10,12 +10,12 @@ import { HandleError, HttpErrorHandler } from '../error-handlers/http-error-hand
   providedIn: 'root',
 })
 export class BseUCCRegister {
-  
+
 
   private mandateDetails: any = null;
   private isEdit: boolean = false;
   private selectedMember: any = null;
-   private handleError!: HandleError;
+  private handleError!: HandleError;
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -23,7 +23,7 @@ export class BseUCCRegister {
 
   constructor(
     private http: HttpClient, private httpErrorHandler: HttpErrorHandler) {
-       this.handleError = httpErrorHandler.createHandleError('BseUCCRegister');
+    this.handleError = httpErrorHandler.createHandleError('BseUCCRegister');
   }
 
   getUccMemberDetails(): Observable<any> {
@@ -32,26 +32,26 @@ export class BseUCCRegister {
       this.httpOptions
     ).pipe(catchError(this.handleError('getUccMemberDetails', [])));
   }
-  
+
   getUccNomineeData(input: uccNomineeDetails): Observable<any> {
 
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/NomineeDetails`, input, this.httpOptions)
-    .pipe( catchError(this.handleError('getUccNomineeData', [])
-     )
-  );
-   
+      .pipe(catchError(this.handleError('getUccNomineeData', [])
+      )
+      );
+
   }
 
   getUccRegisterData(input: UccMemberInfo): Observable<any> {
 
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/RegisterDetails`, input, this.httpOptions)
-       .pipe( catchError(this.handleError('getUccRegisterData', [])
-     )
-  );
+      .pipe(catchError(this.handleError('getUccRegisterData', [])
+      )
+      );
   }
 
 
-   getUccAddressContData(input: UccAddressDetails): Observable<any> {
+  getUccAddressContData(input: UccAddressDetails): Observable<any> {
 
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/ContactDetails`, input, this.httpOptions)
       .pipe(
@@ -90,7 +90,7 @@ export class BseUCCRegister {
       );
   }
 
-    getPartUcc(input: getParticularUcc): Observable<any> {
+  getPartUcc(input: getParticularUcc): Observable<any> {
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/GetParticularUcc`, input, this.httpOptions)
       .pipe(
         catchError(this.handleError('getPartUcc', []))
@@ -135,7 +135,7 @@ export class BseUCCRegister {
   getIsEdit() {
     return this.isEdit;
   }
-  
+
   setMandateDetails(details: any) {
     this.mandateDetails = details;
   }
@@ -164,8 +164,8 @@ export class BseUCCRegister {
         catchError(this.handleError('getSavedDetails', []))
       );
   }
-  
-    getFullValidatedResponse(input: BseGetSaveDetails): Observable<any> {
+
+  getFullValidatedResponse(input: BseGetSaveDetails): Observable<any> {
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/GetFullValidatedResponse`, input, this.httpOptions)
       .pipe(
         catchError(this.handleError('getFullValidatedResponse', []))
@@ -273,7 +273,7 @@ export class BseUCCRegister {
         catchError(this.handleError('checkOrderPlacedBulk', []))
       );
   }
-  
+
   getDeleteClient(input: DeleteClientRequest): Observable<any> {
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/DeleteClients`, input, this.httpOptions)
       .pipe(
@@ -289,7 +289,7 @@ export class BseUCCRegister {
   }
 
 
-    getGroupIdByMembId(): Observable<any> {
+  getGroupIdByMembId(): Observable<any> {
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/GetGroupIdByMembId`, this.httpOptions)
       .pipe(
         catchError(this.handleError('getGroupIdByMembId', []))
@@ -297,7 +297,7 @@ export class BseUCCRegister {
   }
 
 
-      getElogLink(input: UccElogRequest): Observable<any> {
+  getElogLink(input: UccElogRequest): Observable<any> {
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/ElogAuthentication`, input, this.httpOptions)
       .pipe(
         catchError(this.handleError('getElogLink', []))
@@ -305,7 +305,7 @@ export class BseUCCRegister {
   }
 
 
-        getNomineeLink(input: UccNominationLinkRequest): Observable<any> {
+  getNomineeLink(input: UccNominationLinkRequest): Observable<any> {
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/NomineeAuthentication`, input, this.httpOptions)
       .pipe(
         catchError(this.handleError('getNomineeLink', []))
@@ -313,7 +313,7 @@ export class BseUCCRegister {
   }
 
 
-   getFullValidresWithNomination(input: validDatawithNomineeopt): Observable<any> {
+  getFullValidresWithNomination(input: validDatawithNomineeopt): Observable<any> {
     return this.http.post<any>(`${SharedEnv.uccUrl}/SBUccOnboardingApp/GetFullValidatedResponseWithNomination`, input, this.httpOptions)
       .pipe(
         catchError(this.handleError('getFullValidresWithNomination', []))

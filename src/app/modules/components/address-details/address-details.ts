@@ -9,15 +9,13 @@ import { Router } from '@angular/router';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { Location } from '@angular/common';
-import { BseUccEditDetails, UccAddressDetails } from '../../models/bseUCCModel';
+import { UccAddressDetails } from '../../models/bseUCCModel';
 import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
 import { Shared } from '../../../shared/services/shared';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { trigger, state, style, transition, animate } from '@angular/animations';
 import { STATE_LIST } from '../bse-registerinvestors/bse-registerinvestors.constants';
 import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
 
@@ -29,7 +27,7 @@ import { UCCTabsFacade } from '../store/facade/ucctabs.facade';
   styleUrl: './address-details.scss',
   animations: []
 })
-export class AddressDetails  {
+export class AddressDetails {
   isLoading: boolean = false;
 
   @Output() nextTab = new EventEmitter<any>();
@@ -47,7 +45,7 @@ export class AddressDetails  {
 
   countryList = COUNTRY_LIST;
 
-  constructor(private fb: FormBuilder, private bseUccReg: BseUCCRegister, private router: Router, private sharedSer: Shared, private location: Location,) { }
+  constructor(private fb: FormBuilder, private bseUccReg: BseUCCRegister, private router: Router, private sharedSer: Shared) { }
 
 
   ngOnInit() {
@@ -108,13 +106,8 @@ export class AddressDetails  {
 
   goBack() {
     this.nextTab.emit({
-      index: 0,
-      state: {}
+      index: 0
     });
-  }
-
-  navToDepoBankDetail() {
-    this.router.navigate(['/app/depoBankDetails'])
   }
 
   onEditMode() {
@@ -182,7 +175,7 @@ export class AddressDetails  {
     };
   }
 
-  submitData() {
+  saveAddressAndContinue(isEditMode: boolean = this.isEdit) {
     if (this.addressForm.invalid) {
       this.addressForm.markAllAsTouched();
       const invalidControls = Object.keys(this.addressForm.controls)
@@ -193,12 +186,20 @@ export class AddressDetails  {
 
     const rawFormValue = this.addressForm.getRawValue();
     const input: UccAddressDetails = this.mapFormToUccAddressDetails(rawFormValue);
+
+    if (isEditMode) {
+      console.log('Edit mode: skipping address API and moving to next tab. Input:', JSON.stringify(input, null, 2));
+      this.nextTab.emit({
+        index: 2
+      });
+      return;
+    }
+
     console.log('✅ Address Save Input JSON:', JSON.stringify(input, null, 2));
 
     // TODO: Uncomment API call when validations are confirmed
     this.nextTab.emit({
-      index: 2,
-      state: {}
+      index: 2
     });
 
     // API call commented out - uncomment when ready
@@ -239,63 +240,5 @@ export class AddressDetails  {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/\D/g, '');
     this.addressForm.get(controlName)?.setValue(input.value, { emitEvent: false });
-  }
-
-  updateDataAndContinue() {
-    if (this.addressForm.invalid) {
-      this.addressForm.markAllAsTouched();
-      const invalidControls = Object.keys(this.addressForm.controls)
-        .filter(key => this.addressForm.get(key)?.invalid);
-      console.warn('Address form invalid. Invalid controls:', invalidControls);
-      return;
-    }
-
-    const rawFormValue = this.addressForm.getRawValue();
-    const input: UccAddressDetails = this.mapFormToUccAddressDetails(rawFormValue);
-    console.log('✅ Address Update Input JSON:', JSON.stringify(input, null, 2));
-
-    // TODO: Uncomment API call when validations are confirmed
-    this.nextTab.emit({
-      index: 2,
-      state: {}
-    });
-
-    // API call commented out - uncomment when ready
-    // if (this.addressForm.invalid) {
-    //   this.addressForm.markAllAsTouched();
-    //   const invalidControls = Object.keys(this.addressForm.controls)
-    //     .filter(key => this.addressForm.get(key)?.invalid);
-    //   console.warn('Address form invalid on submit. Invalid controls:', invalidControls);
-    //   return;
-    // }
-    // this.isLoading = true;
-    // this.bseUccReg.getUccAddressContData(input).subscribe({
-    //   next: (response: { success: boolean; message: string }) => {
-    //     console.log('API Response:', response);
-    //     this.isLoading = false;
-    //     if (response.success) {
-    //       this.sharedSer.successDia(response.message).subscribe((result: any) => {
-    //         if (result) {
-    //           this.nextTab.emit({
-    //             index: 2,
-    //             state: {
-    //               isUpdateKYC: true,
-    //               MembID: input.MembID || null,
-    //               clieCode: input.clieCode || ''
-    //             }
-    //           });
-    //         }
-    //       });
-    //     } else {
-    //       this.isLoading = false;
-    //       this.sharedSer.OpenAlert('Failed to save address details.');
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.isLoading = false;
-    //     console.error('Registration Edit Error:', err);
-    //     this.sharedSer.OpenAlert('Something went wrong while saving address details.');
-    //   }
-    // });
   }
 }

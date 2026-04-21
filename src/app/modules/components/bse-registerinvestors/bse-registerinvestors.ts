@@ -276,10 +276,6 @@ export class BseRegisterinvestors {
 
   }
 
-  goToNextTab() {
-    this.submitDataandContinue();
-  }
-
   splitFullName(fullName: any) {
     const parts = fullName.trim().split(/\s+/); // split by spaces
 
@@ -342,7 +338,6 @@ export class BseRegisterinvestors {
         this.memberID = ucc.MembID;
         console.log(ucc, this.memberID, 'edit data from store and memberId');
         console.log(ucc.cliecode, 'edited clie code');
-        localStorage.setItem('editedBseClientCode', ucc.cliecode);
 
         const nameParts = this.splitFullName(ucc.fullname);
 
@@ -563,14 +558,6 @@ export class BseRegisterinvestors {
     }
   }
 
-
-  onSubmit(): void {
-    if (this.registrationForm.valid) {
-      console.log('KYC Details:', this.registrationForm.value);
-    } else {
-      this.registrationForm.markAllAsTouched();
-    }
-  }
 
   minimumAgeValidator(minAge: number) {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -817,58 +804,51 @@ export class BseRegisterinvestors {
   formatDateForInput(dob: string): string | null {
     if (!dob) return null;
 
-    // Handle format like "17/11/1981"
+    const raw = dob.trim();
+    const datePart = raw.split(' ')[0];
 
-    const datePart = dob.split(' ')[0];
-    const parts = datePart.split(/[-\/]/); // Matches "-" OR "/"
+    // Edit API format: 1999-01-07
+    if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+      return datePart;
+    }
+
+    // Member API may send: 9/19/1992 12:00:00 AM (or similar)
+    const parts = datePart.split(/[-\/]/).map(p => p.trim());
     if (parts.length === 3) {
-      // Parts could be in DD/MM/YYYY or MM/DD/YYYY depending on source.
-      const p1 = parts[0].trim();
-      const p2 = parts[1].trim();
-      const p3 = parts[2].trim();
-
-      // Try to detect ordering. If first part > 12 it's definitely day-first (DD/MM/YYYY).
-      let day = '';
-      let month = '';
+      const [p1, p2, p3] = parts;
       let year = '';
+      let month = '';
+      let day = '';
 
-      if (Number(p1) > 12) {
-        day = p1;
+      if (p1.length === 4) {
+        // Year-first: YYYY/MM/DD or YYYY-MM-DD
+        year = p1;
         month = p2;
+        day = p3;
+      } else if (p3.length === 4) {
+        // Day-first or month-first with year at end
         year = p3;
-      } else if (Number(p2) > 12) {
-        // second part > 12 => first is month
-        month = p1;
-        day = p2;
-        year = p3;
-      } else {
-        // Ambiguous (both <= 12). Try both constructions and pick the valid one.
-        const tryMonthFirst = new Date(`${p3}-${p1.padStart(2, '0')}-${p2.padStart(2, '0')}`);
-        const tryDayFirst = new Date(`${p3}-${p2.padStart(2, '0')}-${p1.padStart(2, '0')}`);
-
-        if (!isNaN(tryMonthFirst.getTime())) {
-          const tf = tryMonthFirst;
-          // ensure month and day match expected ranges (basic sanity)
-          month = p1;
-          day = p2;
-          year = p3;
-        } else if (!isNaN(tryDayFirst.getTime())) {
-          month = p2;
+        if (Number(p1) > 12) {
           day = p1;
-          year = p3;
+          month = p2;
         } else {
-          // Fallback: assume month-first
+          // Default to month-first for values like 9/19/1992
           month = p1;
           day = p2;
-          year = p3;
         }
       }
 
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // yyyy-MM-dd
+      if (year && month && day) {
+        const normalized = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        const parsedNormalized = new Date(normalized);
+        if (!isNaN(parsedNormalized.getTime())) {
+          return normalized;
+        }
+      }
     }
 
-    // If it's already a valid ISO string or Date, return as is
-    const parsed = new Date(dob);
+    // Fallback parser for any other valid date string
+    const parsed = new Date(raw);
     return !isNaN(parsed.getTime()) ? parsed.toISOString().split('T')[0] : null;
   }
 
@@ -989,87 +969,31 @@ export class BseRegisterinvestors {
     };
   }
 
-  submitDataandContinue() {
-    // console.log(this.registrationForm, 'registration form');
-
-    // if (this.registrationForm.invalid) {
-    //   Object.keys(this.registrationForm.controls).forEach(field => {
-    //     const control = this.registrationForm.get(field);
-    //     if (control?.invalid) {
-    //       console.log(field, control.errors);
-    //     }
-    //   });
-    //   this.registrationForm.markAllAsTouched();
-    //   return;
-    // }
-    // const rawFormValue = this.registrationForm.getRawValue();
-    // console.log(rawFormValue, 'raw form value before formatting dob');
-    // const input: UccRegisterMember = this.buildInput(rawFormValue);
-    // console.log(input, 'input of registration');
-    // return;
+  saveDataAndContinue(isEditMode: boolean = this.isEdit) {
+    if (this.registrationForm.invalid) {
+      this.registrationForm.markAllAsTouched();
+      const invalidControls = Object.keys(this.registrationForm.controls)
+        .filter(key => this.registrationForm.get(key)?.invalid);
+      console.warn('Registration form invalid. Invalid controls:', invalidControls);
+      return;
+    }
 
     // ✅ Build UccRegisterMember and save to NgRx store
     const rawFormValue = this.registrationForm.getRawValue();
+    console.log('Raw form value on save:', rawFormValue);
     const input: UccRegisterMember = this.buildInput(rawFormValue);
-    console.log('✅ UccRegisterMember input:', JSON.stringify(input, null, 2));
+    console.log(
+      `${isEditMode ? '✅ Edit Mode' : '✅ Add Mode'} UccRegisterMember input:`,
+      JSON.stringify(input, null, 2)
+    );
 
     this.uccTabsFacade.setRegistrationData(input);
     console.log(input, '✅ UccRegisterMember saved to NgRx store');
 
     this.nextTab.emit({
-      index: 1,
-      state: {
-
-      }
+      index: 1
     });
 
-    // localStorage.setItem('uccRegistrationData', JSON.stringify(rawFormValue));
-    // const selectedLookUpID = this.registrationForm?.controls['memberName']?.value;
-    // const selectedMemberId = (selectedLookUpID || '').toString();
-    // const selectedMember = this.memberList.find(member => member.LookUpID === selectedMemberId);
-
-    // const formValue = this.registrationForm.getRawValue();
-    // formValue.memberDetails = {
-    //   id: selectedMember?.LookUpID,
-    //   name: selectedMember?.LookUpDescription
-    // };
-
-    // const selectedTaxStatus = this.taxStatusList.find(
-    //   ts => ts.value === formValue.taxStatus
-    // );
-    // formValue.taxStatusDetails = {
-    //   value: selectedTaxStatus?.value,
-    //   label: selectedTaxStatus?.label
-    // };
-
-    // const selectedHoldingPattern = this.holdingPatternList.find(
-    //   pattern => pattern.value === formValue.holdingPattern
-    // );
-    // formValue.holdingPatternDetails = {
-    //   value: selectedHoldingPattern?.value,
-    //   label: selectedHoldingPattern?.label
-    // };
-
-    // localStorage.setItem('uccRegistrationData', JSON.stringify(formValue));
-    // console.log(rawFormValue, 'raw form value');
-
-
-    // const input: UccMemberInfo = this.mapFormToUccMemberInfo(rawFormValue);
-    // console.log(input, 'input of registration');
-
-    // if (this.isEdit && this.memberID) {
-    //   input.membID = Number(this.memberID);
-    // }
-    // console.log(this.memberID, 'memb id');
-    // console.log(input, 'edited input');
-
-    // const storedData = localStorage.getItem('uccRegistrationData');
-    // const parsedData = storedData ? JSON.parse(storedData) : null;
-
-    // const bseClieCode = parsedData?.bseClientCode || '';
-    // console.log('BSE Client Code:', bseClieCode);
-
-    // this.isLoading = true;
 
     // this.bseUCCService.getUccRegisterData(input).subscribe({
     //   next: (response: { success: boolean; message: string }) => {
@@ -1099,99 +1023,6 @@ export class BseRegisterinvestors {
     //     this.sharedService.OpenAlert('Something went wrong while saving registration details.');
     //   }
     // });
-  }
-
-  updateDataandContinue() {
-    console.log('method called');
-    console.log(this.registrationForm, 'registration form');
-
-    if (this.registrationForm.invalid) {
-      this.registrationForm.markAllAsTouched();
-      return;
-    }
-    console.log('method called');
-
-    const rawFormValue = this.registrationForm.getRawValue();
-    rawFormValue.dob = this.formatDateToYYYYMMDD(rawFormValue.dob);
-    console.log(rawFormValue, 'dob');
-
-    localStorage.setItem('uccRegistrationData', JSON.stringify(rawFormValue));
-    const selectedLookUpID = this.registrationForm?.controls['memberName']?.value;
-    const selectedMemberId = (selectedLookUpID || '').toString();
-    const selectedMember = this.memberList.find(member => member.LookUpID === selectedMemberId);
-
-    const formValue = this.registrationForm.getRawValue();
-    formValue.memberDetails = {
-      id: selectedMember?.LookUpID,
-      name: selectedMember?.LookUpDescription
-    };
-
-    const selectedTaxStatus = this.taxStatusList.find(
-      ts => ts.value === formValue.taxStatus
-    );
-    formValue.taxStatusDetails = {
-      value: selectedTaxStatus?.value,
-      label: selectedTaxStatus?.label
-    };
-
-    const selectedHoldingPattern = this.holdingPatternList.find(
-      pattern => pattern.value === formValue.holdingPattern
-    );
-    formValue.holdingPatternDetails = {
-      value: selectedHoldingPattern?.value,
-      label: selectedHoldingPattern?.label
-    };
-
-    localStorage.setItem('uccRegistrationData', JSON.stringify(formValue));
-    console.log(rawFormValue, 'raw form value');
-
-    const editedBseClientCode = localStorage.getItem('editedBseClientCode');
-    console.log(editedBseClientCode, 'edited BSE Client Code');
-
-    const input: UccMemberInfo = this.mapFormToUccMemberInfo(rawFormValue);
-    console.log(input, 'input of registration');
-
-    if (this.isEdit && this.memberID) {
-      input.membID = Number(this.memberID);
-      input.clieCode = editedBseClientCode || input.clieCode;
-    }
-    console.log(this.memberID, 'memb id');
-    console.log(input, 'edited input');
-
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    const bseClieCode = parsedData?.bseClientCode || '';
-
-    this.isLoading = true;
-
-    this.bseUCCService.getUccRegisterData(input).subscribe({
-      next: (response: { success: boolean; message: string }) => {
-        console.log('API Response:', response);
-        this.isLoading = false;
-        if (response.success) {
-          this.sharedService.successDia(response.message).subscribe(result => {
-            if (result) {
-              this.nextTab.emit({
-                index: 1,
-                state: {
-                  isUpdate: true,
-                  MembID: input.membID || null,
-                  clieCode: editedBseClientCode || bseClieCode || ''
-                }
-              });
-            }
-          });
-        } else {
-          this.isLoading = false;
-          this.sharedService.OpenAlert('Failed to save registration details.');
-        }
-      },
-      error: (err: any) => {
-        this.isLoading = false;
-        console.error('API Error:', err);
-        this.sharedService.OpenAlert('Something went wrong while saving registration details.');
-      }
-    });
   }
 
   goBack() {
