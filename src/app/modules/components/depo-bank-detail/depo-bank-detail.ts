@@ -9,7 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { BseUCCRegister } from '../../../shared/services/bse-uccregister';
 import { Router } from '@angular/router';
-import { distinctUntilChanged, skip, Subject, takeUntil } from 'rxjs';
+import { combineLatest, distinctUntilChanged, skip, Subject, takeUntil } from 'rxjs';
 import { BankDetailsModel, bseBankListApiInput, deleteBankData, uccBankDetails } from '../../models/bseUCCModel';
 import { MenuItem } from 'primeng/api';
 import { MatTableModule } from '@angular/material/table';
@@ -121,11 +121,11 @@ export class DepoBankDetail {
   currentClientBankList = [];
   isHide: boolean = true;
   UpdatedbankList: any = [];
-  isUpdate: boolean = false;
   memberIdFromUpdate: any;
   clieCodeFromUpdate: any;
   currentClientCode: string | null = null;
   currentMemberId: string | null = null;
+
 
   private destroy$ = new Subject<void>();
   private depositorySubscriptionsAdded = false;
@@ -138,30 +138,6 @@ export class DepoBankDetail {
 
   ) { }
 
-  //   ngOnChanges(changes: SimpleChanges): void {
-  //   // throw new Error('Method not implemented.');
-  //    if (changes['tabState'] && changes['tabState'].currentValue) {
-  //     console.log(
-  //       'Address Details received state:',
-  //       changes['tabState'].currentValue
-  //     );
-
-  //     const state = changes['tabState'].currentValue;
-  //     console.log(state, 'state');
-
-
-  //     this.isUpdate = state.isUpdateBank === true;
-  //     this.memberIdFromUpdate = state.MembID;
-  //     this.clieCodeFromUpdate = state.clieCode;
-  //     console.log('isUpdate in ngOnChanges:', this.isUpdate);
-
-  //   if (this.isUpdate) {
-  //     // this.getEditApiData(this.clieCodeFromUpdate);
-  //     this.getBankList(this.clieCodeFromUpdate);
-  //   }
-  //   }
-  // }
-
   ngOnInit() {
 
     this.breadcrumb_items = [
@@ -173,21 +149,32 @@ export class DepoBankDetail {
 
     this.home = { icon: 'pi pi-home', routerLink: '/' };
 
-    this.uccTabsFacade.isEditMode$
+    // ✅ Combined edit-mode + edit-data subscription
+    combineLatest([
+      this.uccTabsFacade.isEditMode$,
+      this.uccTabsFacade.editData$
+    ])
       .pipe(takeUntil(this.destroy$))
-      .subscribe((isEditMode) => {
+      .subscribe(([isEditMode, editData]) => {
         this.isEdit = isEditMode;
-      });
 
-    this.uccTabsFacade.editData$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((editData) => {
         if (!editData) {
           return;
         }
 
-        this.currentClientCode = editData.cliecode || editData.clieCode || this.currentClientCode;
-        this.currentMemberId = editData.MembID || editData.membID || this.currentMemberId;
+        const trim = (v: any) => (v ?? '').toString().trim();
+
+        this.currentClientCode = trim(editData.cliecode || editData.clieCode) || this.currentClientCode;
+        this.currentMemberId = trim(editData.MembID || editData.membID) || this.currentMemberId;
+
+        if (isEditMode) {
+          this.prefillFromEditData(editData);
+
+          // Fetch existing bank list from API for edit client code
+          if (this.currentClientCode) {
+            this.getBankList(this.currentClientCode);
+          }
+        }
       });
 
     this.uccTabsFacade.registrationData$
@@ -346,11 +333,6 @@ export class DepoBankDetail {
   }
 
   goToNextTab() {
-    const storedData = localStorage.getItem('uccRegistrationData');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    console.log(parsedData, ' parsed data');
-
-    const nomineeOpted = parsedData?.nominationOpted === 'Y';
 
     const hasAnyBank = (this.savedBankEntries?.length || 0) > 0 || (this.UpdatedbankList?.length || 0) > 0;
 
@@ -359,13 +341,9 @@ export class DepoBankDetail {
       return;
     }
 
-    if (!nomineeOpted) {
-      // this.sharedServ.OpenAlert('You have not opted for a nominee. Redirecting to Register List.');
-      this.router.navigate(['/app/registerdList']);
-      return;
-    }
-
-    this.nextTab.emit(4);
+    this.nextTab.emit({
+      index: 4
+    });
 
   }
 
@@ -648,6 +626,20 @@ export class DepoBankDetail {
 
     // Get current row data
     const bankData = { ...currentRow.value };
+
+    // ✅ Find next available slot (1-5) not occupied by any existing saved bank.
+    // savedBankEntries are loaded from getBankList() which now preserves bankIndex.
+    const usedSlots = new Set(
+      this.savedBankEntries
+        .map((b: any) => Number(b?.bankIndex))
+        .filter((n: number) => Number.isFinite(n) && n >= 1 && n <= 5)
+    );
+    const nextSlot = this.getNextAvailableBankSlot(usedSlots);
+    if (!nextSlot) {
+      this.sharedServ.OpenAlert('Maximum 5 bank details already saved. Please delete one before adding a new bank.');
+      return;
+    }
+    bankData.bankIndex = nextSlot;
 
     // If this bank is set as default, remove default from all other saved banks
     if (bankData.isDefault) {
@@ -1043,46 +1035,14 @@ export class DepoBankDetail {
     return true;
   }
 
-  private isDepoEditMode(): boolean {
-    return this.isEditBankDetail || this.isEditBankinNormalMode;
-  }
-
-  private logEditModeBankInputAndMoveNext(): void {
-    const formValue = this.bankForm.getRawValue();
-    const resolvedClientCode = this.resolveClientID() || '';
-    const input = {
-      ...formValue,
-      clieCode: resolvedClientCode,
-      bankDetails: this.savedBankEntries.length > 0 ? this.savedBankEntries : formValue.bankDetails
-    };
-
-    console.log('Edit mode: skipping bank API and moving to next tab. Input:', input);
-    this.nextTab.emit({
-      index: 4,
-      state: {}
-    });
-  }
-
-
-  submit_() {
-    this.nextTab.emit({
-      index: 4
-    });
-  }
-
 
   submit() {
-    if (this.isDepoEditMode()) {
-      this.logEditModeBankInputAndMoveNext();
+
+     // Check if at least one bank is added - only if no saved banks
+    if (this.savedBankEntries.length === 0 && this.UpdatedbankList.length === 0) {
+      this.sharedServ.OpenAlert('Please add at least one bank detail before submitting.');
       return;
     }
-
-    // Mark all form controls as touched to show validation errors
-    this.bankForm.markAllAsTouched();
-    this.bankFormArray.controls.forEach((control: any) => control.markAllAsTouched());
-
-    console.log(this.savedBankEntries.length, 'saved bank entries');
-    console.log(this.UpdatedbankList.length, 'updated bank list');
 
     // ✅ If user has at least one saved bank, skip all validation and proceed directly
     if (this.savedBankEntries.length > 0 || this.UpdatedbankList.length > 0) {
@@ -1091,125 +1051,7 @@ export class DepoBankDetail {
       return;
     }
 
-    // Validate main form (depository details) - only if no saved banks
-    if (this.bankForm.invalid) {
-      let errorMessages: string[] = [];
-
-      // Check Client Type
-      if (this.bankForm.get('clientType')?.hasError('required')) {
-        errorMessages.push('Client type is required');
-      }
-
-      // Check Dividend Payout
-      if (this.bankForm.get('dividendPayout')?.hasError('required')) {
-        errorMessages.push('Dividend payout mode is required');
-      }
-
-      // Check Depository Name
-      if (this.bankForm.get('defaTDP')?.hasError('required')) {
-        errorMessages.push('Depository name is required');
-      }
-
-      // Check demat fields based on client type
-      const clientType = this.bankForm.get('clientType')?.value;
-
-      if (clientType === 'D') {
-        const depository = this.bankForm.get('defaTDP')?.value;
-
-        if (depository === 'CDSL') {
-          if (this.bankForm.get('cdsldpid')?.hasError('required')) {
-            errorMessages.push('CDSL DP ID is required');
-          } else if (this.bankForm.get('cdsldpid')?.hasError('pattern')) {
-            errorMessages.push('CDSL DP ID must be 8 digits');
-          }
-
-          if (this.bankForm.get('cdslcltid')?.hasError('required')) {
-            errorMessages.push('CDSL Client ID is required');
-          } else if (this.bankForm.get('cdslcltid')?.hasError('pattern')) {
-            errorMessages.push('CDSL Client ID must be 8 digits');
-          }
-        } else if (depository === 'NSDL') {
-          if (this.bankForm.get('nsdldpid')?.hasError('required')) {
-            errorMessages.push('NSDL DP ID is required');
-          } else if (this.bankForm.get('nsdldpid')?.hasError('pattern')) {
-            errorMessages.push('NSDL DP ID must be in format IN123456');
-          }
-
-          if (this.bankForm.get('nsdlcltid')?.hasError('required')) {
-            errorMessages.push('NSDL Client ID is required');
-          } else if (this.bankForm.get('nsdlcltid')?.hasError('pattern')) {
-            errorMessages.push('NSDL Client ID must be 8 digits');
-          }
-
-          if (this.bankForm.get('cmbpiD_ID')?.hasError('required')) {
-            errorMessages.push('Combined ID is required');
-          } else if (this.bankForm.get('cmbpiD_ID')?.hasError('pattern')) {
-            errorMessages.push('Combined ID must be 16 digits');
-          }
-        }
-      }
-
-      if (errorMessages.length > 0) {
-        this.sharedServ.OpenAlert(errorMessages.join('\n'));
-        return;
-      }
-
-      this.sharedServ.OpenAlert('Please fill all required fields correctly.');
-      return;
-    }
-
-    // Validate bank form - only if no saved banks
-    if (!this.validateBankForm()) {
-      return;
-    }
-
-    // Check if at least one bank is added - only if no saved banks
-    if (this.savedBankEntries.length === 0 && this.UpdatedbankList.length === 0) {
-      this.sharedServ.OpenAlert('Please add at least one bank detail before submitting.');
-      return;
-    }
-
-    // Continue submitting
-    console.log("Form is valid", this.bankForm.value);
-
-    //   if (!this.validateDefaultSelection()) {
-    //   return;
-    // }
-    const mainData = { ...this.bankForm.value };
-    const bankData = [...this.bankFormArray.value];
-
-    console.log(mainData, bankData);
-
-    const bseClieCode = this.resolveClientID() || '';
-    console.log('BSE Client Code:', bseClieCode);
-    console.log('client code', bseClieCode);
-
-    const payload = this.mapFormToPayload();
-    payload.clieCode = bseClieCode;
-    console.log('Saving bank to API:', payload);
-    this.bseUccSer.getUccBankData(payload).subscribe({
-      next: (response: { success: boolean; message: string }) => {
-        console.log('Bank API Response:', response);
-
-        if (response.success) {
-          this.sharedServ.successDia(response.message).subscribe(result => {
-            if (result === true) {
-              this.getBankList(payload.clieCode);
-              // Clear all rows and reset to 1 empty row after successful save
-              this.resetBankFormArray();
-            }
-          }
-          )
-        }
-        else {
-          this.sharedServ.OpenAlert('Failed to save bank details.');
-        }
-      },
-      error: (err) => {
-        console.error('Bank API Error:', err);
-        this.sharedServ.OpenAlert('Something went wrong while saving bank details.');
-      }
-    });
+    
   }
 
   resetBankFormArray() {
@@ -1414,6 +1256,102 @@ export class DepoBankDetail {
     })
   }
 
+  /**
+   * Prefill the depository / dividend / client-type fields from the
+   * NgRx edit-mode payload (UCC client master record).
+   *
+   * Maps store fields → form controls:
+   *   ClieType    → clientType
+   *   DivPayMode  → dividendPayout
+   *   DefaTDP     → defaTDP   (PHYS / CDSL / NSDL)
+   *   CDSLDPID    → cdsldpid
+   *   CDSLCLTID   → cdslcltid
+   *   CMBPID_ID   → cmbpiD_ID
+   *   NSDLDPID    → nsdldpid
+   *   NSDLCLTID   → nsdlcltid
+   *
+   * Bank rows themselves are populated via getBankList() API,
+   * which is the authoritative source for NEFTCode/AccNo/etc.
+   */
+  private prefillFromEditData(editData: any) {
+    if (!editData || !this.bankForm) return;
+
+    const trim = (v: any) => (v ?? '').toString().trim();
+
+    const clientType = trim(editData.ClieType);
+    const dividendPayout = trim(editData.DivPayMode) || '02';
+    const defaTDP = trim(editData.DefaTDP);
+
+    this.bankForm.patchValue({
+      clientType: clientType,
+      dividendPayout: dividendPayout,
+      defaTDP: defaTDP,
+      cdsldpid: trim(editData.CDSLDPID),
+      cdslcltid: trim(editData.CDSLCLTID),
+      cmbpiD_ID: trim(editData.CMBPID_ID),
+      nsdldpid: trim(editData.NSDLDPID),
+      nsdlcltid: trim(editData.NSDLCLTID),
+    }, { emitEvent: false });
+
+    // Re-evaluate which depository fields should be enabled/disabled
+    // (clientType valueChanges is suppressed above with emitEvent:false)
+    if (clientType === 'P') {
+      this.disableDematFields();
+    } else {
+      this.enableDematFields();
+    }
+    this.togglePmsByClientType(clientType);
+    this.handleDepositoryLogic();
+
+    console.log('[DepoBankDetail] prefilled from store edit data:', this.bankForm.value);
+  }
+
+  /**
+   * Patch the client-level fields (clientType, dividend payout, depository IDs)
+   * from the getclientbankdetails API response. This is the authoritative
+   * source — overrides any earlier patch from the store edit-data.
+   *
+   * Maps API → form:
+   *   clieType    → clientType   (e.g. "P" / "D")
+   *   divPayMode  → dividendPayout (default "02")
+   *   defaTDP     → defaTDP       (PHYS / CDSL / NSDL — trimmed)
+   *   cdsldpid    → cdsldpid
+   *   cdslcltid   → cdslcltid
+   *   cmbpiD_ID   → cmbpiD_ID
+   *   nsdldpid    → nsdldpid
+   *   nsdlcltid   → nsdlcltid
+   */
+  private patchClientLevelFromBankApi(res: any) {
+    if (!res || !this.bankForm) return;
+
+    const trim = (v: any) => (v ?? '').toString().trim();
+
+    const clientType = trim(res.clieType);
+    const dividendPayout = trim(res.divPayMode) || '02';
+    const defaTDP = trim(res.defaTDP);
+
+    this.bankForm.patchValue({
+      clientType: clientType,
+      dividendPayout: dividendPayout,
+      defaTDP: defaTDP,
+      cdsldpid: trim(res.cdsldpid),
+      cdslcltid: trim(res.cdslcltid),
+      cmbpiD_ID: trim(res.cmbpiD_ID),
+      nsdldpid: trim(res.nsdldpid),
+      nsdlcltid: trim(res.nsdlcltid),
+    }, { emitEvent: false });
+
+    if (clientType === 'P') {
+      this.disableDematFields();
+    } else {
+      this.enableDematFields();
+    }
+    this.togglePmsByClientType(clientType);
+    this.handleDepositoryLogic();
+
+    console.log('[DepoBankDetail] patched client-level fields from bank API:', this.bankForm.value);
+  }
+
 
   isTabActive(tabIndex: number): boolean {
     return this.activeTab === tabIndex;
@@ -1421,21 +1359,8 @@ export class DepoBankDetail {
 
 
   get BseClientCode(): string | null {
-    if (this.currentClientCode) {
-      return this.currentClientCode;
-    }
-
-    const data = localStorage.getItem('uccRegistrationData');
-    if (data) {
-      try {
-        const parsed = JSON.parse(data);
-        return parsed?.bseClientCode || null;
-      } catch (e) {
-        console.error('Invalid JSON in localStorage:', e);
-      }
-    }
-
-    return null;
+    // ✅ Sourced from NgRx store via combineLatest in ngOnInit
+    return this.currentClientCode || null;
   }
 
 
@@ -1530,21 +1455,8 @@ export class DepoBankDetail {
 
 
   get getMembId(): string {
-    if (this.currentMemberId) {
-      return this.currentMemberId;
-    }
-
-    const data = localStorage.getItem('uccRegistrationData');
-    if (data) {
-      try {
-        const parsed = JSON.parse(data);
-        return parsed?.memberDetails?.id ?? '';
-      } catch (e) {
-        console.error('Invalid JSON in localStorage:', e);
-      }
-    }
-
-    return '';
+    // ✅ Sourced from NgRx store via combineLatest in ngOnInit
+    return this.currentMemberId || '';
   }
 
 
@@ -1823,13 +1735,34 @@ export class DepoBankDetail {
 
     // ------------------------------
     // CASE 1: Client Type = "P" (Physical)
-    // Map banks to slots 1-5 sequentially
+    // Place each bank in its tagged bankIndex (existing) or next free slot (new)
     // ------------------------------
     if (formValue.clientType === "P") {
-      filledRows.forEach((bank: any, i: number) => {
-        if (i >= 5) return; // Max 5 banks for Physical
-        const idx = i === 0 ? "" : i + 1;
+      const slotKey = (slot: number) => (slot === 1 ? "" : String(slot));
+      const usedSlots = new Set<number>();
 
+      filledRows.forEach((bank: any) => {
+        const slot = Number(bank?.bankIndex);
+        if (Number.isFinite(slot) && slot >= 1 && slot <= 5 && !usedSlots.has(slot)) {
+          const idx = slotKey(slot);
+          payload[`neftCode${idx}`] = bank.ifsc || "";
+          payload[`accNo${idx}`] = bank.accountNumber || "";
+          payload[`acctype${idx}`] = bank.accountType || "";
+          payload[`bankName${idx}`] = bank.bankName || "";
+          payload[`bankBranch${idx}`] = bank.bankBranch || "";
+          payload[`mcirnO${idx}`] = bank.micr || "";
+          payload[`bank${idx}Default`] = bank.isDefault ? 1 : 0;
+          usedSlots.add(slot);
+        }
+      });
+
+      filledRows.forEach((bank: any) => {
+        const slot = Number(bank?.bankIndex);
+        if (Number.isFinite(slot) && slot >= 1 && slot <= 5) return;
+
+        const nextSlot = this.getNextAvailableBankSlot(usedSlots);
+        if (!nextSlot) return;
+        const idx = slotKey(nextSlot);
         payload[`neftCode${idx}`] = bank.ifsc || "";
         payload[`accNo${idx}`] = bank.accountNumber || "";
         payload[`acctype${idx}`] = bank.accountType || "";
@@ -1837,6 +1770,7 @@ export class DepoBankDetail {
         payload[`bankBranch${idx}`] = bank.bankBranch || "";
         payload[`mcirnO${idx}`] = bank.micr || "";
         payload[`bank${idx}Default`] = bank.isDefault ? 1 : 0;
+        usedSlots.add(nextSlot);
       });
 
       return payload;
@@ -1873,6 +1807,17 @@ export class DepoBankDetail {
     }
 
     return payload;
+  }
+
+  /**
+   * Returns the next free bank slot index (1..5) not present in `usedSlots`.
+   * Returns null if all 5 slots are full.
+   */
+  private getNextAvailableBankSlot(usedSlots: Set<number>): number | null {
+    for (let i = 1; i <= 5; i++) {
+      if (!usedSlots.has(i)) return i;
+    }
+    return null;
   }
 
   mapFormToPayloadWithBanks(banksList: any[]) {
@@ -2081,7 +2026,8 @@ export class DepoBankDetail {
         this.UpdatedbankList = this.mapBankDetailsToArray(res);
         console.log('updated bank list', this.UpdatedbankList);
 
-        localStorage.setItem('getBankList', JSON.stringify(this.UpdatedbankList));
+        // ✅ Authoritative source: patch client-level fields from the API response
+        this.patchClientLevelFromBankApi(res);
 
         // Convert to savedBankEntries format for display
         this.savedBankEntries = this.UpdatedbankList.map((bank: any) => {
@@ -2092,6 +2038,8 @@ export class DepoBankDetail {
             bank.bankDefault === true;
 
           return {
+            // ✅ preserve original bank slot (1-5) so add/save reuses correct slot
+            bankIndex: bank.index,
             isDefault: isDefault,
             ifsc: bank.neftCode || '',
             bankName: bank.bankName || '',
@@ -2164,83 +2112,6 @@ export class DepoBankDetail {
         }
       });
     }
-  }
-
-  getBankListEdit(clieCode: string) {
-
-    if (!clieCode) {
-      console.warn('Client code is missing. Cannot fetch bank list.');
-      return;
-    }
-
-    const input: bseBankListApiInput = {
-      clientCode: clieCode
-    }
-    console.log('bank list input', input);
-
-    this.bseUccSer.getBseBankList(input).subscribe({
-      next: (res: any) => {
-        console.log('res of bank list', res);
-        const clieCode = res.clieCode?.trim() || '';
-        const membID = res.membID?.trim() || '';
-        console.log(clieCode, membID, 'clie code and memb id');
-
-        this.UpdatedbankList = this.mapBankDetailsToArray(res);
-        console.log('updated bank list', this.UpdatedbankList);
-
-        localStorage.setItem('getBankList', JSON.stringify(this.UpdatedbankList));
-
-        // Convert to savedBankEntries format for display
-        this.savedBankEntries = this.UpdatedbankList.map((bank: any) => {
-          // Handle various formats of bankDefault: "True", "1", 1, true
-          const isDefault = bank.bankDefault === 'True' ||
-            bank.bankDefault === '1' ||
-            bank.bankDefault === 1 ||
-            bank.bankDefault === true;
-
-          return {
-            isDefault: isDefault,
-            ifsc: bank.neftCode || '',
-            bankName: bank.bankName || '',
-            accountType: bank.acctype || '',
-            accountNumber: bank.accNo || '',
-            micr: bank.mcirno || '',
-            bankBranch: bank.bankBranch || ''
-          };
-        });
-
-        console.log('Converted savedBankEntries with defaults:', this.savedBankEntries.map((b, i) => ({ index: i, isDefault: b.isDefault })));
-
-        // Ensure only one default
-        const defaultIndices = this.savedBankEntries
-          .map((bank, index) => bank.isDefault ? index : -1)
-          .filter(index => index !== -1);
-
-        console.log('Default bank indices found:', defaultIndices);
-
-        if (defaultIndices.length === 0 && this.savedBankEntries.length > 0) {
-          // No default found, set first as default
-          this.savedBankEntries[0].isDefault = true;
-          console.log('No default found, setting first bank as default');
-
-          // Update default on server
-          this.updateDefaultBankOnServer(0);
-        } else if (defaultIndices.length > 1) {
-          // Multiple defaults found, keep only the first one
-          console.log('Multiple defaults found, keeping only the first one');
-          this.savedBankEntries.forEach((bank, index) => {
-            bank.isDefault = (index === defaultIndices[0]);
-          });
-        }
-
-        console.log('Final saved bank entries from API:', this.savedBankEntries);
-        this.convertBankJsonToList(this.UpdatedbankList);
-      },
-
-      error: (err: any) => {
-        console.error('Error fetching bank list', err);
-      }
-    })
   }
 
 }

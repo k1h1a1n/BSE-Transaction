@@ -484,11 +484,7 @@
         <span pButtonLabel>Back</span>
     </button>
     <button pButton class="Blue_FilledBtn ms-1" (click)="submit()" [disabled]="isLoading">
-        <span pButtonLabel>Save & Continue</span>
+        <span pButtonLabel>{{ isEdit ? 'Update & Continue' : 'Save & Continue' }}</span>
     </button>
-
-    <button class="btn btn-primary me-2"  *ngIf="isUpdate" [disabled]="isLoading">
-           Next
-        </button>
 
 </div>
