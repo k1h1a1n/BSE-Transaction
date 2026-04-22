@@ -16,8 +16,6 @@ import { Shared } from '../../../shared/services/shared';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { Location } from '@angular/common';
-import { UccTabs } from '../ucc-tabs/ucc-tabs';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { COUNTRY_CODE_LIST } from '../address-details/country-list';
 
@@ -412,7 +410,7 @@ export class NomineeDetail implements OnInit, OnDestroy {
   nomiIndexInEdit: any;
   @Output() nextTab = new EventEmitter<any>();
 
-  constructor(private fb: FormBuilder, private location: Location, private router: Router, private bseUccSer: BseUCCRegister, private sharedService: Shared) { }
+  constructor(private fb: FormBuilder, private router: Router, private bseUccSer: BseUCCRegister, private sharedService: Shared) { }
 
   ngOnInit(): void {
 
