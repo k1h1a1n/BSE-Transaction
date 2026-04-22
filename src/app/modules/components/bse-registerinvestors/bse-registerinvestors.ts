@@ -990,39 +990,33 @@ export class BseRegisterinvestors {
     this.uccTabsFacade.setRegistrationData(input);
     console.log(input, '✅ UccRegisterMember saved to NgRx store');
 
-    this.nextTab.emit({
-      index: 1
+    this.isLoading = true;
+    this.bseUCCService.getUccRegisterData(input as any).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('API Response:', response);
+        this.isLoading = false;
+        if (response?.success) {
+          this.sharedService.successDia(response.message).subscribe(result => {
+            if (result) {
+              this.nextTab.emit({
+                index: 1,
+                state: {
+                  isUpdate: isEditMode,
+                  clieCode: input.clieCode || ''
+                }
+              });
+            }
+          });
+        } else {
+          this.sharedService.OpenAlert(response?.message || 'Failed to save registration details.');
+        }
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('API Error:', err);
+        this.sharedService.OpenAlert('Something went wrong while saving registration details.');
+      }
     });
-
-
-    // this.bseUCCService.getUccRegisterData(input).subscribe({
-    //   next: (response: { success: boolean; message: string }) => {
-    //     console.log('API Response:', response);
-    //     this.isLoading = false;
-    //     if (response.success) {
-    //       this.sharedService.successDia(response.message).subscribe(result => {
-    //         if (result) { 
-    //           this.nextTab.emit({
-    //             index: 1,
-    //             state: {
-    //               isUpdate: false,
-    //               MembID: input.membID || null,
-    //               clieCode: bseClieCode || '',
-    //             }
-    //           });
-    //         }
-    //       });
-    //     } else {
-    //       this.isLoading = false;
-    //       this.sharedService.OpenAlert('Failed to save registration details.');
-    //     }
-    //   },
-    //   error: (err: any) => {
-    //     this.isLoading = false;
-    //     console.error('API Error:', err);
-    //     this.sharedService.OpenAlert('Something went wrong while saving registration details.');
-    //   }
-    // });
   }
 
   goBack() {

@@ -187,53 +187,38 @@ export class AddressDetails {
     const rawFormValue = this.addressForm.getRawValue();
     const input: UccAddressDetails = this.mapFormToUccAddressDetails(rawFormValue);
 
-    if (isEditMode) {
-      console.log('Edit mode: skipping address API and moving to next tab. Input:', JSON.stringify(input, null, 2));
-      this.nextTab.emit({
-        index: 2
-      });
-      return;
-    }
+    console.log(
+      `${isEditMode ? '✅ Edit Mode' : '✅ Add Mode'} Address Save Input JSON:`,
+      JSON.stringify(input, null, 2)
+    );
 
-    console.log('✅ Address Save Input JSON:', JSON.stringify(input, null, 2));
-
-    // TODO: Uncomment API call when validations are confirmed
-    this.nextTab.emit({
-      index: 2
+    this.isLoading = true;
+    this.bseUccReg.getUccAddressContData(input).subscribe({
+      next: (response: { success: boolean; message: string }) => {
+        console.log('Address API Response:', response);
+        this.isLoading = false;
+        if (response?.success) {
+          this.sharedSer.successDia(response.message).subscribe(result => {
+            if (result) {
+              this.nextTab.emit({
+                index: 2,
+                state: {
+                  isUpdate: isEditMode,
+                  clieCode: input.clieCode || ''
+                }
+              });
+            }
+          });
+        } else {
+          this.sharedSer.OpenAlert(response?.message || 'Failed to save address details.');
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Address API Error:', err);
+        this.sharedSer.OpenAlert('Something went wrong while saving address details.');
+      }
     });
-
-    // API call commented out - uncomment when ready
-    // if (this.addressForm.invalid) {
-    //   this.addressForm.markAllAsTouched();
-    //   const invalidControls = Object.keys(this.addressForm.controls)
-    //     .filter(key => this.addressForm.get(key)?.invalid);
-    //   console.warn('Address form invalid on submit. Invalid controls:', invalidControls);
-    //   return;
-    // }
-    // const bseClientCode = this.BseClientCode || '';
-    // rawFormValue.bseClientCode = bseClientCode;
-    // this.isLoading = true;
-    // this.bseUccReg.getUccAddressContData(input).subscribe({
-    //   next: (response: { success: boolean; message: string }) => {
-    //     console.log('API Response:', response);
-    //     this.isLoading = false;
-    //     if (response?.success === true) {
-    //       this.sharedSer.successDia(response?.message).subscribe(result => {
-    //         if (result === true) {
-    //           this.nextTab.emit({ index: 2 });
-    //         }
-    //       });
-    //     } else {
-    //       this.isLoading = false;
-    //       this.sharedSer.OpenAlert('Failed to save address details.');
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.isLoading = false;
-    //     console.error('Registration Edit Error:', err);
-    //     this.sharedSer.OpenAlert('Something went wrong while saving address details.');
-    //   }
-    // });
   }
 
   allowOnlyNumbers(event: any, controlName: string) {
