@@ -16,13 +16,12 @@ import { Router } from '@angular/router';
 @Injectable()
 
 export class HttpsInterceptor implements HttpInterceptor {
-    constructor(private router: Router) {}
-    
+    constructor(private router: Router) { }
+
     intercept(
         req: HttpRequest<any>,
         next: HttpHandler
     ): Observable<HttpEvent<any>> {
-
 
         const restrictedApis = [
             `/User/VerifyUser`, // Replace with the actual endpoint
@@ -30,10 +29,10 @@ export class HttpsInterceptor implements HttpInterceptor {
             `/Login/LoginData`
         ];
         const restrictedReqBodyApis = [
-            `/SBUccOnboardingApp/LookupGroupsOrMembers`
+            `/SBUccOnboardingApp/LookupGroupsOrMembers`,
         ];
 
-        const restrictedGroupIDByMemberApis =[
+        const restrictedGroupIDByMemberApis = [
             `/SBUccOnboardingApp/GetGroupIdByMembId`
         ];
 
@@ -68,12 +67,12 @@ export class HttpsInterceptor implements HttpInterceptor {
             `/SBUccOnboardingApp/SubmitMandateToBSE`,
             `/SBUccOnboardingApp/DownloadMandatePDF`,
             `/SBUccOnboardingApp/UploadSignedMandate`,
-          
-            
+
+
         ];
 
         const restrictedSideMenuUrl = [
-         `/menu/side-menu`
+            `/menu/side-menu`
         ];
 
         const restrictedUcclistingApis = [
@@ -81,22 +80,20 @@ export class HttpsInterceptor implements HttpInterceptor {
         ];
 
         // Try to get IFAID from router state first (from SSO navigation), then localStorage, then SharedEnv
-        const routerState = this.router.getCurrentNavigation()?.extras?.state;
-        const ifaidFromState = routerState?.['IFAID'];
-        const ifaEmailFromState = routerState?.['IFAEmailId'];
-        
-        var IFADBNameDBKey = localStorage.getItem("IFADBNameDBKey") || `${SharedEnv.IFAKey}`;
-        // var GrouID = localStorage.getItem("GrouID") || `${SharedEnv.GrouID}`;
-       
-        var IFAID = ifaidFromState || localStorage.getItem("IFAID") || `${SharedEnv.IFAID}`;
-        var IFAEmailId = ifaEmailFromState || localStorage.getItem("IFAEmailId") || `${SharedEnv.IFAEmailId}`;
-        // console.warn('HttpsInterceptor');
-        var membID = localStorage.getItem("selectedGroupID") || `${SharedEnv.GrouID}`;
-        var GrouID = localStorage.getItem("resSelectedGroupID") || `${SharedEnv.GrouID}`;
-      console.log(IFADBNameDBKey, membID,GrouID, IFAID, IFAEmailId, 'ifadbnamedbkey', 'membID','GrouID','IFAID', 'IFAEmailId');
-      console.log('Router state IFAID:', ifaidFromState, 'localStorage IFAID:', localStorage.getItem("IFAID"), 'Final IFAID:', IFAID);
+        // const routerState = this.router.getCurrentNavigation()?.extras?.state;
+        // const ifaidFromState = routerState?.['IFAID'];
+        // const ifaEmailFromState = routerState?.['IFAEmailId'];
 
-        if (req.body) {
+        var IFADBNameDBKey : string = localStorage.getItem("IFAKey") || '';
+        // var GrouID = localStorage.getItem("GrouID") || `${SharedEnv.GrouID}`;
+
+        var IFAID : string = localStorage.getItem("IFAID") || '';
+        var IFAEmailId : string = localStorage.getItem("IFAEmailId") || '';
+        // console.warn('HttpsInterceptor');
+        var membID = localStorage.getItem("selectedGroupID") || '';
+        var GrouID = localStorage.getItem("resSelectedGroupID") || '';
+
+        if (req.body ) {
             // Append addition property
             var addParam;
 
@@ -104,10 +101,10 @@ export class HttpsInterceptor implements HttpInterceptor {
             //   const isRestrictedApi = restrictedApis.some(api => req.url.includes(api));
             if (req.body instanceof FormData) {
                 // if (!isRestrictedApi) {
-                req.body.append("IFAID", IFAID || `${SharedEnv.IFAID}`);
-                req.body.append("IFAKey", IFADBNameDBKey || `${SharedEnv.IFAKey}`);
-                req.body.append("GrouID", GrouID || `${SharedEnv.GrouID}`);
-                req.body.append("IsWMPRO", `${SharedEnv.IsWMPRO}`);
+                req.body.append("IFAID", IFAID);
+                req.body.append("IFAKey", IFADBNameDBKey);
+                req.body.append("GrouID", GrouID);
+                req.body.append("IsWMPRO" , `${SharedEnv.IsWMPRO}`);
                 console.log('FormData appended with IFAID:', IFAID, req.body);
 
                 // }
@@ -120,22 +117,17 @@ export class HttpsInterceptor implements HttpInterceptor {
 
 
             } else {
-                console.log('Request body before adding params:', req.body);
-
                 addParam = req.clone({
                     // params: req.params.set('sessionid', `${SharedEnv.IFAID}`),
                     url: req.url.replace('http://', 'http://'),
-                    body: { ...req.body, IFAID: IFAID || `${SharedEnv.IFAID}`, GroupID: GrouID || `${SharedEnv.GrouID}`, GrouID: GrouID || `${SharedEnv.GrouID}`, IsWMPRO: `${SharedEnv.IsWMPRO}`, IFAKey: IFADBNameDBKey },
+                    body: { ...req.body, IFAID: IFAID, GroupID: GrouID, GrouID: GrouID, IsWMPRO: `${SharedEnv.IsWMPRO}`, IFAKey: IFADBNameDBKey },
                 });
-                
-                console.log('Final request body with IFAID:', addParam.body);
-
                 const isRestrictedIFAEmailID = restrictedApis.some(api => req.url.includes(api));
                 const isrestrictedReqBodyApis = restrictedReqBodyApis.some(api => req.url.includes(api));
                 const isrestrictedGroupIDapis = restrictedGroupIDapis.some(api => req.url.includes(api));
-                 const isrestrictedGroupIDByMemberApis = restrictedGroupIDByMemberApis.some(api => req.url.includes(api));
-                 const isrestrictedSideMenuUrl = restrictedSideMenuUrl.some(api => req.url.includes(api));
-                    const isrestrictedUcclistingApis = restrictedUcclistingApis.some(api => req.url.includes(api));
+                const isrestrictedGroupIDByMemberApis = restrictedGroupIDByMemberApis.some(api => req.url.includes(api));
+                const isrestrictedSideMenuUrl = restrictedSideMenuUrl.some(api => req.url.includes(api));
+                const isrestrictedUcclistingApis = restrictedUcclistingApis.some(api => req.url.includes(api));
                 if (isRestrictedIFAEmailID) {
                     // Append additional fields to the body
                     addParam = addParam.clone({
@@ -154,49 +146,43 @@ export class HttpsInterceptor implements HttpInterceptor {
                 if (isrestrictedReqBodyApis) {
                     addParam = addParam.clone({
                         body: {
-                            // loginId: IFAEmailId
-                            isGroup: 0,
-                            searchStr: "",
-                            groupId: 0,
-                            isGroupCode: 0,
-                            isFolio: 0,
                             IFAKey: IFADBNameDBKey
                         }
                     });
                     console.warn('Restricted req body API - clearing body:', SharedEnv.IFAEmailId);
                 }
 
-               if(isrestrictedGroupIDByMemberApis){
-                         addParam = addParam.clone({
-                         body: {
-                          membID : membID
-                          }
+                if (isrestrictedGroupIDByMemberApis) {
+                    addParam = addParam.clone({
+                        body: {
+                            membID: membID
+                        }
                     });
 
-               }
+                }
 
-              if(isrestrictedSideMenuUrl){
-                     addParam = addParam.clone({
+                if (isrestrictedSideMenuUrl) {
+                    addParam = addParam.clone({
                         body: {
-                        
+
                             roleId: 1,
                             userId: 1,
-                             userName: IFAEmailId
+                            userName: IFAEmailId
 
                         }
                     });
-                    console.log('Restricted SideMenu Url:' , isrestrictedSideMenuUrl);
-              }
+                    console.log('Restricted SideMenu Url:', isrestrictedSideMenuUrl);
+                }
 
-            if(isrestrictedUcclistingApis){ 
-                addParam = addParam.clone({
-                    body:{
-                        GrouID : '',
-                        GroupID :'',
-                        IFAKey:  IFADBNameDBKey
-                    }
-                });
-            }
+                if (isrestrictedUcclistingApis) {
+                    addParam = addParam.clone({
+                        body: {
+                            GrouID: '',
+                            GroupID: '',
+                            IFAKey: IFADBNameDBKey
+                        }
+                    });
+                }
 
                 // if (isrestrictedGroupIDapis) {
                 //     addParam = addParam.clone({
@@ -211,7 +197,7 @@ export class HttpsInterceptor implements HttpInterceptor {
                 //     console.warn('Restricted GroupID API - setting GroupID:');
                 // }
 
-                
+
 
             }
             // params: sessionid is dummy currently not in use
@@ -244,8 +230,6 @@ export class HttpsInterceptor implements HttpInterceptor {
             );
         }
     }
-
-
 }
 
 // import { Injectable } from '@angular/core';

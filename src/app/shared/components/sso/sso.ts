@@ -38,7 +38,7 @@ export class Sso implements OnDestroy {
   }
 
  
-// http://bsetransactionang.imagicuat.in/#/sso?PageURL=app/Registerlist&UserName=tejas.gawde@datacomp.in&UserID=1&IFAID=RJYvPoURzxtufN4kwyb9dg==&IFAKey=MAvh9CEWMwNZ5JEbThW5Isl1/Gq8RbHygOUFgg9dnyk=
+// http://bsetransactionang.imagicuat.in/#/sso?PageURL=app/Registerlist&UserName=tejas.gawde@datacomp.in&UserID=1&IFAID=RJYvPoURzxtufN4kwyb9dg==&IFAKey=ocevM71Mb+iJMng/1p8iEwH8HKmPczdGiVjcaCxTpGc=
 
 ngOnInit(): void {
   console.log(' sso comp called');
